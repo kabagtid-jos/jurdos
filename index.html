@@ -403,7 +403,7 @@
                                 <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
                                     <div class="flex justify-between items-center mb-4">
                                         <h4 class="font-semibold text-gray-700">Program Studi</h4>
-                                        <button class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
+                                        <button onclick="openMasterModal('prodi')" class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
                                             <i class="fas fa-plus"></i> Tambah
                                         </button>
                                     </div>
@@ -416,7 +416,7 @@
                                 <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
                                     <div class="flex justify-between items-center mb-4">
                                         <h4 class="font-semibold text-gray-700">Metode Perkuliahan</h4>
-                                        <button class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
+                                        <button onclick="openMasterModal('metode')" class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
                                             <i class="fas fa-plus"></i> Tambah
                                         </button>
                                     </div>
@@ -431,7 +431,7 @@
                                         <h4 class="font-semibold text-gray-700">Mata Kuliah</h4>
                                         <div class="flex gap-2">
                                             <input type="text" placeholder="Cari mata kuliah..." class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary w-full md:w-auto">
-                                            <button class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1 whitespace-nowrap">
+                                            <button onclick="openMasterModal('matakuliah')" class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1 whitespace-nowrap">
                                                 <i class="fas fa-plus"></i> Tambah
                                             </button>
                                         </div>
@@ -463,6 +463,55 @@
                 </div>
 
             </main>
+        </div>
+    </div>
+
+    <!-- MODAL MASTER DATA -->
+    <div id="masterModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-gray-900 bg-opacity-50 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl w-11/12 max-w-md overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 id="masterModalTitle" class="text-lg font-bold text-gray-800">Tambah Data</h3>
+                <button onclick="closeMasterModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="formMasterData" onsubmit="saveMasterData(event)">
+                    <input type="hidden" id="md-type">
+                    
+                    <!-- Field: Kode (Only for MK) -->
+                    <div id="wrap-md-kode" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Kode</label>
+                        <input type="text" id="md-kode" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                    </div>
+
+                    <!-- Field: Nama -->
+                    <div id="wrap-md-nama" class="mb-4">
+                        <label id="label-md-nama" class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                        <input type="text" id="md-nama" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary" required>
+                    </div>
+
+                    <!-- Field: SKS (Only for MK) -->
+                    <div id="wrap-md-sks" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">SKS</label>
+                        <input type="number" id="md-sks" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                    </div>
+
+                    <!-- Field: Prodi (Only for MK) -->
+                    <div id="wrap-md-prodi" class="mb-6 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Program Studi</label>
+                        <select id="md-prodi" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                        </select>
+                    </div>
+
+                    <div class="flex gap-3 justify-end mt-6">
+                        <button type="button" onclick="closeMasterModal()" class="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition">Batal</button>
+                        <button type="submit" id="btnSaveMaster" class="px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-primary hover:bg-blue-700 shadow-md transition flex items-center gap-2">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -905,6 +954,131 @@
             } else {
                 sidebar.classList.add('-translate-x-full');
                 overlay.classList.add('hidden');
+            }
+        }
+
+        // --- FUNGSI MASTER DATA ---
+        function openMasterModal(type) {
+            document.getElementById('md-type').value = type;
+            const modal = document.getElementById('masterModal');
+            const title = document.getElementById('masterModalTitle');
+            const labelNama = document.getElementById('label-md-nama');
+            
+            document.getElementById('formMasterData').reset();
+
+            const wrapKode = document.getElementById('wrap-md-kode');
+            const wrapSks = document.getElementById('wrap-md-sks');
+            const wrapProdi = document.getElementById('wrap-md-prodi');
+
+            if (type === 'prodi') {
+                title.innerText = 'Tambah Program Studi';
+                labelNama.innerText = 'Nama Program Studi';
+                wrapKode.classList.add('hidden');
+                wrapSks.classList.add('hidden');
+                wrapProdi.classList.add('hidden');
+                document.getElementById('md-kode').required = false;
+                document.getElementById('md-sks').required = false;
+                document.getElementById('md-prodi').required = false;
+            } else if (type === 'metode') {
+                title.innerText = 'Tambah Metode Perkuliahan';
+                labelNama.innerText = 'Nama Metode';
+                wrapKode.classList.add('hidden');
+                wrapSks.classList.add('hidden');
+                wrapProdi.classList.add('hidden');
+                document.getElementById('md-kode').required = false;
+                document.getElementById('md-sks').required = false;
+                document.getElementById('md-prodi').required = false;
+            } else if (type === 'matakuliah') {
+                title.innerText = 'Tambah Mata Kuliah';
+                labelNama.innerText = 'Nama Mata Kuliah';
+                wrapKode.classList.remove('hidden');
+                wrapSks.classList.remove('hidden');
+                wrapProdi.classList.remove('hidden');
+                
+                document.getElementById('md-kode').required = true;
+                document.getElementById('md-sks').required = true;
+                document.getElementById('md-prodi').required = true;
+
+                const selectProdi = document.getElementById('md-prodi');
+                selectProdi.innerHTML = '<option value="" disabled selected>Pilih Program Studi...</option>';
+                appData.prodi.forEach(p => {
+                    const nama = p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'];
+                    if (nama) selectProdi.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeMasterModal() {
+            document.getElementById('masterModal').classList.add('hidden');
+        }
+
+        function saveMasterData(e) {
+            e.preventDefault();
+            const type = document.getElementById('md-type').value;
+            const btn = document.getElementById('btnSaveMaster');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
+            btn.disabled = true;
+
+            let payload = { action: 'addMaster' };
+            
+            if (type === 'prodi') {
+                payload.sheetName = 'Prodi';
+                payload.rowData = [document.getElementById('md-nama').value];
+            } else if (type === 'metode') {
+                payload.sheetName = 'Metode';
+                payload.rowData = [document.getElementById('md-nama').value];
+            } else if (type === 'matakuliah') {
+                payload.sheetName = 'MataKuliah';
+                payload.rowData = [
+                    document.getElementById('md-kode').value,
+                    document.getElementById('md-nama').value,
+                    document.getElementById('md-sks').value,
+                    document.getElementById('md-prodi').value
+                ];
+            }
+
+            if (USE_MOCK_DATA) {
+                setTimeout(() => {
+                    if (type === 'prodi') appData.prodi.push({'Nama Prodi': payload.rowData[0]});
+                    if (type === 'metode') appData.metode.push({'Nama Metode': payload.rowData[0]});
+                    if (type === 'matakuliah') appData.mataKuliah.push({
+                        'Kode': payload.rowData[0], 
+                        'Nama Mata Kuliah': payload.rowData[1], 
+                        'SKS': payload.rowData[2], 
+                        'Prodi': payload.rowData[3]
+                    });
+                    
+                    renderAllData();
+                    closeMasterModal();
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    alert('Data berhasil ditambahkan (Mode Simulasi)');
+                }, 800);
+            } else {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        alert('Data berhasil disimpan ke Spreadsheet!');
+                        // Refresh data from server to update UI
+                        fetchAllData().then(() => {
+                            closeMasterModal();
+                        });
+                    } else {
+                        alert('Gagal: ' + data.message);
+                    }
+                })
+                .catch(err => alert('Error jaringan: ' + err))
+                .finally(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
             }
         }
     </script>
