@@ -268,7 +268,7 @@
                 <div id="view-dosen" class="page-view hidden fade-in">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Daftar Dosen</h2>
-                        <button class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow transition flex items-center gap-2">
+                        <button onclick="openMasterModal('dosen')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow transition flex items-center gap-2">
                             <i class="fas fa-plus"></i> Tambah Dosen
                         </button>
                     </div>
@@ -279,6 +279,7 @@
                                     <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-100">
                                         <th class="p-4 font-medium">NIDN</th>
                                         <th class="p-4 font-medium">Nama Dosen</th>
+                                        <th class="p-4 font-medium">L/P</th>
                                         <th class="p-4 font-medium">Program Studi</th>
                                         <th class="p-4 font-medium">Status</th>
                                         <th class="p-4 font-medium">Aksi</th>
@@ -300,6 +301,9 @@
                         <h2 class="text-2xl font-bold text-gray-800">Daftar Mahasiswa</h2>
                         <div class="flex gap-2 w-full md:w-auto">
                             <input type="text" placeholder="Cari NIM/Nama..." class="w-full md:w-64 px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary">
+                            <button onclick="openMasterModal('mahasiswa')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow transition flex items-center gap-2 whitespace-nowrap">
+                                <i class="fas fa-plus"></i> Tambah
+                            </button>
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -309,6 +313,7 @@
                                     <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-100">
                                         <th class="p-4 font-medium">NIM</th>
                                         <th class="p-4 font-medium">Nama Mahasiswa</th>
+                                        <th class="p-4 font-medium">L/P</th>
                                         <th class="p-4 font-medium">Prodi</th>
                                         <th class="p-4 font-medium">Semester</th>
                                         <th class="p-4 font-medium">Aksi</th>
@@ -441,10 +446,32 @@
                         <input type="text" id="md-kode" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
                     </div>
 
+                    <!-- Field: NIDN (Only for Dosen) -->
+                    <div id="wrap-md-nidn" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">NIDN / NIP</label>
+                        <input type="text" id="md-nidn" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                    </div>
+
+                    <!-- Field: NIM (Only for Mahasiswa) -->
+                    <div id="wrap-md-nim" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">NIM</label>
+                        <input type="text" id="md-nim" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                    </div>
+
                     <!-- Field: Nama -->
                     <div id="wrap-md-nama" class="mb-4">
                         <label id="label-md-nama" class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
                         <input type="text" id="md-nama" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary" required>
+                    </div>
+
+                    <!-- Field: Jenis Kelamin (For Dosen and Mahasiswa) -->
+                    <div id="wrap-md-jk" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
+                        <select id="md-jk" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                            <option value="" disabled selected>Pilih Jenis Kelamin...</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
                     </div>
 
                     <!-- Field: SKS (Only for MK) -->
@@ -453,10 +480,33 @@
                         <input type="number" id="md-sks" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
                     </div>
 
-                    <!-- Field: Prodi (Only for MK) -->
+                    <!-- Field: Semester (Only for Mahasiswa) -->
+                    <div id="wrap-md-semester" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Semester</label>
+                        <input type="number" id="md-semester" min="1" max="14" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                    </div>
+
+                    <!-- Field: Prodi (For MK and Dosen) -->
                     <div id="wrap-md-prodi" class="mb-6 hidden">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Program Studi</label>
+                        
+                        <!-- Dropdown (Digunakan untuk Mata Kuliah) -->
                         <select id="md-prodi" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                        </select>
+
+                        <!-- Checklist (Digunakan untuk Dosen) -->
+                        <div id="md-prodi-checkboxes" class="hidden space-y-2 max-h-40 overflow-y-auto p-3 border border-gray-200 rounded-lg bg-gray-50">
+                            <!-- Checkboxes injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Field: Status (Only for Dosen) -->
+                    <div id="wrap-md-status" class="mb-6 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select id="md-status" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary">
+                            <option value="Aktif" selected>Aktif</option>
+                            <option value="Nonaktif">Nonaktif</option>
+                            <option value="Cuti">Cuti</option>
                         </select>
                     </div>
 
@@ -682,11 +732,12 @@
             const tbodyDosen = document.getElementById('tbodyDosen');
             tbodyDosen.innerHTML = '';
             if (appData.dosen.length === 0) {
-                tbodyDosen.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Tidak ada data dosen</td></tr>';
+                tbodyDosen.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Tidak ada data dosen</td></tr>';
             } else {
                 appData.dosen.forEach(d => {
                     const nidn = d['NIDN'] || d['nidn'] || '-';
                     const nama = d['Nama Dosen'] || d['Nama'] || d['nama'] || '-';
+                    const jk = d['Jenis Kelamin'] || d['JK'] || d['jk'] || '-';
                     const prodi = d['Program Studi'] || d['Prodi'] || d['prodi'] || '-';
                     const status = d['Status'] || d['status'] || 'Aktif';
                     
@@ -694,6 +745,7 @@
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
                             <td class="p-4">${nidn}</td>
                             <td class="p-4 font-medium">${nama}</td>
+                            <td class="p-4">${jk}</td>
                             <td class="p-4">${prodi}</td>
                             <td class="p-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">${status}</span></td>
                             <td class="p-4">
@@ -703,6 +755,35 @@
                         </tr>
                     `;
                 });
+            }
+
+            const tbodyMhs = document.getElementById('tbodyMahasiswa');
+            if (tbodyMhs) {
+                tbodyMhs.innerHTML = '';
+                if (appData.mahasiswa.length === 0) {
+                    tbodyMhs.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Tidak ada data mahasiswa</td></tr>';
+                } else {
+                    appData.mahasiswa.forEach(m => {
+                        const nim = m['NIM'] || m['nim'] || '-';
+                        const nama = m['Nama Mahasiswa'] || m['Nama'] || m['nama'] || '-';
+                        const jk = m['Jenis Kelamin'] || m['JK'] || m['jk'] || '-';
+                        const prodi = m['Prodi'] || m['Program Studi'] || m['prodi'] || '-';
+                        const semester = m['Semester'] || m['semester'] || '-';
+                        
+                        tbodyMhs.innerHTML += `
+                            <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                <td class="p-4">${nim}</td>
+                                <td class="p-4 font-medium">${nama}</td>
+                                <td class="p-4">${jk}</td>
+                                <td class="p-4">${prodi}</td>
+                                <td class="p-4">${semester}</td>
+                                <td class="p-4">
+                                    <button class="text-secondary hover:text-cyan-700"><i class="fas fa-eye"></i> Detail</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
             }
 
             const selectDosen = document.getElementById('jurnalDosen');
@@ -967,6 +1048,11 @@
             const wrapKode = document.getElementById('wrap-md-kode');
             const wrapSks = document.getElementById('wrap-md-sks');
             const wrapProdi = document.getElementById('wrap-md-prodi');
+            const wrapNidn = document.getElementById('wrap-md-nidn');
+            const wrapStatus = document.getElementById('wrap-md-status');
+            const wrapNim = document.getElementById('wrap-md-nim');
+            const wrapSemester = document.getElementById('wrap-md-semester');
+            const wrapJk = document.getElementById('wrap-md-jk');
 
             if (type === 'prodi') {
                 title.innerText = 'Tambah Program Studi';
@@ -974,33 +1060,140 @@
                 wrapKode.classList.add('hidden');
                 wrapSks.classList.add('hidden');
                 wrapProdi.classList.add('hidden');
+                wrapNidn.classList.add('hidden');
+                wrapStatus.classList.add('hidden');
+                wrapNim.classList.add('hidden');
+                wrapSemester.classList.add('hidden');
+                wrapJk.classList.add('hidden');
                 document.getElementById('md-kode').required = false;
                 document.getElementById('md-sks').required = false;
                 document.getElementById('md-prodi').required = false;
+                document.getElementById('md-nidn').required = false;
+                document.getElementById('md-status').required = false;
+                document.getElementById('md-nim').required = false;
+                document.getElementById('md-semester').required = false;
+                document.getElementById('md-jk').required = false;
             } else if (type === 'metode') {
                 title.innerText = 'Tambah Metode Perkuliahan';
                 labelNama.innerText = 'Nama Metode';
                 wrapKode.classList.add('hidden');
                 wrapSks.classList.add('hidden');
                 wrapProdi.classList.add('hidden');
+                wrapNidn.classList.add('hidden');
+                wrapStatus.classList.add('hidden');
+                wrapNim.classList.add('hidden');
+                wrapSemester.classList.add('hidden');
+                wrapJk.classList.add('hidden');
                 document.getElementById('md-kode').required = false;
                 document.getElementById('md-sks').required = false;
                 document.getElementById('md-prodi').required = false;
+                document.getElementById('md-nidn').required = false;
+                document.getElementById('md-status').required = false;
+                document.getElementById('md-nim').required = false;
+                document.getElementById('md-semester').required = false;
+                document.getElementById('md-jk').required = false;
             } else if (type === 'matakuliah') {
                 title.innerText = 'Tambah Mata Kuliah';
                 labelNama.innerText = 'Nama Mata Kuliah';
                 wrapKode.classList.remove('hidden');
                 wrapSks.classList.remove('hidden');
                 wrapProdi.classList.remove('hidden');
+                wrapNidn.classList.add('hidden');
+                wrapStatus.classList.add('hidden');
+                wrapNim.classList.add('hidden');
+                wrapSemester.classList.add('hidden');
+                wrapJk.classList.add('hidden');
                 
                 document.getElementById('md-kode').required = true;
                 document.getElementById('md-sks').required = true;
                 document.getElementById('md-prodi').required = true;
+                document.getElementById('md-nidn').required = false;
+                document.getElementById('md-status').required = false;
+                document.getElementById('md-nim').required = false;
+                document.getElementById('md-semester').required = false;
+                document.getElementById('md-jk').required = false;
+
+                // Tampilkan mode dropdown, sembunyikan mode checklist
+                document.getElementById('md-prodi').classList.remove('hidden');
+                document.getElementById('md-prodi-checkboxes').classList.add('hidden');
 
                 const selectProdi = document.getElementById('md-prodi');
                 selectProdi.innerHTML = '<option value="" disabled selected>Pilih Program Studi...</option>';
                 appData.prodi.forEach(p => {
-                    const nama = p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'];
+                    const nama = p['Nama Program Studi'] || p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'] || Object.values(p)[0];
+                    if (nama) selectProdi.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            } else if (type === 'dosen') {
+                title.innerText = 'Tambah Dosen';
+                labelNama.innerText = 'Nama Lengkap (beserta gelar)';
+                wrapKode.classList.add('hidden');
+                wrapSks.classList.add('hidden');
+                wrapProdi.classList.remove('hidden');
+                wrapNidn.classList.remove('hidden');
+                wrapStatus.classList.add('hidden');
+                wrapNim.classList.add('hidden');
+                wrapSemester.classList.add('hidden');
+                wrapJk.classList.remove('hidden');
+                
+                document.getElementById('md-kode').required = false;
+                document.getElementById('md-sks').required = false;
+                document.getElementById('md-prodi').required = false; // Harus false karena kita pakai checklist custom
+                document.getElementById('md-nidn').required = true;
+                document.getElementById('md-status').required = false;
+                document.getElementById('md-nim').required = false;
+                document.getElementById('md-semester').required = false;
+                document.getElementById('md-jk').required = true;
+
+                // Tampilkan mode checklist, sembunyikan mode dropdown
+                document.getElementById('md-prodi').classList.add('hidden');
+                const checkboxProdi = document.getElementById('md-prodi-checkboxes');
+                checkboxProdi.classList.remove('hidden');
+                
+                checkboxProdi.innerHTML = '';
+                if (appData.prodi.length === 0) {
+                    checkboxProdi.innerHTML = '<span class="text-sm text-gray-500">Belum ada data program studi. Silakan tambah di pengaturan.</span>';
+                } else {
+                    appData.prodi.forEach(p => {
+                        const nama = p['Nama Program Studi'] || p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'] || Object.values(p)[0];
+                        if (nama) {
+                            checkboxProdi.innerHTML += `
+                                <label class="flex items-center gap-3 cursor-pointer p-1 hover:bg-gray-100 rounded transition">
+                                    <input type="checkbox" value="${nama}" class="prodi-checkbox rounded text-primary focus:ring-primary w-4 h-4">
+                                    <span class="text-sm text-gray-700">${nama}</span>
+                                </label>
+                            `;
+                        }
+                    });
+                }
+            } else if (type === 'mahasiswa') {
+                title.innerText = 'Tambah Mahasiswa';
+                labelNama.innerText = 'Nama Lengkap Mahasiswa';
+                wrapKode.classList.add('hidden');
+                wrapSks.classList.add('hidden');
+                wrapProdi.classList.remove('hidden');
+                wrapNidn.classList.add('hidden');
+                wrapStatus.classList.add('hidden');
+                wrapNim.classList.remove('hidden');
+                wrapSemester.classList.remove('hidden');
+                wrapJk.classList.remove('hidden');
+                
+                document.getElementById('md-kode').required = false;
+                document.getElementById('md-sks').required = false;
+                document.getElementById('md-prodi').required = true;
+                document.getElementById('md-nidn').required = false;
+                document.getElementById('md-status').required = false;
+                document.getElementById('md-nim').required = true;
+                document.getElementById('md-semester').required = true;
+                document.getElementById('md-jk').required = true;
+
+                // Tampilkan mode dropdown, sembunyikan mode checklist
+                document.getElementById('md-prodi').classList.remove('hidden');
+                document.getElementById('md-prodi-checkboxes').classList.add('hidden');
+
+                const selectProdi = document.getElementById('md-prodi');
+                selectProdi.innerHTML = '<option value="" disabled selected>Pilih Program Studi...</option>';
+                appData.prodi.forEach(p => {
+                    const nama = p['Nama Program Studi'] || p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'] || Object.values(p)[0];
                     if (nama) selectProdi.innerHTML += `<option value="${nama}">${nama}</option>`;
                 });
             }
@@ -1036,6 +1229,37 @@
                     document.getElementById('md-sks').value,
                     document.getElementById('md-prodi').value
                 ];
+            } else if (type === 'dosen') {
+                // Ambil semua prodi yang dicentang dan gabungkan dengan koma
+                const selectedProdi = Array.from(document.querySelectorAll('.prodi-checkbox:checked'))
+                                          .map(cb => cb.value)
+                                          .join(', ');
+
+                // Validasi agar minimal 1 prodi dipilih
+                if (!selectedProdi) {
+                    showPopup("Peringatan", "Pilih minimal satu Program Studi!", "warning");
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return; // Hentikan proses simpan
+                }
+
+                payload.sheetName = 'Dosen';
+                payload.rowData = [
+                    document.getElementById('md-nidn').value,
+                    document.getElementById('md-nama').value,
+                    document.getElementById('md-jk').value,
+                    selectedProdi,
+                    'Aktif'
+                ];
+            } else if (type === 'mahasiswa') {
+                payload.sheetName = 'Mahasiswa';
+                payload.rowData = [
+                    document.getElementById('md-nim').value,
+                    document.getElementById('md-nama').value,
+                    document.getElementById('md-jk').value,
+                    document.getElementById('md-prodi').value,
+                    document.getElementById('md-semester').value
+                ];
             }
 
             if (USE_MOCK_DATA) {
@@ -1047,6 +1271,20 @@
                         'Nama Mata Kuliah': payload.rowData[1], 
                         'SKS': payload.rowData[2], 
                         'Prodi': payload.rowData[3]
+                    });
+                    if (type === 'dosen') appData.dosen.push({
+                        'NIDN': payload.rowData[0], 
+                        'Nama Dosen': payload.rowData[1], 
+                        'Jenis Kelamin': payload.rowData[2],
+                        'Program Studi': payload.rowData[3],
+                        'Status': payload.rowData[4]
+                    });
+                    if (type === 'mahasiswa') appData.mahasiswa.push({
+                        'NIM': payload.rowData[0], 
+                        'Nama Mahasiswa': payload.rowData[1], 
+                        'Jenis Kelamin': payload.rowData[2],
+                        'Prodi': payload.rowData[3], 
+                        'Semester': payload.rowData[4]
                     });
                     
                     renderAllData();
