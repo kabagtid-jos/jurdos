@@ -732,7 +732,8 @@
             if (selectProdi) {
                 selectProdi.innerHTML = '<option value="" disabled selected>Pilih Program Studi...</option>';
                 appData.prodi.forEach(p => {
-                    const nama = p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'];
+                    // Gunakan Object.values(p)[0] agar otomatis mengambil kolom pertama apapun nama headernya
+                    const nama = p['Nama Program Studi'] || p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'] || Object.values(p)[0];
                     if (nama) selectProdi.innerHTML += `<option value="${nama}">${nama}</option>`;
                 });
             }
@@ -750,7 +751,8 @@
             if (selectMetode) {
                 selectMetode.innerHTML = '<option value="" disabled selected>Pilih Metode...</option>';
                 appData.metode.forEach(m => {
-                    const nama = m['Nama Metode'] || m['Metode'] || m['nama'];
+                    // Sama seperti prodi, otomatis ambil kolom pertama
+                    const nama = m['Nama Metode'] || m['Metode Perkuliahan'] || m['Metode'] || m['nama'] || Object.values(m)[0];
                     if (nama) selectMetode.innerHTML += `<option value="${nama}">${nama}</option>`;
                 });
             }
@@ -784,7 +786,8 @@
                 listProdi.innerHTML = '';
                 if (appData.prodi.length === 0) listProdi.innerHTML = '<li class="p-3 text-center text-gray-500">Data kosong</li>';
                 appData.prodi.forEach(p => {
-                    const nama = p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'] || '-';
+                    // Otomatis mengambil kolom pertama
+                    const nama = p['Nama Program Studi'] || p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'] || Object.values(p)[0] || '-';
                     listProdi.innerHTML += `
                         <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
                             <span>${nama}</span>
@@ -802,7 +805,8 @@
                 listMetode.innerHTML = '';
                 if (appData.metode.length === 0) listMetode.innerHTML = '<li class="p-3 text-center text-gray-500">Data kosong</li>';
                 appData.metode.forEach(m => {
-                    const nama = m['Nama Metode'] || m['Metode'] || m['nama'] || '-';
+                    // Otomatis mengambil kolom pertama
+                    const nama = m['Nama Metode'] || m['Metode Perkuliahan'] || m['Metode'] || m['nama'] || Object.values(m)[0] || '-';
                     listMetode.innerHTML += `
                         <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
                             <span>${nama}</span>
