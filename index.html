@@ -161,7 +161,16 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 font-medium">Total Dosen</p>
-                                <h3 class="text-2xl font-bold text-gray-800">45</h3>
+                                <h3 id="dashTotalDosen" class="text-2xl font-bold text-gray-800">0</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                            <div class="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-2xl text-secondary"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Total Mahasiswa</p>
+                                <h3 id="dashTotalMhs" class="text-2xl font-bold text-gray-800">0</h3>
                             </div>
                         </div>
                         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
@@ -187,28 +196,8 @@
                     <!-- Recent Activity -->
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Aktivitas Jurnal Terbaru</h3>
-                        <div class="space-y-4">
-                            <!-- Mock Data Items -->
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">AB</div>
-                                    <div>
-                                        <p class="font-semibold text-gray-800 text-sm">Dr. Ahmad Budi, M.Pd</p>
-                                        <p class="text-xs text-gray-500">Mata Kuliah: Metodologi Penelitian - PAI Smt 5</p>
-                                    </div>
-                                </div>
-                                <span class="text-xs font-medium text-secondary bg-cyan-50 px-3 py-1 rounded-full">Hari ini, 08:30</span>
-                            </div>
-                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">SF</div>
-                                    <div>
-                                        <p class="font-semibold text-gray-800 text-sm">Siti Fatimah, M.A</p>
-                                        <p class="text-xs text-gray-500">Mata Kuliah: Sejarah Kebudayaan Islam - PAI Smt 3</p>
-                                    </div>
-                                </div>
-                                <span class="text-xs font-medium text-secondary bg-cyan-50 px-3 py-1 rounded-full">Hari ini, 10:15</span>
-                            </div>
+                        <div id="recentActivityList" class="space-y-4">
+                            <div class="p-4 text-center text-sm text-gray-500">Memuat aktivitas...</div>
                         </div>
                     </div>
                 </div>
@@ -239,27 +228,18 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Program Studi</label>
                                     <select id="jurnalProdi" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
                                         <option value="" disabled selected>Pilih Program Studi...</option>
-                                        <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
-                                        <option value="Ekonomi Syariah">Ekonomi Syariah</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Mata Kuliah</label>
                                     <select id="jurnalMataKuliah" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
                                         <option value="" disabled selected>Pilih Mata Kuliah...</option>
-                                        <option value="Metodologi Penelitian">Metodologi Penelitian</option>
-                                        <option value="Sejarah Kebudayaan Islam">Sejarah Kebudayaan Islam</option>
-                                        <option value="Fikih Muamalah">Fikih Muamalah</option>
-                                        <option value="Tafsir Tarbawi">Tafsir Tarbawi</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Metode Perkuliahan</label>
                                     <select id="jurnalMetode" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
                                         <option value="" disabled selected>Pilih Metode...</option>
-                                        <option value="Tatap Muka (Luring)">Tatap Muka (Luring)</option>
-                                        <option value="Daring (Online)">Daring (Online)</option>
-                                        <option value="Hybrid">Hybrid</option>
                                     </select>
                                 </div>
                                 
@@ -357,16 +337,9 @@
                                         <th class="p-4 font-medium">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody class="text-sm text-gray-700">
+                                <tbody id="tbodyDosen" class="text-sm text-gray-700">
                                     <tr class="border-b border-gray-50 hover:bg-gray-50">
-                                        <td class="p-4">0123456789</td>
-                                        <td class="p-4 font-medium">Dr. Ahmad Budi, M.Pd</td>
-                                        <td class="p-4">Pendidikan Agama Islam</td>
-                                        <td class="p-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">Aktif</span></td>
-                                        <td class="p-4">
-                                            <button class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
-                                            <button class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
-                                        </td>
+                                        <td colspan="5" class="p-4 text-center">Memuat data...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -394,15 +367,9 @@
                                         <th class="p-4 font-medium">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody class="text-sm text-gray-700">
+                                <tbody id="tbodyMahasiswa" class="text-sm text-gray-700">
                                     <tr class="border-b border-gray-50 hover:bg-gray-50">
-                                        <td class="p-4">20210011</td>
-                                        <td class="p-4 font-medium">Muhammad Fikri</td>
-                                        <td class="p-4">PAI</td>
-                                        <td class="p-4">5</td>
-                                        <td class="p-4">
-                                            <button class="text-secondary hover:text-cyan-700"><i class="fas fa-eye"></i> Detail</button>
-                                        </td>
+                                        <td colspan="5" class="p-4 text-center">Memuat data...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -463,21 +430,8 @@
                                             <i class="fas fa-plus"></i> Tambah
                                         </button>
                                     </div>
-                                    <ul class="space-y-2 text-sm text-gray-600">
-                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                                            <span>Pendidikan Agama Islam</span>
-                                            <div class="flex gap-2">
-                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
-                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                            </div>
-                                        </li>
-                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                                            <span>Ekonomi Syariah</span>
-                                            <div class="flex gap-2">
-                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
-                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                            </div>
-                                        </li>
+                                    <ul id="listMasterProdi" class="space-y-2 text-sm text-gray-600">
+                                        <li class="p-3 text-center text-gray-500">Memuat data...</li>
                                     </ul>
                                 </div>
 
@@ -489,28 +443,8 @@
                                             <i class="fas fa-plus"></i> Tambah
                                         </button>
                                     </div>
-                                    <ul class="space-y-2 text-sm text-gray-600">
-                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                                            <span>Tatap Muka (Luring)</span>
-                                            <div class="flex gap-2">
-                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
-                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                            </div>
-                                        </li>
-                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                                            <span>Daring (Online)</span>
-                                            <div class="flex gap-2">
-                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
-                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                            </div>
-                                        </li>
-                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                                            <span>Hybrid</span>
-                                            <div class="flex gap-2">
-                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
-                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                            </div>
-                                        </li>
+                                    <ul id="listMasterMetode" class="space-y-2 text-sm text-gray-600">
+                                        <li class="p-3 text-center text-gray-500">Memuat data...</li>
                                     </ul>
                                 </div>
 
@@ -537,36 +471,9 @@
                                                     <th class="p-3 font-medium text-right rounded-tr-lg">Aksi</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <tr class="bg-white border-b border-gray-100 hover:bg-gray-50">
-                                                    <td class="p-3">MK-001</td>
-                                                    <td class="p-3 font-medium text-gray-700">Metodologi Penelitian</td>
-                                                    <td class="p-3">2</td>
-                                                    <td class="p-3">PAI</td>
-                                                    <td class="p-3 text-right">
-                                                        <button class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
-                                                        <button class="text-red-500 hover:text-red-700 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
-                                                    </td>
-                                                </tr>
-                                                <tr class="bg-white border-b border-gray-100 hover:bg-gray-50">
-                                                    <td class="p-3">MK-002</td>
-                                                    <td class="p-3 font-medium text-gray-700">Sejarah Kebudayaan Islam</td>
-                                                    <td class="p-3">3</td>
-                                                    <td class="p-3">PAI</td>
-                                                    <td class="p-3 text-right">
-                                                        <button class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
-                                                        <button class="text-red-500 hover:text-red-700 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
-                                                    </td>
-                                                </tr>
-                                                <tr class="bg-white hover:bg-gray-50 rounded-b-lg">
-                                                    <td class="p-3">MK-003</td>
-                                                    <td class="p-3 font-medium text-gray-700">Fikih Muamalah</td>
-                                                    <td class="p-3">2</td>
-                                                    <td class="p-3">Ekonomi Syariah</td>
-                                                    <td class="p-3 text-right">
-                                                        <button class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
-                                                        <button class="text-red-500 hover:text-red-700 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
-                                                    </td>
+                                            <tbody id="tbodyMasterMK">
+                                                <tr>
+                                                    <td colspan="5" class="p-4 text-center text-gray-500">Memuat data...</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -589,6 +496,7 @@
         // CONFIGURATION
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytO29mRmuEq94v1i27tudnmff4ng1CPZ5RR1e2ZpE3jS041aLeeTQfnZrPEPQJl1Bd/exec'; 
         let USE_MOCK_DATA = false; // Set false untuk memanggil API betulan
+        let appData = { dosen: [], mahasiswa: [], prodi: [], mataKuliah: [], metode: [], jurnal: [] }; // Menyimpan data dari spreadsheet
 
         // Initialize App (Aman dari error null)
         document.addEventListener('DOMContentLoaded', () => {
@@ -624,15 +532,23 @@
 
                 fetch(url)
                 .then(res => res.json())
-                .then(data => {
+                .then(async data => {
                     if(data.status === 'success') {
-                        // Login berhasil, gunakan nama dari Google Sheets jika ada
+                        // Jika login berhasil, ambil data dari spreadsheet sebelum masuk
+                        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengambil Data...';
+                        await fetchAllData();
+                        
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.disabled = false;
+                        
                         loginSuccess(data.user.nama || data.user.username);
                     } else {
                         // Login gagal, tampilkan pesan error dari API
                         const errEl = document.getElementById('loginError');
                         errEl.innerText = data.message || 'Username atau password salah!';
                         errEl.classList.remove('hidden');
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.disabled = false;
                     }
                 })
                 .catch(err => {
@@ -641,12 +557,230 @@
                     errEl.innerText = 'Koneksi ke server gagal. Periksa URL Apps Script Anda.';
                     errEl.classList.remove('hidden');
                     console.error('Login Error:', err);
-                })
-                .finally(() => {
-                    // Kembalikan tombol ke keadaan semula
                     btnSubmit.innerHTML = originalText;
                     btnSubmit.disabled = false;
                 });
+            }
+        }
+
+        async function fetchAllData() {
+            if (USE_MOCK_DATA) return;
+            try {
+                // Fetch semua tabel dari spreadsheet secara paralel
+                const [resDosen, resMhs, resProdi, resMK, resMetode, resJurnal] = await Promise.all([
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getDosen`).then(r => r.json()).catch(() => ({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getMahasiswa`).then(r => r.json()).catch(() => ({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getProdi`).then(r => r.json()).catch(() => ({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getMataKuliah`).then(r => r.json()).catch(() => ({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getMetode`).then(r => r.json()).catch(() => ({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getJurnal`).then(r => r.json()).catch(() => ({status:'error'}))
+                ]);
+                
+                if (resDosen.status === 'success') appData.dosen = resDosen.data || [];
+                if (resMhs.status === 'success') appData.mahasiswa = resMhs.data || [];
+                if (resProdi.status === 'success') appData.prodi = resProdi.data || [];
+                if (resMK.status === 'success') appData.mataKuliah = resMK.data || [];
+                if (resMetode.status === 'success') appData.metode = resMetode.data || [];
+                if (resJurnal.status === 'success') appData.jurnal = resJurnal.data || [];
+
+                renderAllData(); // Perbarui tampilan dengan data dari API
+            } catch (err) {
+                console.error("Gagal mengambil data:", err);
+                alert("Peringatan: Gagal mengambil beberapa data dari Spreadsheet.");
+            }
+        }
+
+        function renderAllData() {
+            // 1. Render Dashboard Stats
+            document.getElementById('dashTotalDosen').innerText = appData.dosen.length;
+            document.getElementById('dashTotalMhs').innerText = appData.mahasiswa.length;
+
+            // Render Dashboard Activity
+            const activityList = document.getElementById('recentActivityList');
+            if (activityList) {
+                activityList.innerHTML = '';
+                if (appData.jurnal.length === 0) {
+                    activityList.innerHTML = '<div class="p-4 text-center text-sm text-gray-500">Belum ada aktivitas jurnal</div>';
+                } else {
+                    // Tampilkan 3 jurnal terakhir
+                    const recentJurnal = appData.jurnal.slice(-3).reverse();
+                    recentJurnal.forEach(j => {
+                        const dosen = j['Dosen'] || j['dosen'] || '-';
+                        const inisial = dosen.substring(0, 2).toUpperCase();
+                        const mk = j['Mata Kuliah'] || j['mataKuliah'] || '-';
+                        
+                        // Parse Tanggal (jika ada)
+                        let tglStr = '-';
+                        if(j['Timestamp'] || j['Tanggal'] || j['tanggal']) {
+                            const d = new Date(j['Timestamp'] || j['Tanggal'] || j['tanggal']);
+                            tglStr = isNaN(d.getTime()) ? (j['Timestamp'] || j['Tanggal'] || j['tanggal']) : d.toLocaleDateString('id-ID');
+                        }
+
+                        activityList.innerHTML += `
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">${inisial}</div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800 text-sm">${dosen}</p>
+                                        <p class="text-xs text-gray-500">Mata Kuliah: ${mk}</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-medium text-secondary bg-cyan-50 px-3 py-1 rounded-full">${tglStr}</span>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            // 2. Render Tabel Dosen
+            const tbodyDosen = document.getElementById('tbodyDosen');
+            tbodyDosen.innerHTML = '';
+            if (appData.dosen.length === 0) {
+                tbodyDosen.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Tidak ada data dosen</td></tr>';
+            } else {
+                appData.dosen.forEach(d => {
+                    // Adaptasi nama kolom dari Google Sheets
+                    const nidn = d['NIDN'] || d['nidn'] || '-';
+                    const nama = d['Nama Dosen'] || d['Nama'] || d['nama'] || '-';
+                    const prodi = d['Program Studi'] || d['Prodi'] || d['prodi'] || '-';
+                    const status = d['Status'] || d['status'] || 'Aktif';
+                    
+                    tbodyDosen.innerHTML += `
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="p-4">${nidn}</td>
+                            <td class="p-4 font-medium">${nama}</td>
+                            <td class="p-4">${prodi}</td>
+                            <td class="p-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">${status}</span></td>
+                            <td class="p-4">
+                                <button class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
+                                <button class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            // 4. Render Dropdown Dosen, Prodi, Mata Kuliah, Metode (di form Jurnal)
+            const selectDosen = document.getElementById('jurnalDosen');
+            if (selectDosen) {
+                selectDosen.innerHTML = '<option value="" disabled selected>Pilih Dosen...</option>';
+                appData.dosen.forEach(d => {
+                    const nama = d['Nama Dosen'] || d['Nama'] || d['nama'];
+                    if (nama) selectDosen.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            }
+
+            const selectProdi = document.getElementById('jurnalProdi');
+            if (selectProdi) {
+                selectProdi.innerHTML = '<option value="" disabled selected>Pilih Program Studi...</option>';
+                appData.prodi.forEach(p => {
+                    const nama = p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'];
+                    if (nama) selectProdi.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            }
+
+            const selectMK = document.getElementById('jurnalMataKuliah');
+            if (selectMK) {
+                selectMK.innerHTML = '<option value="" disabled selected>Pilih Mata Kuliah...</option>';
+                appData.mataKuliah.forEach(mk => {
+                    const nama = mk['Nama Mata Kuliah'] || mk['Mata Kuliah'] || mk['nama'];
+                    if (nama) selectMK.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            }
+
+            const selectMetode = document.getElementById('jurnalMetode');
+            if (selectMetode) {
+                selectMetode.innerHTML = '<option value="" disabled selected>Pilih Metode...</option>';
+                appData.metode.forEach(m => {
+                    const nama = m['Nama Metode'] || m['Metode'] || m['nama'];
+                    if (nama) selectMetode.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            }
+
+            // 5. Render Daftar Absensi Mahasiswa (di form Jurnal)
+            const tbodyAbsen = document.getElementById('studentAttendanceList');
+            if (tbodyAbsen) {
+                tbodyAbsen.innerHTML = '';
+                appData.mahasiswa.forEach(m => {
+                    const nama = m['Nama Mahasiswa'] || m['Nama'] || m['nama'] || 'Tanpa Nama';
+                    tbodyAbsen.innerHTML += `
+                        <tr class="border-b border-gray-100">
+                            <td class="py-3 text-gray-700">${nama}</td>
+                            <td class="py-2">
+                                <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="${nama}">
+                                    <option value="Hadir" selected>Hadir</option>
+                                    <option value="Izin">Izin</option>
+                                    <option value="Sakit">Sakit</option>
+                                    <option value="Alpha">Alpha</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // 6. Render Data Master di Halaman Setting
+            const listProdi = document.getElementById('listMasterProdi');
+            if (listProdi) {
+                listProdi.innerHTML = '';
+                if (appData.prodi.length === 0) listProdi.innerHTML = '<li class="p-3 text-center text-gray-500">Data kosong</li>';
+                appData.prodi.forEach(p => {
+                    const nama = p['Nama Prodi'] || p['Nama'] || p['Prodi'] || p['prodi'] || '-';
+                    listProdi.innerHTML += `
+                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <span>${nama}</span>
+                            <div class="flex gap-2">
+                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                    `;
+                });
+            }
+
+            const listMetode = document.getElementById('listMasterMetode');
+            if (listMetode) {
+                listMetode.innerHTML = '';
+                if (appData.metode.length === 0) listMetode.innerHTML = '<li class="p-3 text-center text-gray-500">Data kosong</li>';
+                appData.metode.forEach(m => {
+                    const nama = m['Nama Metode'] || m['Metode'] || m['nama'] || '-';
+                    listMetode.innerHTML += `
+                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <span>${nama}</span>
+                            <div class="flex gap-2">
+                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                    `;
+                });
+            }
+
+            const tbodyMK = document.getElementById('tbodyMasterMK');
+            if (tbodyMK) {
+                tbodyMK.innerHTML = '';
+                if (appData.mataKuliah.length === 0) {
+                    tbodyMK.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Data kosong</td></tr>';
+                } else {
+                    appData.mataKuliah.forEach(mk => {
+                        const kode = mk['Kode'] || mk['kode'] || '-';
+                        const nama = mk['Nama Mata Kuliah'] || mk['Mata Kuliah'] || mk['nama'] || '-';
+                        const sks = mk['SKS'] || mk['sks'] || '-';
+                        const prodi = mk['Prodi'] || mk['Program Studi'] || '-';
+                        
+                        tbodyMK.innerHTML += `
+                            <tr class="bg-white border-b border-gray-100 hover:bg-gray-50">
+                                <td class="p-3">${kode}</td>
+                                <td class="p-3 font-medium text-gray-700">${nama}</td>
+                                <td class="p-3">${sks}</td>
+                                <td class="p-3">${prodi}</td>
+                                <td class="p-3 text-right">
+                                    <button class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
+                                    <button class="text-red-500 hover:text-red-700 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
             }
         }
 
