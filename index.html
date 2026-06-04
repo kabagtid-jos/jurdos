@@ -443,7 +443,7 @@
                                     <input type="text" id="scriptUrlInput" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary" value="https://script.google.com/macros/s/..." placeholder="Masukkan URL API">
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <input type="checkbox" id="mockDataToggle" class="rounded text-primary focus:ring-primary h-4 w-4" checked>
+                                    <input type="checkbox" id="mockDataToggle" class="rounded text-primary focus:ring-primary h-4 w-4">
                                     <label class="text-sm text-gray-700">Gunakan Mode Simulasi (Mock Data) untuk preview UI</label>
                                 </div>
                             </div>
@@ -588,7 +588,7 @@
     <script>
         // CONFIGURATION
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytO29mRmuEq94v1i27tudnmff4ng1CPZ5RR1e2ZpE3jS041aLeeTQfnZrPEPQJl1Bd/exec'; 
-        let USE_MOCK_DATA = true; // Set false untuk memanggil API betulan
+        let USE_MOCK_DATA = false; // Set false untuk memanggil API betulan
 
         // Initialize App (Aman dari error null)
         document.addEventListener('DOMContentLoaded', () => {
