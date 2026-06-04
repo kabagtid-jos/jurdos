@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurdos - Institut Kiai Haji Abu Zairi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#0369a1', // Sky 700 (Blue)
+                        secondary: '#06b6d4', // Cyan 500
+                        dark: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden h-screen flex">
+
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-primary to-secondary">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-11/12 max-w-md fade-in">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-tr from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-university text-2xl text-white"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">JURDOS</h1>
+                <p class="text-sm text-gray-500 mt-1">Institut Kiai Haji Abu Zairi</p>
+            </div>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        <input type="text" id="username" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" placeholder="Masukkan username (admin)" required>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" placeholder="Masukkan password (123)" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-primary to-secondary text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transform transition hover:-translate-y-0.5">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Masuk Sistem
+                </button>
+            </form>
+            <div id="loginError" class="mt-4 text-center text-red-500 text-sm hidden">Username atau password salah!</div>
+        </div>
+    </div>
+
+    <!-- ================= MAIN APP ================= -->
+    <div id="mainApp" class="hidden w-full h-full flex flex-col md:flex-row">
+        
+        <!-- Sidebar (Desktop) / Mobile Overlay -->
+        <div id="sidebar" class="sidebar-transition fixed inset-y-0 left-0 z-40 w-64 bg-dark text-white transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 flex flex-col shadow-2xl">
+            <div class="p-6 flex items-center justify-between border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-university text-secondary text-xl"></i>
+                    <span class="font-bold tracking-wider">JURDOS</span>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="px-6 py-4">
+                <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">Menu Utama</div>
+                <nav class="space-y-1">
+                    <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-white bg-gradient-to-r from-primary to-secondary font-medium transition-all">
+                        <i class="fas fa-chart-pie w-5 text-center"></i> Dashboard
+                    </button>
+                    <button onclick="navigate('input-jurnal')" id="nav-input-jurnal" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+                        <i class="fas fa-book-open w-5 text-center"></i> Input Jurnal
+                    </button>
+                    <button onclick="navigate('dosen')" id="nav-dosen" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+                        <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Daftar Dosen
+                    </button>
+                    <button onclick="navigate('mahasiswa')" id="nav-mahasiswa" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+                        <i class="fas fa-user-graduate w-5 text-center"></i> Daftar Mahasiswa
+                    </button>
+                    <button onclick="navigate('rekap')" id="nav-rekap" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+                        <i class="fas fa-clipboard-list w-5 text-center"></i> Rekap Presensi
+                    </button>
+                </nav>
+            </div>
+
+            <div class="px-6 py-4 mt-auto border-t border-gray-800">
+                <nav class="space-y-1">
+                    <button onclick="navigate('setting')" id="nav-setting" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+                        <i class="fas fa-cog w-5 text-center"></i> Setting
+                    </button>
+                    <button onclick="doLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-red-400 hover:text-red-300 hover:bg-gray-800 transition-all">
+                        <i class="fas fa-sign-out-alt w-5 text-center"></i> Logout
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mobile Header -->
+        <div class="md:hidden glass-effect sticky top-0 z-30 flex items-center justify-between p-4 border-b border-gray-200 shadow-sm">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-university text-primary"></i>
+                <span class="font-bold text-gray-800">JURDOS IKHZ</span>
+            </div>
+            <button onclick="toggleSidebar()" class="text-gray-600 focus:outline-none p-2 rounded-lg bg-gray-100">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden bg-slate-50 relative">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 md:p-8" id="contentArea">
+                
+                <!-- VIEW: DASHBOARD -->
+                <div id="view-dashboard" class="page-view fade-in">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+                            <p class="text-gray-500 text-sm">Selamat datang, <span id="userNameDisplay" class="font-semibold text-primary">Admin</span></p>
+                        </div>
+                        <div class="hidden md:flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                            <i class="fas fa-calendar-alt text-secondary"></i>
+                            <span class="text-sm text-gray-600" id="currentDate"></span>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                            <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center">
+                                <i class="fas fa-chalkboard-teacher text-2xl text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Total Dosen</p>
+                                <h3 class="text-2xl font-bold text-gray-800">45</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                            <div class="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-2xl text-secondary"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Total Mahasiswa</p>
+                                <h3 class="text-2xl font-bold text-gray-800">850</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                            <div class="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center">
+                                <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 font-medium">Presensi Hari Ini</p>
+                                <h3 class="text-2xl font-bold text-gray-800">12</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Aktivitas Jurnal Terbaru</h3>
+                        <div class="space-y-4">
+                            <!-- Mock Data Items -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">AB</div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800 text-sm">Dr. Ahmad Budi, M.Pd</p>
+                                        <p class="text-xs text-gray-500">Mata Kuliah: Metodologi Penelitian - PAI Smt 5</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-medium text-secondary bg-cyan-50 px-3 py-1 rounded-full">Hari ini, 08:30</span>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">SF</div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800 text-sm">Siti Fatimah, M.A</p>
+                                        <p class="text-xs text-gray-500">Mata Kuliah: Sejarah Kebudayaan Islam - PAI Smt 3</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-medium text-secondary bg-cyan-50 px-3 py-1 rounded-full">Hari ini, 10:15</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: INPUT JURNAL -->
+                <div id="view-input-jurnal" class="page-view hidden fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Input Jurnal Mengajar</h2>
+                        <p class="text-gray-500 text-sm mt-1">Formulir jurnal harian ringkas</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 max-w-3xl">
+                        <form id="formJurnal" onsubmit="submitJurnal(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                                    <input type="date" id="jurnalTanggal" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Dosen</label>
+                                    <select id="jurnalDosen" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
+                                        <option value="" disabled selected>Pilih Dosen...</option>
+                                        <option value="Dr. Ahmad Budi, M.Pd">Dr. Ahmad Budi, M.Pd</option>
+                                        <option value="Siti Fatimah, M.A">Siti Fatimah, M.A</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Jurusan</label>
+                                    <select id="jurnalJurusan" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
+                                        <option value="" disabled selected>Pilih Jurusan...</option>
+                                        <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
+                                        <option value="Ekonomi Syariah">Ekonomi Syariah</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Bagian Absensi Mahasiswa diubah menjadi list dropdown per mahasiswa -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Daftar Absensi Mahasiswa</label>
+                                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-60 overflow-y-auto">
+                                        <table class="w-full text-sm text-left">
+                                            <thead>
+                                                <tr class="border-b border-gray-200 text-gray-600">
+                                                    <th class="pb-2 font-medium">Nama Mahasiswa</th>
+                                                    <th class="pb-2 font-medium w-1/3">Status Kehadiran</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="studentAttendanceList">
+                                                <tr class="border-b border-gray-100">
+                                                    <td class="py-3 text-gray-700">Muhammad Fikri</td>
+                                                    <td class="py-2">
+                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Muhammad Fikri">
+                                                            <option value="Hadir" selected>Hadir</option>
+                                                            <option value="Izin">Izin</option>
+                                                            <option value="Sakit">Sakit</option>
+                                                            <option value="Alpha">Alpha</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr class="border-b border-gray-100">
+                                                    <td class="py-3 text-gray-700">Aisyah Putri</td>
+                                                    <td class="py-2">
+                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Aisyah Putri">
+                                                            <option value="Hadir" selected>Hadir</option>
+                                                            <option value="Izin">Izin</option>
+                                                            <option value="Sakit">Sakit</option>
+                                                            <option value="Alpha">Alpha</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr class="border-b border-gray-100">
+                                                    <td class="py-3 text-gray-700">Budi Santoso</td>
+                                                    <td class="py-2">
+                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Budi Santoso">
+                                                            <option value="Hadir" selected>Hadir</option>
+                                                            <option value="Izin">Izin</option>
+                                                            <option value="Sakit">Sakit</option>
+                                                            <option value="Alpha">Alpha</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="py-3 text-gray-700">Siti Aminah</td>
+                                                    <td class="py-2">
+                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Siti Aminah">
+                                                            <option value="Hadir" selected>Hadir</option>
+                                                            <option value="Izin">Izin</option>
+                                                            <option value="Sakit">Sakit</option>
+                                                            <option value="Alpha">Alpha</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <button type="submit" class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-xl text-sm font-semibold hover:shadow-lg transform transition hover:-translate-y-0.5 w-full md:w-auto">
+                                    <i class="fas fa-paper-plane mr-2"></i> Simpan Jurnal
+                                </button>
+                                <button type="reset" class="bg-gray-100 text-gray-600 px-8 py-3 rounded-xl text-sm font-semibold hover:bg-gray-200 transition w-full md:w-auto">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- VIEW: DOSEN -->
+                <div id="view-dosen" class="page-view hidden fade-in">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Daftar Dosen</h2>
+                        <button class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow transition flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Tambah Dosen
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-100">
+                                        <th class="p-4 font-medium">NIDN</th>
+                                        <th class="p-4 font-medium">Nama Dosen</th>
+                                        <th class="p-4 font-medium">Program Studi</th>
+                                        <th class="p-4 font-medium">Status</th>
+                                        <th class="p-4 font-medium">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm text-gray-700">
+                                    <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                        <td class="p-4">0123456789</td>
+                                        <td class="p-4 font-medium">Dr. Ahmad Budi, M.Pd</td>
+                                        <td class="p-4">Pendidikan Agama Islam</td>
+                                        <td class="p-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">Aktif</span></td>
+                                        <td class="p-4">
+                                            <button class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
+                                            <button class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: MAHASISWA -->
+                <div id="view-mahasiswa" class="page-view hidden fade-in">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Daftar Mahasiswa</h2>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <input type="text" placeholder="Cari NIM/Nama..." class="w-full md:w-64 px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary">
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-100">
+                                        <th class="p-4 font-medium">NIM</th>
+                                        <th class="p-4 font-medium">Nama Mahasiswa</th>
+                                        <th class="p-4 font-medium">Prodi</th>
+                                        <th class="p-4 font-medium">Semester</th>
+                                        <th class="p-4 font-medium">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm text-gray-700">
+                                    <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                        <td class="p-4">20210011</td>
+                                        <td class="p-4 font-medium">Muhammad Fikri</td>
+                                        <td class="p-4">PAI</td>
+                                        <td class="p-4">5</td>
+                                        <td class="p-4">
+                                            <button class="text-secondary hover:text-cyan-700"><i class="fas fa-eye"></i> Detail</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: REKAP -->
+                <div id="view-rekap" class="page-view hidden fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Rekap Presensi & Jurnal</h2>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row gap-4">
+                        <select class="px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none flex-1">
+                            <option>Semua Program Studi</option>
+                            <option>Pendidikan Agama Islam</option>
+                            <option>Ekonomi Syariah</option>
+                        </select>
+                        <select class="px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none flex-1">
+                            <option>Bulan Ini</option>
+                            <option>Bulan Lalu</option>
+                            <option>Semester Ganjil 2023/2024</option>
+                        </select>
+                        <button class="bg-secondary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-cyan-600 transition shadow">
+                            <i class="fas fa-filter mr-1"></i> Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW: SETTING -->
+                <div id="view-setting" class="page-view hidden fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Pengaturan Sistem</h2>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-2xl">
+                        
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Koneksi Database (Google Sheets)</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Google Apps Script Web App URL</label>
+                                    <input type="text" id="scriptUrlInput" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary" value="https://script.google.com/macros/s/..." placeholder="Masukkan URL API">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="mockDataToggle" class="rounded text-primary focus:ring-primary h-4 w-4" checked>
+                                    <label class="text-sm text-gray-700">Gunakan Mode Simulasi (Mock Data) untuk preview UI</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Overlay Background for Mobile Sidebar -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <script>
+        // CONFIGURATION
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytO29mRmuEq94v1i27tudnmff4ng1CPZ5RR1e2ZpE3jS041aLeeTQfnZrPEPQJl1Bd/exec'; 
+        let USE_MOCK_DATA = true; // Set false untuk memanggil API betulan
+
+        // Initialize App (Aman dari error null)
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateEl = document.getElementById('currentDate');
+            if(dateEl) {
+                dateEl.innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            if (USE_MOCK_DATA) {
+                if(user === 'admin' && pass === '123') {
+                    loginSuccess('Administrator');
+                } else {
+                    document.getElementById('loginError').classList.remove('hidden');
+                }
+            } else {
+                // Fetch API Login
+            }
+        }
+
+        function loginSuccess(name) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            const userDisplay = document.getElementById('userNameDisplay');
+            if (userDisplay) userDisplay.innerText = name;
+            
+            // Set Default value form Jurnal (Aman dari null)
+            const jurnalTanggal = document.getElementById('jurnalTanggal');
+            if (jurnalTanggal) jurnalTanggal.valueAsDate = new Date();
+            
+            navigate('dashboard');
+        }
+
+        function submitJurnal(e) {
+            e.preventDefault();
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
+            btnSubmit.disabled = true;
+
+            // Kumpulkan data absensi dari setiap dropdown mahasiswa
+            const attendanceSelects = document.querySelectorAll('.student-status-select');
+            let attendanceDataArr = [];
+            attendanceSelects.forEach(select => {
+                attendanceDataArr.push(`${select.getAttribute('data-name')} (${select.value})`);
+            });
+            const absensiString = attendanceDataArr.join(', ');
+
+            const payload = {
+                action: 'saveJurnal',
+                tanggal: document.getElementById('jurnalTanggal').value,
+                dosen: document.getElementById('jurnalDosen').value,
+                jurusan: document.getElementById('jurnalJurusan').value,
+                absensi: absensiString
+            };
+
+            if (USE_MOCK_DATA) {
+                setTimeout(() => {
+                    alert('Mode Simulasi: Jurnal berhasil disimpan!\n\nJurusan: ' + payload.jurusan + '\nData Absensi: ' + payload.absensi);
+                    document.getElementById('formJurnal').reset();
+                    
+                    const tgl = document.getElementById('jurnalTanggal');
+                    if(tgl) tgl.valueAsDate = new Date();
+                    
+                    btnSubmit.innerHTML = originalText;
+                    btnSubmit.disabled = false;
+                    navigate('dashboard');
+                }, 800);
+            } else {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        alert('Jurnal berhasil disimpan ke Spreadsheet!');
+                        document.getElementById('formJurnal').reset();
+                        
+                        const tgl = document.getElementById('jurnalTanggal');
+                        if(tgl) tgl.valueAsDate = new Date();
+                    } else {
+                        alert('Gagal: ' + data.message);
+                    }
+                })
+                .catch(err => alert('Error jaringan: ' + err))
+                .finally(() => {
+                    btnSubmit.innerHTML = originalText;
+                    btnSubmit.disabled = false;
+                });
+            }
+        }
+
+        function doLogout() {
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+            
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                toggleSidebar();
+            }
+        }
+
+        function navigate(pageId) {
+            // Sembunyikan semua halaman
+            document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+            
+            // Tampilkan halaman target
+            const targetPage = document.getElementById(`view-${pageId}`);
+            if(targetPage) targetPage.classList.remove('hidden');
+
+            // Update style menu navigasi
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all';
+            });
+            const activeBtn = document.getElementById(`nav-${pageId}`);
+            if(activeBtn) {
+                activeBtn.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-white bg-gradient-to-r from-primary to-secondary font-medium shadow-md transition-all';
+            }
+
+            // Tutup sidebar di HP setelah pindah halaman
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+        
+        const mockDataToggle = document.getElementById('mockDataToggle');
+        if(mockDataToggle) {
+            mockDataToggle.addEventListener('change', function(e) {
+                USE_MOCK_DATA = e.target.checked;
+                alert(USE_MOCK_DATA ? 'Mode Simulasi Aktif' : 'Mode Live API Aktif. Pastikan URL Apps Script sudah diisi dengan benar.');
+            });
+        }
+    </script>
+</body>
+</html>
