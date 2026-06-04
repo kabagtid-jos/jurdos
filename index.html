@@ -174,21 +174,12 @@
                             </div>
                         </div>
                         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
-                            <div class="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center">
-                                <i class="fas fa-user-graduate text-2xl text-secondary"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Total Mahasiswa</p>
-                                <h3 class="text-2xl font-bold text-gray-800">850</h3>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
                             <div class="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center">
                                 <i class="fas fa-check-circle text-2xl text-green-500"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500 font-medium">Presensi Hari Ini</p>
-                                <h3 class="text-2xl font-bold text-gray-800">12</h3>
+                                <p class="text-sm text-gray-500 font-medium">Jurnal Hari Ini</p>
+                                <h3 id="dashPresensiHariIni" class="text-2xl font-bold text-gray-800">0</h3>
                             </div>
                         </div>
                     </div>
@@ -594,6 +585,25 @@
             // 1. Render Dashboard Stats
             document.getElementById('dashTotalDosen').innerText = appData.dosen.length;
             document.getElementById('dashTotalMhs').innerText = appData.mahasiswa.length;
+
+            // Hitung jumlah jurnal/kelas yang masuk hari ini
+            let hariIniCount = 0;
+            const today = new Date();
+            appData.jurnal.forEach(j => {
+                const dateVal = j['Timestamp'] || j['Tanggal'] || j['tanggal'];
+                if (dateVal) {
+                    const d = new Date(dateVal);
+                    if (!isNaN(d.getTime())) {
+                        if (d.getDate() === today.getDate() &&
+                            d.getMonth() === today.getMonth() &&
+                            d.getFullYear() === today.getFullYear()) {
+                            hariIniCount++;
+                        }
+                    }
+                }
+            });
+            const presensiEl = document.getElementById('dashPresensiHariIni');
+            if(presensiEl) presensiEl.innerText = hariIniCount;
 
             // Render Dashboard Activity
             const activityList = document.getElementById('recentActivityList');
