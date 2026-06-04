@@ -673,6 +673,13 @@
             return Object.values(obj)[0] || '-'; // Fallback
         }
 
+        // Pindahkan fungsi fillSelect ke global agar bisa diakses dari berbagai tempat termasuk pop-up modal
+        function fillSelect(id, arr, label, keys) {
+            const el = document.getElementById(id); if(!el) return;
+            el.innerHTML = `<option value="" disabled selected>${label}</option>`;
+            arr.forEach(item => { const v = getCol(item, keys); if(v && v!=='-') el.innerHTML += `<option value="${v}">${v}</option>`; });
+        }
+
         function renderAllData() {
             // Stats
             document.getElementById('dashTotalDosen').innerText = appData.dosen.length; document.getElementById('dashTotalMhs').innerText = appData.mahasiswa.length;
@@ -714,11 +721,6 @@
             }
 
             // Populate Form Dropdowns
-            const fillSelect = (id, arr, label, keys) => {
-                const el = document.getElementById(id); if(!el) return;
-                el.innerHTML = `<option value="" disabled selected>${label}</option>`;
-                arr.forEach(item => { const v = getCol(item, keys); if(v && v!=='-') el.innerHTML += `<option value="${v}">${v}</option>`; });
-            };
             fillSelect('jurnalDosen', appData.dosen, 'Pilih Dosen...', ['Nama Dosen','Nama','nama']);
             fillSelect('jurnalProdi', appData.prodi, 'Pilih Program Studi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
             fillSelect('jurnalMataKuliah', appData.mataKuliah, 'Pilih Mata Kuliah...', ['Nama Mata Kuliah','Mata Kuliah','nama']);
