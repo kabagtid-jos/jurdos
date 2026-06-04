@@ -135,7 +135,7 @@
                 <div class="text-[11px] text-gray-400 dark:text-slate-500 uppercase tracking-widest font-bold mb-3 px-3">Menu Utama</div>
                 <nav class="space-y-1.5">
                     <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl text-white bg-primary font-semibold shadow-md shadow-primary/20 transition-all"><i class="fas fa-chart-pie w-5 text-center"></i> Dashboard</button>
-                    <button onclick="navigate('input-jurnal')" id="nav-input-jurnal" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 font-medium transition-all"><i class="fas fa-pen-nib w-5 text-center text-gray-400"></i> Input Jurnal</button>
+                    <button onclick="navigate('input-jurnal')" id="nav-input-jurnal" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 font-medium transition-all"><i class="fas fa-pen-nib w-5 text-center text-gray-400"></i> Input Presensi</button>
                     <button onclick="navigate('dosen')" id="nav-dosen" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 font-medium transition-all"><i class="fas fa-user-tie w-5 text-center text-gray-400"></i> Data Dosen</button>
                     <button onclick="navigate('mahasiswa')" id="nav-mahasiswa" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 font-medium transition-all"><i class="fas fa-users w-5 text-center text-gray-400"></i> Data Mahasiswa</button>
                     <button onclick="navigate('rekap')" id="nav-rekap" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 font-medium transition-all"><i class="fas fa-chart-bar w-5 text-center text-gray-400"></i> Rekapitulasi</button>
@@ -219,7 +219,7 @@
                             <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                             <div class="relative flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-500 dark:text-slate-400 font-semibold uppercase tracking-wider mb-1">Total Dosen</p>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 font-semibold uppercase tracking-wider mb-1">Dosen</p>
                                     <h3 id="dashTotalDosen" class="text-4xl font-black text-gray-800 dark:text-white"><div class="skeleton-box w-12"></div></h3>
                                 </div>
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30"><i class="fas fa-user-tie text-2xl"></i></div>
@@ -241,7 +241,7 @@
                             <div class="absolute -right-6 -top-6 w-24 h-24 bg-green-50 dark:bg-green-900/20 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                             <div class="relative flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-500 dark:text-slate-400 font-semibold uppercase tracking-wider mb-1">Jurnal Hari Ini</p>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 font-semibold uppercase tracking-wider mb-1">Presensi Hari Ini</p>
                                     <h3 id="dashPresensiHariIni" class="text-4xl font-black text-gray-800 dark:text-white"><div class="skeleton-box w-8"></div></h3>
                                 </div>
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-600 text-white flex items-center justify-center shadow-lg shadow-green-500/30"><i class="fas fa-check-double text-2xl"></i></div>
@@ -297,7 +297,6 @@
                             
                             <!-- WIZARD TAHAP 1: Info Perkuliahan -->
                             <div id="wiz-step1" class="transition-opacity duration-300">
-                                <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-slate-700 pb-2">Informasi Perkuliahan</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Tanggal</label><input type="date" id="jurnalTanggal" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required></div>
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Nama Dosen</label><select id="jurnalDosen" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Dosen...</option></select></div>
@@ -742,61 +741,118 @@
 
         // --- CHART JS INIT ---
         function initChart() {
-            const ctx = document.getElementById('jurnalChart');
-            if(!ctx || appData.jurnal.length === 0) return;
+            if(appData.jurnal.length === 0 && appData.mahasiswa.length === 0) return;
             
-            document.getElementById('chartSkeleton').classList.add('hidden'); // Sembunyikan loading
+            // Sembunyikan semua skeleton
+            document.getElementById('chartSkeleton1')?.classList.add('hidden');
+            document.getElementById('chartSkeleton2')?.classList.add('hidden');
+            document.getElementById('chartSkeleton3')?.classList.add('hidden');
             
-            // Hitung jurnal 7 hari terakhir
-            let counts = [0,0,0,0,0,0,0], labels = [];
-            const today = new Date();
-            for(let i=6; i>=0; i--) {
-                const d = new Date(today); d.setDate(today.getDate()-i);
-                labels.push(d.toLocaleDateString('id-ID', {weekday:'short'}));
-                appData.jurnal.forEach(j => {
-                    const jD = new Date(getCol(j,['Timestamp','Tanggal','tanggal']));
-                    if(!isNaN(jD) && jD.getDate()===d.getDate() && jD.getMonth()===d.getMonth() && jD.getFullYear()===d.getFullYear()) counts[6-i]++;
-                });
-            }
-
             const isDark = document.documentElement.classList.contains('dark');
             const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
             const textColor = isDark ? '#94a3b8' : '#64748b';
 
-            if(chartInstance) chartInstance.destroy(); // Hancurkan yang lama jika ada
-
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Kelas Diselenggarakan',
-                        data: counts,
-                        backgroundColor: '#0ea5e9', // Sky 500
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barThickness: 24
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor, drawBorder: false } },
-                        x: { ticks: { color: textColor }, grid: { display: false, drawBorder: false } }
-                    }
+            // 1. CHART PRESENSI DOSEN (Bar Chart)
+            const ctxDosen = document.getElementById('dosenChart');
+            if(ctxDosen) {
+                let counts = [0,0,0,0,0,0,0], labels = [];
+                const today = new Date();
+                for(let i=6; i>=0; i--) {
+                    const d = new Date(today); d.setDate(today.getDate()-i);
+                    labels.push(d.toLocaleDateString('id-ID', {weekday:'short'}));
+                    appData.jurnal.forEach(j => {
+                        const jD = new Date(getCol(j,['Timestamp','Tanggal','tanggal']));
+                        if(!isNaN(jD) && jD.getDate()===d.getDate() && jD.getMonth()===d.getMonth() && jD.getFullYear()===d.getFullYear()) counts[6-i]++;
+                    });
                 }
-            });
+
+                if(dosenChartInstance) dosenChartInstance.destroy();
+                dosenChartInstance = new Chart(ctxDosen, {
+                    type: 'bar',
+                    data: { labels: labels, datasets: [{ label: 'Kelas Diselenggarakan', data: counts, backgroundColor: '#0ea5e9', borderRadius: 6, barThickness: 24 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor, drawBorder: false } }, x: { ticks: { color: textColor }, grid: { display: false, drawBorder: false } } } }
+                });
+            }
+
+            // 2. CHART JENIS KELAMIN (Doughnut Chart)
+            const ctxGender = document.getElementById('genderChart');
+            if(ctxGender) {
+                let male = 0, female = 0;
+                appData.mahasiswa.forEach(m => {
+                    const jk = getCol(m, ['Jenis Kelamin', 'JK', 'jk']);
+                    if(jk && jk.toLowerCase().includes('laki')) male++;
+                    else if(jk && jk.toLowerCase().includes('perempuan')) female++;
+                });
+
+                if(genderChartInstance) genderChartInstance.destroy();
+                genderChartInstance = new Chart(ctxGender, {
+                    type: 'doughnut',
+                    data: { 
+                        labels: ['Laki-laki', 'Perempuan'], 
+                        datasets: [{ data: [male, female], backgroundColor: ['#3b82f6', '#ec4899'], borderWidth: 0, hoverOffset: 4 }] 
+                    },
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, cutout: '75%', 
+                        plugins: { legend: { position: 'bottom', labels: { color: textColor, padding: 20, usePointStyle: true, boxWidth: 8 } } } 
+                    }
+                });
+            }
+
+            // 3. CHART PRESENSI MAHASISWA PER BULAN (Line Chart)
+            const ctxMhs = document.getElementById('mhsChart');
+            if(ctxMhs) {
+                let monthlyHadir = new Array(12).fill(0);
+                const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                
+                appData.jurnal.forEach(j => {
+                    const dV = getCol(j, ['Timestamp', 'Tanggal', 'tanggal']);
+                    if(dV) {
+                        const d = new Date(dV);
+                        if(!isNaN(d.getTime())) {
+                            const month = d.getMonth(); // 0 - 11
+                            const absensiStr = getCol(j, ['Absensi', 'absensi']) || '';
+                            // Hitung jumlah kata "(Hadir)" dalam string absensi
+                            const hadirCount = (absensiStr.match(/\(Hadir\)/gi) || []).length;
+                            monthlyHadir[month] += hadirCount;
+                        }
+                    }
+                });
+
+                if(mhsChartInstance) mhsChartInstance.destroy();
+                mhsChartInstance = new Chart(ctxMhs, {
+                    type: 'line',
+                    data: { 
+                        labels: monthLabels, 
+                        datasets: [{ 
+                            label: 'Total Mahasiswa Hadir', data: monthlyHadir, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                            borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#10b981', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6, fill: true, tension: 0.4
+                        }] 
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor, drawBorder: false } }, x: { ticks: { color: textColor }, grid: { display: false, drawBorder: false } } } }
+                });
+            }
         }
 
         function updateChartTheme(isDark) {
-            if(!chartInstance) return;
             const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
             const textColor = isDark ? '#94a3b8' : '#64748b';
-            chartInstance.options.scales.y.grid.color = gridColor;
-            chartInstance.options.scales.y.ticks.color = textColor;
-            chartInstance.options.scales.x.ticks.color = textColor;
-            chartInstance.update();
+            
+            if(dosenChartInstance) {
+                dosenChartInstance.options.scales.y.grid.color = gridColor;
+                dosenChartInstance.options.scales.y.ticks.color = textColor;
+                dosenChartInstance.options.scales.x.ticks.color = textColor;
+                dosenChartInstance.update();
+            }
+            if(genderChartInstance) {
+                genderChartInstance.options.plugins.legend.labels.color = textColor;
+                genderChartInstance.update();
+            }
+            if(mhsChartInstance) {
+                mhsChartInstance.options.scales.y.grid.color = gridColor;
+                mhsChartInstance.options.scales.y.ticks.color = textColor;
+                mhsChartInstance.options.scales.x.ticks.color = textColor;
+                mhsChartInstance.update();
+            }
         }
 
         // --- WIZARD FORM JURNAL ---
