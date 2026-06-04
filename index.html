@@ -211,8 +211,6 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Nama Dosen</label>
                                     <select id="jurnalDosen" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
                                         <option value="" disabled selected>Pilih Dosen...</option>
-                                        <option value="Dr. Ahmad Budi, M.Pd">Dr. Ahmad Budi, M.Pd</option>
-                                        <option value="Siti Fatimah, M.A">Siti Fatimah, M.A</option>
                                     </select>
                                 </div>
                                 <div>
@@ -234,7 +232,6 @@
                                     </select>
                                 </div>
                                 
-                                <!-- Bagian Absensi Mahasiswa diubah menjadi list dropdown per mahasiswa -->
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Daftar Absensi Mahasiswa</label>
                                     <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-60 overflow-y-auto">
@@ -246,49 +243,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="studentAttendanceList">
-                                                <tr class="border-b border-gray-100">
-                                                    <td class="py-3 text-gray-700">Muhammad Fikri</td>
-                                                    <td class="py-2">
-                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Muhammad Fikri">
-                                                            <option value="Hadir" selected>Hadir</option>
-                                                            <option value="Izin">Izin</option>
-                                                            <option value="Sakit">Sakit</option>
-                                                            <option value="Alpha">Alpha</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr class="border-b border-gray-100">
-                                                    <td class="py-3 text-gray-700">Aisyah Putri</td>
-                                                    <td class="py-2">
-                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Aisyah Putri">
-                                                            <option value="Hadir" selected>Hadir</option>
-                                                            <option value="Izin">Izin</option>
-                                                            <option value="Sakit">Sakit</option>
-                                                            <option value="Alpha">Alpha</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr class="border-b border-gray-100">
-                                                    <td class="py-3 text-gray-700">Budi Santoso</td>
-                                                    <td class="py-2">
-                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Budi Santoso">
-                                                            <option value="Hadir" selected>Hadir</option>
-                                                            <option value="Izin">Izin</option>
-                                                            <option value="Sakit">Sakit</option>
-                                                            <option value="Alpha">Alpha</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
                                                 <tr>
-                                                    <td class="py-3 text-gray-700">Siti Aminah</td>
-                                                    <td class="py-2">
-                                                        <select class="student-status-select w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-secondary outline-none" data-name="Siti Aminah">
-                                                            <option value="Hadir" selected>Hadir</option>
-                                                            <option value="Izin">Izin</option>
-                                                            <option value="Sakit">Sakit</option>
-                                                            <option value="Alpha">Alpha</option>
-                                                        </select>
-                                                    </td>
+                                                    <td colspan="2" class="py-3 text-center text-gray-500">Memuat data...</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -393,6 +349,20 @@
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Pengaturan Sistem</h2>
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-4xl">
                         
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Koneksi Database (Google Sheets)</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Google Apps Script Web App URL</label>
+                                    <input type="text" id="scriptUrlInput" class="w-full px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary" value="https://script.google.com/macros/s/..." placeholder="Masukkan URL API" disabled>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="mockDataToggle" class="rounded text-primary focus:ring-primary h-4 w-4">
+                                    <label class="text-sm text-gray-700">Gunakan Mode Simulasi (Mock Data) untuk preview UI</label>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- MANAJEMEN DATA MASTER -->
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Manajemen Data Master</h3>
@@ -514,6 +484,22 @@
             </div>
         </div>
     </div>
+    
+    <!-- CUSTOM POPUP ALERT -->
+    <div id="customPopup" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-gray-900 bg-opacity-50 transition-opacity opacity-0 duration-300">
+        <div id="customPopupBox" class="bg-white rounded-2xl shadow-xl w-11/12 max-w-sm overflow-hidden transform transition-all scale-95 opacity-0 duration-300">
+            <div class="p-6 text-center">
+                <div id="customPopupIcon" class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4">
+                    <!-- Icon disisipkan disini oleh JS -->
+                </div>
+                <h3 id="customPopupTitle" class="text-xl font-bold text-gray-800 mb-2">Title</h3>
+                <p id="customPopupMessage" class="text-sm text-gray-600 mb-6">Message here</p>
+                <button onclick="closePopup()" class="w-full bg-primary text-white font-semibold py-3 rounded-xl shadow hover:bg-blue-700 transition">
+                    OK Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Overlay Background for Mobile Sidebar -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-30 hidden md:hidden" onclick="toggleSidebar()"></div>
@@ -521,16 +507,58 @@
     <script>
         // CONFIGURATION
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytO29mRmuEq94v1i27tudnmff4ng1CPZ5RR1e2ZpE3jS041aLeeTQfnZrPEPQJl1Bd/exec'; 
-        let USE_MOCK_DATA = false; // Set false untuk memanggil API betulan
+        let USE_MOCK_DATA = false; // Default: terhubung ke API asli
         let appData = { dosen: [], mahasiswa: [], prodi: [], mataKuliah: [], metode: [], jurnal: [] }; // Menyimpan data dari spreadsheet
 
-        // Initialize App (Aman dari error null)
+        // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
             const dateEl = document.getElementById('currentDate');
             if(dateEl) {
                 dateEl.innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             }
         });
+
+        // --- FUNGSI CUSTOM POPUP ALERT ---
+        function showPopup(title, message, type = 'success') {
+            const popup = document.getElementById('customPopup');
+            const box = document.getElementById('customPopupBox');
+            const icon = document.getElementById('customPopupIcon');
+            
+            document.getElementById('customPopupTitle').innerText = title;
+            document.getElementById('customPopupMessage').innerText = message;
+
+            if (type === 'success') {
+                icon.className = 'mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-500 text-3xl mb-4';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else if (type === 'error') {
+                icon.className = 'mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 text-red-500 text-3xl mb-4';
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+            } else {
+                icon.className = 'mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 text-yellow-500 text-3xl mb-4';
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            }
+
+            popup.classList.remove('hidden');
+            // Timeout sedikir agar CSS animasi bisa ditrigger
+            setTimeout(() => {
+                popup.classList.remove('opacity-0');
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('customPopup');
+            const box = document.getElementById('customPopupBox');
+            
+            popup.classList.add('opacity-0');
+            box.classList.remove('scale-100', 'opacity-100');
+            box.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 300);
+        }
 
         function handleLogin(e) {
             e.preventDefault();
@@ -544,23 +572,19 @@
                     document.getElementById('loginError').classList.remove('hidden');
                 }
             } else {
-                // Live API Login
                 const btnSubmit = e.target.querySelector('button[type="submit"]');
                 const originalText = btnSubmit.innerHTML;
                 
-                // Ubah state tombol menjadi loading
                 btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Proses...';
                 btnSubmit.disabled = true;
                 document.getElementById('loginError').classList.add('hidden');
 
-                // Kita gunakan GET request karena backend code.gs mengecek e.parameter
                 const url = `${GOOGLE_SCRIPT_URL}?action=login&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`;
 
                 fetch(url)
                 .then(res => res.json())
                 .then(async data => {
                     if(data.status === 'success') {
-                        // Jika login berhasil, ambil data dari spreadsheet sebelum masuk
                         btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengambil Data...';
                         await fetchAllData();
                         
@@ -569,7 +593,6 @@
                         
                         loginSuccess(data.user.nama || data.user.username);
                     } else {
-                        // Login gagal, tampilkan pesan error dari API
                         const errEl = document.getElementById('loginError');
                         errEl.innerText = data.message || 'Username atau password salah!';
                         errEl.classList.remove('hidden');
@@ -578,7 +601,6 @@
                     }
                 })
                 .catch(err => {
-                    // Error koneksi (misal URL salah atau terblokir CORS)
                     const errEl = document.getElementById('loginError');
                     errEl.innerText = 'Koneksi ke server gagal. Periksa URL Apps Script Anda.';
                     errEl.classList.remove('hidden');
@@ -592,7 +614,6 @@
         async function fetchAllData() {
             if (USE_MOCK_DATA) return;
             try {
-                // Fetch semua tabel dari spreadsheet secara paralel
                 const [resDosen, resMhs, resProdi, resMK, resMetode, resJurnal] = await Promise.all([
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getDosen`).then(r => r.json()).catch(() => ({status:'error'})),
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getMahasiswa`).then(r => r.json()).catch(() => ({status:'error'})),
@@ -609,19 +630,17 @@
                 if (resMetode.status === 'success') appData.metode = resMetode.data || [];
                 if (resJurnal.status === 'success') appData.jurnal = resJurnal.data || [];
 
-                renderAllData(); // Perbarui tampilan dengan data dari API
+                renderAllData();
             } catch (err) {
                 console.error("Gagal mengambil data:", err);
-                alert("Peringatan: Gagal mengambil beberapa data dari Spreadsheet.");
+                showPopup("Peringatan", "Gagal mengambil beberapa data dari Spreadsheet.", "error");
             }
         }
 
         function renderAllData() {
-            // 1. Render Dashboard Stats
             document.getElementById('dashTotalDosen').innerText = appData.dosen.length;
             document.getElementById('dashTotalMhs').innerText = appData.mahasiswa.length;
 
-            // Hitung jumlah jurnal/kelas yang masuk hari ini
             let hariIniCount = 0;
             const today = new Date();
             appData.jurnal.forEach(j => {
@@ -640,21 +659,18 @@
             const presensiEl = document.getElementById('dashPresensiHariIni');
             if(presensiEl) presensiEl.innerText = hariIniCount;
 
-            // Render Dashboard Activity
             const activityList = document.getElementById('recentActivityList');
             if (activityList) {
                 activityList.innerHTML = '';
                 if (appData.jurnal.length === 0) {
                     activityList.innerHTML = '<div class="p-4 text-center text-sm text-gray-500">Belum ada aktivitas jurnal</div>';
                 } else {
-                    // Tampilkan 3 jurnal terakhir
                     const recentJurnal = appData.jurnal.slice(-3).reverse();
                     recentJurnal.forEach(j => {
                         const dosen = j['Dosen'] || j['dosen'] || '-';
                         const inisial = dosen.substring(0, 2).toUpperCase();
                         const mk = j['Mata Kuliah'] || j['mataKuliah'] || '-';
                         
-                        // Parse Tanggal (jika ada)
                         let tglStr = '-';
                         if(j['Timestamp'] || j['Tanggal'] || j['tanggal']) {
                             const d = new Date(j['Timestamp'] || j['Tanggal'] || j['tanggal']);
@@ -677,14 +693,12 @@
                 }
             }
 
-            // 2. Render Tabel Dosen
             const tbodyDosen = document.getElementById('tbodyDosen');
             tbodyDosen.innerHTML = '';
             if (appData.dosen.length === 0) {
                 tbodyDosen.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Tidak ada data dosen</td></tr>';
             } else {
                 appData.dosen.forEach(d => {
-                    // Adaptasi nama kolom dari Google Sheets
                     const nidn = d['NIDN'] || d['nidn'] || '-';
                     const nama = d['Nama Dosen'] || d['Nama'] || d['nama'] || '-';
                     const prodi = d['Program Studi'] || d['Prodi'] || d['prodi'] || '-';
@@ -704,7 +718,7 @@
                     `;
                 });
             }
-            // 4. Render Dropdown Dosen, Prodi, Mata Kuliah, Metode (di form Jurnal)
+
             const selectDosen = document.getElementById('jurnalDosen');
             if (selectDosen) {
                 selectDosen.innerHTML = '<option value="" disabled selected>Pilih Dosen...</option>';
@@ -741,10 +755,12 @@
                 });
             }
 
-            // 5. Render Daftar Absensi Mahasiswa (di form Jurnal)
             const tbodyAbsen = document.getElementById('studentAttendanceList');
             if (tbodyAbsen) {
                 tbodyAbsen.innerHTML = '';
+                if (appData.mahasiswa.length === 0) {
+                    tbodyAbsen.innerHTML = '<tr><td colspan="2" class="py-3 text-center text-gray-500">Tidak ada data mahasiswa</td></tr>';
+                }
                 appData.mahasiswa.forEach(m => {
                     const nama = m['Nama Mahasiswa'] || m['Nama'] || m['nama'] || 'Tanpa Nama';
                     tbodyAbsen.innerHTML += `
@@ -763,7 +779,6 @@
                 });
             }
 
-            // 6. Render Data Master di Halaman Setting
             const listProdi = document.getElementById('listMasterProdi');
             if (listProdi) {
                 listProdi.innerHTML = '';
@@ -836,7 +851,6 @@
             const userDisplay = document.getElementById('userNameDisplay');
             if (userDisplay) userDisplay.innerText = name;
             
-            // Set Default value form Jurnal (Aman dari null)
             const jurnalTanggal = document.getElementById('jurnalTanggal');
             if (jurnalTanggal) jurnalTanggal.valueAsDate = new Date();
             
@@ -850,7 +864,6 @@
             btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
             btnSubmit.disabled = true;
 
-            // Kumpulkan data absensi dari setiap dropdown mahasiswa
             const attendanceSelects = document.querySelectorAll('.student-status-select');
             let attendanceDataArr = [];
             attendanceSelects.forEach(select => {
@@ -870,7 +883,7 @@
 
             if (USE_MOCK_DATA) {
                 setTimeout(() => {
-                    alert('Mode Simulasi: Jurnal berhasil disimpan!\n\nMata Kuliah: ' + payload.mataKuliah + '\nData Absensi: ' + payload.absensi);
+                    showPopup("Berhasil!", "Jurnal untuk " + payload.mataKuliah + " berhasil disimpan (Simulasi)", "success");
                     document.getElementById('formJurnal').reset();
                     
                     const tgl = document.getElementById('jurnalTanggal');
@@ -888,16 +901,16 @@
                 .then(res => res.json())
                 .then(data => {
                     if(data.status === 'success') {
-                        alert('Jurnal berhasil disimpan ke Spreadsheet!');
+                        showPopup("Berhasil!", "Jurnal berhasil disimpan ke Spreadsheet!", "success");
                         document.getElementById('formJurnal').reset();
                         
                         const tgl = document.getElementById('jurnalTanggal');
                         if(tgl) tgl.valueAsDate = new Date();
                     } else {
-                        alert('Gagal: ' + data.message);
+                        showPopup("Gagal", data.message, "error");
                     }
                 })
-                .catch(err => alert('Error jaringan: ' + err))
+                .catch(err => showPopup("Error Jaringan", "Terjadi kesalahan: " + err, "error"))
                 .finally(() => {
                     btnSubmit.innerHTML = originalText;
                     btnSubmit.disabled = false;
@@ -919,14 +932,11 @@
         }
 
         function navigate(pageId) {
-            // Sembunyikan semua halaman
             document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
             
-            // Tampilkan halaman target
             const targetPage = document.getElementById(`view-${pageId}`);
             if(targetPage) targetPage.classList.remove('hidden');
 
-            // Update style menu navigasi
             document.querySelectorAll('.nav-btn').forEach(el => {
                 el.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all';
             });
@@ -935,7 +945,6 @@
                 activeBtn.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-lg text-white bg-gradient-to-r from-primary to-secondary font-medium shadow-md transition-all';
             }
 
-            // Tutup sidebar di HP setelah pindah halaman
             if (window.innerWidth < 768) {
                 const sidebar = document.getElementById('sidebar');
                 if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
@@ -957,7 +966,6 @@
             }
         }
 
-        // --- FUNGSI MASTER DATA ---
         function openMasterModal(type) {
             document.getElementById('md-type').value = type;
             const modal = document.getElementById('masterModal');
@@ -1055,7 +1063,7 @@
                     closeMasterModal();
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    alert('Data berhasil ditambahkan (Mode Simulasi)');
+                    showPopup("Berhasil!", "Data berhasil ditambahkan (Mode Simulasi)", "success");
                 }, 800);
             } else {
                 fetch(`${GOOGLE_SCRIPT_URL}?action=addMaster`, {
@@ -1065,21 +1073,29 @@
                 .then(res => res.json())
                 .then(data => {
                     if(data.status === 'success') {
-                        alert('Data berhasil disimpan ke Spreadsheet!');
                         // Refresh data from server to update UI
                         fetchAllData().then(() => {
                             closeMasterModal();
+                            showPopup("Berhasil!", "Data berhasil disimpan ke Spreadsheet!", "success");
                         });
                     } else {
-                        alert('Gagal: ' + data.message);
+                        showPopup("Gagal Menyimpan", data.message, "error");
                     }
                 })
-                .catch(err => alert('Error jaringan: ' + err))
+                .catch(err => showPopup("Error Jaringan", "Terjadi kesalahan: " + err, "error"))
                 .finally(() => {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 });
             }
+        }
+        
+        const mockDataToggle = document.getElementById('mockDataToggle');
+        if(mockDataToggle) {
+            mockDataToggle.addEventListener('change', function(e) {
+                USE_MOCK_DATA = e.target.checked;
+                showPopup("Informasi", USE_MOCK_DATA ? 'Mode Simulasi Aktif. Data tidak akan dikirim.' : 'Mode Live API Aktif.', 'warning');
+            });
         }
     </script>
 </body>
