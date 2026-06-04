@@ -610,7 +610,43 @@
                     document.getElementById('loginError').classList.remove('hidden');
                 }
             } else {
-                // Fetch API Login
+                // Live API Login
+                const btnSubmit = e.target.querySelector('button[type="submit"]');
+                const originalText = btnSubmit.innerHTML;
+                
+                // Ubah state tombol menjadi loading
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Proses...';
+                btnSubmit.disabled = true;
+                document.getElementById('loginError').classList.add('hidden');
+
+                // Kita gunakan GET request karena backend code.gs mengecek e.parameter
+                const url = `${GOOGLE_SCRIPT_URL}?action=login&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`;
+
+                fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        // Login berhasil, gunakan nama dari Google Sheets jika ada
+                        loginSuccess(data.user.nama || data.user.username);
+                    } else {
+                        // Login gagal, tampilkan pesan error dari API
+                        const errEl = document.getElementById('loginError');
+                        errEl.innerText = data.message || 'Username atau password salah!';
+                        errEl.classList.remove('hidden');
+                    }
+                })
+                .catch(err => {
+                    // Error koneksi (misal URL salah atau terblokir CORS)
+                    const errEl = document.getElementById('loginError');
+                    errEl.innerText = 'Koneksi ke server gagal. Periksa URL Apps Script Anda.';
+                    errEl.classList.remove('hidden');
+                    console.error('Login Error:', err);
+                })
+                .finally(() => {
+                    // Kembalikan tombol ke keadaan semula
+                    btnSubmit.innerHTML = originalText;
+                    btnSubmit.disabled = false;
+                });
             }
         }
 
