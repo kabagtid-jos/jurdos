@@ -930,7 +930,8 @@
             
             document.getElementById('formMasterData').reset();
             ['kode','sks','prodi','nidn','status','nim','semester','jk'].forEach(f => {
-                document.getElementById(`wrap-md-${f}`).classList.add('hidden');
+                const wrap = document.getElementById(`wrap-md-${f}`);
+                if (wrap) wrap.classList.add('hidden'); // Cek keamanan jika elemen sudah dihapus
                 const el = document.getElementById(`md-${f}`); if(el) el.required = false;
             });
 
