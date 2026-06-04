@@ -236,6 +236,14 @@
                                     </select>
                                 </div>
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Program Studi</label>
+                                    <select id="jurnalProdi" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
+                                        <option value="" disabled selected>Pilih Program Studi...</option>
+                                        <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
+                                        <option value="Ekonomi Syariah">Ekonomi Syariah</option>
+                                    </select>
+                                </div>
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Mata Kuliah</label>
                                     <select id="jurnalMataKuliah" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition" required>
                                         <option value="" disabled selected>Pilih Mata Kuliah...</option>
@@ -425,7 +433,7 @@
                 <!-- VIEW: SETTING -->
                 <div id="view-setting" class="page-view hidden fade-in">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Pengaturan Sistem</h2>
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-2xl">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-4xl">
                         
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Koneksi Database (Google Sheets)</h3>
@@ -440,6 +448,133 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- MANAJEMEN DATA MASTER -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Manajemen Data Master</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                
+                                <!-- Card: Program Studi -->
+                                <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="font-semibold text-gray-700">Program Studi</h4>
+                                        <button class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
+                                            <i class="fas fa-plus"></i> Tambah
+                                        </button>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-600">
+                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <span>Pendidikan Agama Islam</span>
+                                            <div class="flex gap-2">
+                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
+                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </li>
+                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <span>Ekonomi Syariah</span>
+                                            <div class="flex gap-2">
+                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
+                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Card: Metode Perkuliahan -->
+                                <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="font-semibold text-gray-700">Metode Perkuliahan</h4>
+                                        <button class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1">
+                                            <i class="fas fa-plus"></i> Tambah
+                                        </button>
+                                    </div>
+                                    <ul class="space-y-2 text-sm text-gray-600">
+                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <span>Tatap Muka (Luring)</span>
+                                            <div class="flex gap-2">
+                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
+                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </li>
+                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <span>Daring (Online)</span>
+                                            <div class="flex gap-2">
+                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
+                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </li>
+                                        <li class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <span>Hybrid</span>
+                                            <div class="flex gap-2">
+                                                <button class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
+                                                <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Card: Mata Kuliah -->
+                                <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 md:col-span-2">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="font-semibold text-gray-700">Mata Kuliah</h4>
+                                        <div class="flex gap-2">
+                                            <input type="text" placeholder="Cari mata kuliah..." class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary w-full md:w-auto">
+                                            <button class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1 whitespace-nowrap">
+                                                <i class="fas fa-plus"></i> Tambah
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-sm text-gray-600 border-collapse">
+                                            <thead>
+                                                <tr class="bg-gray-100 border-b border-gray-200">
+                                                    <th class="p-3 font-medium rounded-tl-lg">Kode</th>
+                                                    <th class="p-3 font-medium">Nama Mata Kuliah</th>
+                                                    <th class="p-3 font-medium">SKS</th>
+                                                    <th class="p-3 font-medium">Program Studi</th>
+                                                    <th class="p-3 font-medium text-right rounded-tr-lg">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="bg-white border-b border-gray-100 hover:bg-gray-50">
+                                                    <td class="p-3">MK-001</td>
+                                                    <td class="p-3 font-medium text-gray-700">Metodologi Penelitian</td>
+                                                    <td class="p-3">2</td>
+                                                    <td class="p-3">PAI</td>
+                                                    <td class="p-3 text-right">
+                                                        <button class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
+                                                        <button class="text-red-500 hover:text-red-700 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr class="bg-white border-b border-gray-100 hover:bg-gray-50">
+                                                    <td class="p-3">MK-002</td>
+                                                    <td class="p-3 font-medium text-gray-700">Sejarah Kebudayaan Islam</td>
+                                                    <td class="p-3">3</td>
+                                                    <td class="p-3">PAI</td>
+                                                    <td class="p-3 text-right">
+                                                        <button class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
+                                                        <button class="text-red-500 hover:text-red-700 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr class="bg-white hover:bg-gray-50 rounded-b-lg">
+                                                    <td class="p-3">MK-003</td>
+                                                    <td class="p-3 font-medium text-gray-700">Fikih Muamalah</td>
+                                                    <td class="p-3">2</td>
+                                                    <td class="p-3">Ekonomi Syariah</td>
+                                                    <td class="p-3 text-right">
+                                                        <button class="text-blue-500 hover:text-blue-700 mx-1" title="Edit"><i class="fas fa-edit"></i></button>
+                                                        <button class="text-red-500 hover:text-red-700 mx-1" title="Hapus"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -512,6 +647,7 @@
                 action: 'saveJurnal',
                 tanggal: document.getElementById('jurnalTanggal').value,
                 dosen: document.getElementById('jurnalDosen').value,
+                prodi: document.getElementById('jurnalProdi').value,
                 mataKuliah: document.getElementById('jurnalMataKuliah').value,
                 metode: document.getElementById('jurnalMetode').value,
                 absensi: absensiString
