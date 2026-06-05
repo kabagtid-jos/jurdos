@@ -544,7 +544,9 @@
 
                     <div id="wrap-md-semester" class="mb-5 hidden">
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Semester Aktif</label>
-                        <input type="number" id="md-semester" min="1" max="14" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                        <select id="md-semester" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                            <option value="" disabled selected>Pilih Semester...</option>
+                        </select>
                     </div>
 
                     <div id="wrap-md-prodi" class="mb-6 hidden">
@@ -1175,6 +1177,7 @@
                 showReq('nim'); showReq('jk'); showReq('prodi'); showReq('semester'); showOpt('foto');
                 document.getElementById('md-prodi').classList.remove('hidden'); document.getElementById('md-prodi-checkboxes').classList.add('hidden');
                 fillSelect('md-prodi', appData.prodi, 'Pilih Prodi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
+                fillSelect('md-semester', appData.semester, 'Pilih Semester...', ['Nama Semester','Semester','nama']);
             }
             
             modal.classList.remove('hidden');
