@@ -514,6 +514,15 @@
                         <div id="md-prodi-checkboxes" class="hidden space-y-2.5 mt-2 max-h-40 overflow-y-auto p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-900/50"></div>
                     </div>
 
+                    <!-- Input Foto (Menggunakan URL Link Gambar) -->
+                    <div id="wrap-md-foto" class="mb-5 hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">URL Foto / Gambar (Opsional)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fas fa-link text-gray-400"></i></div>
+                            <input type="url" id="md-foto" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all" placeholder="https://contoh.com/foto.jpg">
+                        </div>
+                    </div>
+
                     <div class="flex flex-col-reverse md:flex-row gap-3 pt-4 border-t border-gray-100 dark:border-slate-700">
                         <button type="button" onclick="closeMasterModal()" class="w-full md:w-auto px-5 py-3 rounded-xl text-sm font-bold text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 transition">Batal</button>
                         <button type="submit" id="btnSaveMaster" class="w-full md:w-auto md:flex-1 px-5 py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-blue-700 shadow-md shadow-primary/30 transition flex justify-center items-center gap-2"><i class="fas fa-save"></i> Simpan Data</button>
@@ -705,18 +714,25 @@
                 });
             }
 
-            // Cards Dosen (Mobile Optimized List View with Edit/Delete)
+            // Cards Dosen (Mobile Optimized List View with Foto)
             const boxDosen = document.getElementById('cardContainerDosen');
             if(boxDosen){ 
                 boxDosen.innerHTML = '';
                 if(appData.dosen.length===0) boxDosen.innerHTML = '<div class="py-10 text-center text-gray-500">Data dosen kosong</div>';
                 else appData.dosen.forEach(d => {
                     const nidn = getCol(d,['NIDN','nidn']), nama = getCol(d,['Nama Dosen','Nama','nama']), jk = getCol(d,['Jenis Kelamin','JK','jk']), prodi = getCol(d,['Program Studi','Prodi','prodi']), status = getCol(d,['Status','status']);
+                    const foto = getCol(d, ['Foto', 'foto', 'URL Foto']);
                     const statClass = status.toLowerCase()==='aktif' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                    
+                    let avatarHtml = `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl shrink-0"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div>`;
+                    if (foto && foto !== '-' && foto.startsWith('http')) {
+                        avatarHtml = `<img src="${foto}" alt="${nama}" class="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white dark:border-slate-800 shadow-sm" onerror="this.outerHTML='<div class=\\'w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl shrink-0\\'><i class=\\'fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}\\'></i></div>'">`;
+                    }
+
                     boxDosen.innerHTML += `
                     <div class="card-item bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl shrink-0"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div>
+                            ${avatarHtml}
                             <div>
                                 <h4 class="font-bold text-gray-800 dark:text-white leading-tight searchable">${nama}</h4>
                                 <div class="flex flex-wrap items-center gap-2 mt-1">
@@ -735,14 +751,35 @@
                 });
             }
 
-            // Cards Mahasiswa
+            // Cards Mahasiswa (With Foto)
             const boxMhs = document.getElementById('cardContainerMhs');
             if(boxMhs){ 
                 boxMhs.innerHTML = '';
                 if(appData.mahasiswa.length===0) boxMhs.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500">Data mahasiswa kosong</div>';
                 else appData.mahasiswa.forEach(m => {
                     const nim = getCol(m,['NIM','nim']), nama = getCol(m,['Nama Mahasiswa','Nama','nama']), jk = getCol(m,['Jenis Kelamin','JK','jk']), prodi = getCol(m,['Prodi','Program Studi','prodi']), smt = getCol(m,['Semester','semester']);
-                    boxMhs.innerHTML += `<div class="card-item bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-soft"><div class="flex justify-between items-start mb-1"><span class="text-xs font-bold text-primary dark:text-blue-400 searchable">${nim}</span><span class="text-[10px] bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded text-gray-600 dark:text-slate-300 font-bold">SMT ${smt}</span></div><h4 class="font-bold text-gray-800 dark:text-white text-lg mb-3 searchable">${nama}</h4><div class="flex gap-2"><span class="text-[10px] bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-lg font-semibold truncate max-w-[60%] border border-blue-100 dark:border-blue-800/30">${prodi}</span><span class="text-[10px] bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2.5 py-1 rounded-lg font-semibold border border-slate-200 dark:border-slate-600">${jk.charAt(0)}</span></div></div>`;
+                    const foto = getCol(m, ['Foto', 'foto', 'URL Foto']);
+
+                    let avatarMhsHtml = `<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xl shrink-0"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div>`;
+                    if (foto && foto !== '-' && foto.startsWith('http')) {
+                        avatarMhsHtml = `<img src="${foto}" alt="${nama}" class="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white dark:border-slate-800 shadow-sm" onerror="this.outerHTML='<div class=\\'w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xl shrink-0\\'><i class=\\'fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}\\'></i></div>'">`;
+                    }
+
+                    boxMhs.innerHTML += `
+                    <div class="card-item bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-soft">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-xs font-bold text-primary dark:text-blue-400 searchable block mb-1">${nim}</span>
+                                <span class="text-[10px] bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded text-gray-600 dark:text-slate-300 font-bold">SMT ${smt}</span>
+                            </div>
+                            ${avatarMhsHtml}
+                        </div>
+                        <h4 class="font-bold text-gray-800 dark:text-white text-lg mb-3 searchable">${nama}</h4>
+                        <div class="flex gap-2">
+                            <span class="text-[10px] bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-lg font-semibold truncate max-w-[60%] border border-blue-100 dark:border-blue-800/30">${prodi}</span>
+                            <span class="text-[10px] bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2.5 py-1 rounded-lg font-semibold border border-slate-200 dark:border-slate-600">${jk.charAt(0)}</span>
+                        </div>
+                    </div>`;
                 });
             }
 
@@ -954,7 +991,7 @@
             // Reset readonly state just in case
             document.getElementById('md-nidn').readOnly = false;
             
-            ['kode','sks','prodi','nidn','status','nim','semester','jk'].forEach(f => {
+            ['kode','sks','prodi','nidn','status','nim','semester','jk', 'foto'].forEach(f => {
                 const wrap = document.getElementById(`wrap-md-${f}`);
                 if (wrap) wrap.classList.add('hidden'); // Cek keamanan jika elemen sudah dihapus
                 const el = document.getElementById(`md-${f}`); if(el) el.required = false;
@@ -975,7 +1012,7 @@
             } 
             else if (type === 'dosen') {
                 t.innerText = 'Tambah Dosen'; l.innerText = 'Nama Lengkap (beserta gelar)';
-                showOpt('prodi'); showReq('nidn'); showReq('jk');
+                showOpt('prodi'); showReq('nidn'); showReq('jk'); showOpt('foto');
                 document.getElementById('md-prodi').classList.add('hidden'); document.getElementById('md-prodi-checkboxes').classList.remove('hidden');
                 
                 const cbContainer = document.getElementById('md-prodi-checkboxes'); cbContainer.innerHTML = '';
@@ -986,7 +1023,7 @@
             } 
             else if (type === 'mahasiswa') {
                 t.innerText = 'Tambah Mahasiswa'; l.innerText = 'Nama Lengkap Mahasiswa';
-                showReq('nim'); showReq('jk'); showReq('prodi'); showReq('semester');
+                showReq('nim'); showReq('jk'); showReq('prodi'); showReq('semester'); showOpt('foto');
                 document.getElementById('md-prodi').classList.remove('hidden'); document.getElementById('md-prodi-checkboxes').classList.add('hidden');
                 fillSelect('md-prodi', appData.prodi, 'Pilih Prodi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
             }
@@ -1018,14 +1055,14 @@
                 const sel = Array.from(document.querySelectorAll('.prodi-checkbox:checked')).map(cb => cb.value).join(', ');
                 if (!sel) { showPopup("Perhatian", "Centang minimal 1 prodi", "warning"); btn.innerHTML=ori; btn.disabled=false; return; }
                 payload.sheetName = 'Dosen'; 
-                payload.rowData = [v('nidn'), v('nama'), v('jk'), sel, 'Aktif'];
+                payload.rowData = [v('nidn'), v('nama'), v('jk'), sel, 'Aktif', v('foto')];
                 
                 if (editMode) {
                     payload.idColumn = 'NIDN';
                     payload.idValue = currentEditId;
                 }
             } 
-            else if (type === 'mahasiswa') { payload.sheetName = 'Mahasiswa'; payload.rowData = [v('nim'), v('nama'), v('jk'), v('prodi'), v('semester')]; }
+            else if (type === 'mahasiswa') { payload.sheetName = 'Mahasiswa'; payload.rowData = [v('nim'), v('nama'), v('jk'), v('prodi'), v('semester'), v('foto')]; }
 
             if (USE_MOCK_DATA) {
                 setTimeout(() => { showPopup("Berhasil", "Data tersimpan (Simulasi)", "success"); closeMasterModal(); btn.innerHTML=ori; btn.disabled=false; }, 800);
@@ -1050,6 +1087,10 @@
             document.getElementById('md-nidn').readOnly = true; // Kunci NIDN supaya tidak merusak ID
             document.getElementById('md-nama').value = getCol(dosen, ['Nama Dosen', 'Nama', 'nama']);
             document.getElementById('md-jk').value = getCol(dosen, ['Jenis Kelamin', 'JK', 'jk']);
+            
+            // Set Foto
+            const foto = getCol(dosen, ['Foto', 'foto', 'URL Foto']);
+            document.getElementById('md-foto').value = foto !== '-' ? foto : '';
             
             // Set checkboxes for Prodi
             const prodis = getCol(dosen, ['Program Studi', 'Prodi', 'prodi']).split(', ');
