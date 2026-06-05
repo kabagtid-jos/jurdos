@@ -76,9 +76,6 @@
         th.sticky-header { position: sticky; top: 0; z-index: 10; }
         
         .mob-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; padding: 0.5rem 0; transition: color 0.3s; }
-        
-        /* Wizard Form Styles */
-        .step-hidden { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased overflow-x-hidden h-screen flex transition-colors duration-300">
@@ -281,38 +278,26 @@
                     </div>
                 </div>
 
-                <!-- VIEW: INPUT JURNAL (WIZARD) -->
+                <!-- VIEW: INPUT JURNAL (SINGLE PAGE) -->
                 <div id="view-input-jurnal" class="page-view hidden">
                     <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-6 md:p-10 max-w-4xl transition-colors mx-auto relative overflow-hidden">
-                        <!-- Wizard Progress Bar -->
-                        <div class="flex items-center mb-8 relative z-10">
-                            <div id="wiz-step1-indicator" class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shadow-md ring-4 ring-blue-50 dark:ring-slate-900 transition-colors">1</div>
-                            <div class="flex-1 h-1.5 mx-4 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div id="wiz-progress-bar" class="h-full bg-primary w-0 transition-all duration-500"></div>
-                            </div>
-                            <div id="wiz-step2-indicator" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400 flex items-center justify-center font-bold transition-colors">2</div>
-                        </div>
-
                         <form id="formJurnal" onsubmit="submitJurnal(event)">
                             
-                            <!-- WIZARD TAHAP 1: Info Perkuliahan -->
-                            <div id="wiz-step1" class="transition-opacity duration-300">
+                            <!-- Bagian 1: Info Perkuliahan -->
+                            <div class="mb-8">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Tanggal</label><input type="date" id="jurnalTanggal" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required></div>
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Nama Dosen</label><select id="jurnalDosen" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Dosen...</option></select></div>
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Program Studi</label><select id="jurnalProdi" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required onchange="filterMahasiswaByProdi()"><option value="" disabled selected>Pilih Program Studi...</option></select></div>
-                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Mata Kuliah</label><select id="jurnalMataKuliah" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Mata Kuliah...</option></select></div>
+                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Mata Kuliah</label><select id="jurnalMataKuliah" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Prodi terlebih dahulu...</option></select></div>
                                     <div class="md:col-span-2"><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Metode Perkuliahan</label><select id="jurnalMetode" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Metode...</option></select></div>
-                                </div>
-                                <div class="mt-8 flex justify-end">
-                                    <button type="button" onclick="nextWizardStep()" class="bg-primary text-white px-8 py-3.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-transform flex items-center gap-2">Selanjutnya <i class="fas fa-arrow-right"></i></button>
                                 </div>
                             </div>
 
-                            <!-- WIZARD TAHAP 2: Absensi -->
-                            <div id="wiz-step2" class="step-hidden transition-opacity duration-300">
-                                <div class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-slate-700 pb-2">
-                                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">Absensi Mahasiswa</h4>
+                            <!-- Bagian 2: Absensi -->
+                            <div class="pt-6 border-t border-gray-100 dark:border-slate-700">
+                                <div class="flex justify-between items-center mb-4 pb-2">
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Absensi Mahasiswa</h4>
                                     <div class="flex gap-2">
                                         <button type="button" onclick="setAllAttendance('Hadir')" class="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-3 py-1.5 rounded-lg font-semibold hover:bg-green-200 transition">Hadir Semua</button>
                                     </div>
@@ -334,9 +319,8 @@
                                     </div>
                                 </div>
 
-                                <div class="flex justify-between items-center mt-6">
-                                    <button type="button" onclick="prevWizardStep()" class="text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white font-semibold flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-                                    <button type="submit" id="btnSubmitJurnal" class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:-translate-y-0.5 transition-transform flex items-center gap-2"><i class="fas fa-paper-plane"></i> Simpan Jurnal</button>
+                                <div class="flex justify-end items-center mt-8">
+                                    <button type="submit" id="btnSubmitJurnal" class="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white px-10 py-3.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:-translate-y-0.5 transition-transform flex items-center justify-center gap-2"><i class="fas fa-paper-plane"></i> Simpan</button>
                                 </div>
                             </div>
                         </form>
@@ -699,7 +683,7 @@
                 else appData.dosen.forEach(d => {
                     const nidn = getCol(d,['NIDN','nidn']), nama = getCol(d,['Nama Dosen','Nama','nama']), jk = getCol(d,['Jenis Kelamin','JK','jk']), prodi = getCol(d,['Program Studi','Prodi','prodi']), status = getCol(d,['Status','status']);
                     const statClass = status.toLowerCase()==='aktif' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-                    boxDosen.innerHTML += `<div class="card-item bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-soft flex flex-col justify-between"><div class="flex items-start gap-4 mb-4"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div><div><h4 class="font-bold text-gray-800 dark:text-white leading-tight searchable">${nama}</h4><p class="text-xs text-gray-500 dark:text-slate-400 mt-1 searchable">${nidn}</p></div></div><div class="mt-auto pt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center"><div class="text-[10px] font-bold text-gray-400 uppercase max-w-[120px] truncate">${prodi}</div><span class="px-2.5 py-1 rounded-md text-[10px] font-bold ${statClass}">${status}</span></div></div>`;
+                    boxDosen.innerHTML += `<div class="card-item bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-soft flex flex-col justify-between"><div class="flex items-start gap-4 mb-4"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div><div><h4 class="font-bold text-gray-800 dark:text-white leading-tight searchable">${nama}</h4><p class="text-xs text-gray-500 dark:text-slate-400 mt-1 searchable">${nidn}</p></div></div><div class="mt-auto pt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center"><div class="text-[10px] font-bold text-gray-400 uppercase max-w-[120px] truncate">${prodi}</div><span class="px-2.5 py-1 rounded-md text-[10px] font-bold ${statClass}"> ${status}</span></div></div>`;
                 });
             }
 
@@ -716,7 +700,10 @@
             // Populate Form Dropdowns
             fillSelect('jurnalDosen', appData.dosen, 'Pilih Dosen...', ['Nama Dosen','Nama','nama']);
             fillSelect('jurnalProdi', appData.prodi, 'Pilih Program Studi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
-            fillSelect('jurnalMataKuliah', appData.mataKuliah, 'Pilih Mata Kuliah...', ['Nama Mata Kuliah','Mata Kuliah','nama']);
+            
+            // Set default Mata Kuliah menyuruh pilih prodi dulu
+            document.getElementById('jurnalMataKuliah').innerHTML = '<option value="" disabled selected>Pilih Prodi terlebih dahulu...</option>';
+            
             fillSelect('jurnalMetode', appData.metode, 'Pilih Metode...', ['Nama Metode','Metode Perkuliahan','Metode','nama']);
 
             // Populate Settings Lists
@@ -855,34 +842,12 @@
             }
         }
 
-        // --- WIZARD FORM JURNAL ---
-        function nextWizardStep() {
-            // Validasi manual HTML5 untuk Tahap 1
-            const form = document.getElementById('formJurnal');
-            const step1Inputs = document.getElementById('wiz-step1').querySelectorAll('input[required], select[required]');
-            let isValid = true;
-            step1Inputs.forEach(input => { if(!input.checkValidity()) { input.reportValidity(); isValid = false; } });
-            
-            if(isValid) {
-                document.getElementById('wiz-step1').classList.add('step-hidden');
-                document.getElementById('wiz-step2').classList.remove('step-hidden');
-                document.getElementById('wiz-progress-bar').style.width = '100%';
-                document.getElementById('wiz-step2-indicator').className = 'w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shadow-md transition-colors delay-300';
-            }
-        }
-
-        function prevWizardStep() {
-            document.getElementById('wiz-step2').classList.add('step-hidden');
-            document.getElementById('wiz-step1').classList.remove('step-hidden');
-            document.getElementById('wiz-progress-bar').style.width = '0%';
-            document.getElementById('wiz-step2-indicator').className = 'w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400 flex items-center justify-center font-bold transition-colors';
-        }
-
         function filterMahasiswaByProdi() {
             const selProdi = document.getElementById('jurnalProdi').value;
             const tbody = document.getElementById('studentAttendanceList');
             tbody.innerHTML = '';
             
+            // 1. Filter Data Mahasiswa berdasarkan Prodi
             const filteredMhs = appData.mahasiswa.filter(m => getCol(m,['Prodi','Program Studi','prodi']) === selProdi);
             
             if (filteredMhs.length === 0) {
@@ -902,6 +867,14 @@
                         </tr>
                     `;
                 });
+            }
+            
+            // 2. Filter Mata Kuliah berdasarkan Prodi
+            const filteredMK = appData.mataKuliah.filter(mk => getCol(mk,['Prodi','Program Studi']) === selProdi);
+            if (filteredMK.length === 0) {
+                document.getElementById('jurnalMataKuliah').innerHTML = `<option value="" disabled selected>Belum ada MK di ${selProdi}</option>`;
+            } else {
+                fillSelect('jurnalMataKuliah', filteredMK, 'Pilih Mata Kuliah...', ['Nama Mata Kuliah','Mata Kuliah','nama']);
             }
         }
 
@@ -935,7 +908,8 @@
             document.getElementById('formJurnal').reset();
             const tgl = document.getElementById('jurnalTanggal'); if(tgl) tgl.valueAsDate = new Date();
             document.getElementById('studentAttendanceList').innerHTML = '<tr><td colspan="2" class="py-10 text-center text-gray-500 text-sm">Pilih Prodi terlebih dahulu</td></tr>';
-            prevWizardStep(); navigate('dashboard'); fetchAllData(); // Refresh bg data
+            document.getElementById('jurnalMataKuliah').innerHTML = '<option value="" disabled selected>Pilih Prodi terlebih dahulu...</option>';
+            navigate('dashboard'); fetchAllData(); // Refresh bg data
         }
 
         // --- NAVIGATION & UI HELPERS ---
