@@ -350,7 +350,7 @@
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Tahun Akademik</label><select id="jurnalTahunAkademik" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Tahun...</option></select></div>
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Nama Dosen</label><select id="jurnalDosen" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Dosen...</option></select></div>
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Program Studi</label><select id="jurnalProdi" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required onchange="filterMahasiswaByProdi()"><option value="" disabled selected>Pilih Program Studi...</option></select></div>
-                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Mata Kuliah</label><select id="jurnalMataKuliah" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Prodi terlebih dahulu...</option></select></div>
+                                    <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Mata Kuliah</label><select id="jurnalMataKuliah" onchange="filterMahasiswaByMataKuliah()" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Prodi terlebih dahulu...</option></select></div>
                                     <div><label class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Metode Perkuliahan</label><select id="jurnalMetode" class="w-full px-4 py-3.5 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" required><option value="" disabled selected>Pilih Metode...</option></select></div>
                                 </div>
                             </div>
@@ -1286,40 +1286,111 @@
         }
 
         // --- FILTER FOR JURNAL ---
-        function filterMahasiswaByProdi() {
-            const selProdi = document.getElementById('jurnalProdi').value;
+        function normalizeText(value) {
+            return (value || '').toString().trim().toLowerCase();
+        }
+
+        function normalizeSemester(value) {
+            return normalizeText(value).replace(/^semester\s*/i, '').trim();
+        }
+
+        function isSameText(a, b) {
+            return normalizeText(a) === normalizeText(b);
+        }
+
+        function isSameSemester(a, b) {
+            const normA = normalizeText(a);
+            const normB = normalizeText(b);
+            return normA === normB || normalizeSemester(a) === normalizeSemester(b);
+        }
+
+        function escapeHtml(value) {
+            return (value || '').toString().replace(/[&<>"']/g, function(ch) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+            });
+        }
+
+        function renderAttendanceStudents(students, emptyMessage) {
             const tbody = document.getElementById('studentAttendanceList');
             tbody.innerHTML = '';
-            
-            // 1. Filter Data Mahasiswa berdasarkan Prodi
-            const filteredMhs = appData.mahasiswa.filter(m => getCol(m,['Prodi','Program Studi','prodi']) === selProdi);
-            
-            if (filteredMhs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="py-10 text-center text-gray-500 text-sm">Tidak ada mahasiswa di prodi ${selProdi}</td></tr>`;
-            } else {
-                filteredMhs.forEach((m, idx) => {
-                    const nama = getCol(m,['Nama Mahasiswa','Nama','nama']), nim = getCol(m,['NIM','nim']);
-                    const bgClass = idx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/50 dark:bg-slate-800/50';
-                    tbody.innerHTML += `
-                        <tr class="${bgClass} hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors">
-                            <td class="py-3 px-3 rounded-l-xl"><p class="font-bold text-gray-800 dark:text-slate-200 text-sm leading-tight">${nama}</p><p class="text-[10px] text-gray-500">${nim}</p></td>
-                            <td class="py-2 pr-3 rounded-r-xl">
-                                <select class="student-status-select w-full px-2 py-2 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg text-xs font-bold focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all shadow-sm" data-name="${nama}">
-                                    <option value="Hadir" selected>Hadir</option><option value="Izin">Izin</option><option value="Sakit">Sakit</option><option value="Alpha">Alpha</option>
-                                </select>
-                            </td>
-                        </tr>
-                    `;
-                });
+
+            if (students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="py-10 text-center text-gray-500 text-sm">${emptyMessage}</td></tr>`;
+                return;
             }
-            
-            // 2. Filter Mata Kuliah berdasarkan Prodi
-            const filteredMK = appData.mataKuliah.filter(mk => getCol(mk,['Prodi','Program Studi']) === selProdi);
+
+            students.forEach((m, idx) => {
+                const nama = getCol(m, ['Nama Mahasiswa','Nama','nama']);
+                const nim = getCol(m, ['NIM','nim']);
+                const bgClass = idx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/50 dark:bg-slate-800/50';
+                tbody.innerHTML += `
+                    <tr class="${bgClass} hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors">
+                        <td class="py-3 px-3 rounded-l-xl"><p class="font-bold text-gray-800 dark:text-slate-200 text-sm leading-tight">${escapeHtml(nama)}</p><p class="text-[10px] text-gray-500">${escapeHtml(nim)}</p></td>
+                        <td class="py-2 pr-3 rounded-r-xl">
+                            <select class="student-status-select w-full px-2 py-2 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-800 dark:text-white rounded-lg text-xs font-bold focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all shadow-sm" data-name="${escapeHtml(nama)}">
+                                <option value="Hadir" selected>Hadir</option><option value="Izin">Izin</option><option value="Sakit">Sakit</option><option value="Alpha">Alpha</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterMahasiswaByProdi() {
+            const selProdi = document.getElementById('jurnalProdi').value;
+            const mkSelect = document.getElementById('jurnalMataKuliah');
+            const tbody = document.getElementById('studentAttendanceList');
+
+            tbody.innerHTML = '<tr><td colspan="2" class="py-10 text-center text-gray-500 text-sm">Pilih mata kuliah terlebih dahulu</td></tr>';
+            mkSelect.innerHTML = '<option value="" disabled selected>Pilih Mata Kuliah...</option>';
+
+            // Filter Mata Kuliah tetap berdasarkan Prodi, agar logika sebelumnya tidak berubah.
+            const filteredMK = appData.mataKuliah.filter(mk => isSameText(getCol(mk, ['Prodi','Program Studi','prodi']), selProdi));
             if (filteredMK.length === 0) {
-                document.getElementById('jurnalMataKuliah').innerHTML = `<option value="" disabled selected>Belum ada MK di ${selProdi}</option>`;
-            } else {
-                fillSelect('jurnalMataKuliah', filteredMK, 'Pilih Mata Kuliah...', ['Nama Mata Kuliah','Mata Kuliah','nama']);
+                mkSelect.innerHTML = `<option value="" disabled selected>Belum ada MK di ${escapeHtml(selProdi)}</option>`;
+                return;
             }
+
+            filteredMK.forEach(mk => {
+                const nama = getCol(mk, ['Nama Mata Kuliah','Mata Kuliah','nama']);
+                const semester = getCol(mk, ['Semester','Nama Semester','semester']);
+                const kode = getCol(mk, ['Kode MK','Kode','kode']);
+                const labelKode = kode && kode !== '-' ? `${kode} - ` : '';
+                const labelSemester = semester && semester !== '-' ? ` (${semester})` : '';
+                mkSelect.innerHTML += `<option value="${escapeHtml(nama)}" data-semester="${escapeHtml(semester)}" data-prodi="${escapeHtml(selProdi)}">${escapeHtml(labelKode + nama + labelSemester)}</option>`;
+            });
+        }
+
+        function filterMahasiswaByMataKuliah() {
+            const selProdi = document.getElementById('jurnalProdi').value;
+            const mkSelect = document.getElementById('jurnalMataKuliah');
+            const selectedOption = mkSelect.options[mkSelect.selectedIndex];
+            const selectedMK = mkSelect.value;
+            const mkSemester = selectedOption ? (selectedOption.dataset.semester || '') : '';
+
+            if (!selProdi) {
+                renderAttendanceStudents([], 'Pilih Prodi terlebih dahulu');
+                return;
+            }
+
+            if (!selectedMK) {
+                renderAttendanceStudents([], 'Pilih mata kuliah terlebih dahulu');
+                return;
+            }
+
+            if (!mkSemester || mkSemester === '-') {
+                renderAttendanceStudents([], `Semester untuk mata kuliah ${escapeHtml(selectedMK)} belum tersedia di database`);
+                return;
+            }
+
+            // Mahasiswa yang muncul harus sesuai Prodi dan Semester dari Mata Kuliah terpilih.
+            const filteredMhs = appData.mahasiswa.filter(m => {
+                const mProdi = getCol(m, ['Prodi','Program Studi','prodi']);
+                const mSemester = getCol(m, ['Semester','Nama Semester','semester']);
+                return isSameText(mProdi, selProdi) && isSameSemester(mSemester, mkSemester);
+            });
+
+            renderAttendanceStudents(filteredMhs, `Tidak ada mahasiswa semester ${escapeHtml(mkSemester)} di prodi ${escapeHtml(selProdi)}`);
         }
 
         function setAllAttendance(status) {
