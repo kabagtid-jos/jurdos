@@ -702,11 +702,37 @@
             }
         }
 
+        // Helper: Convert Google Drive Link to Direct Image Link automatically
+        function getDirectImageUrl(url) {
+            if (!url || typeof url !== 'string') return '';
+            url = url.trim();
+            // Cek regex apakah itu link Google Drive
+            const driveRegex = /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=|docs\.google\.com\/file\/d\/)([\w-]+)/;
+            const match = url.match(driveRegex);
+            if (match && match[1]) {
+                // Return link uc?export=view yang didukung browser untuk load gambar
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+            return url;
+        }
+
         function getCol(obj, possibleKeys) {
             if (!obj) return '-';
-            for(let key of possibleKeys) { 
-                if(obj[key] !== undefined && obj[key] !== null && obj[key] !== '') return String(obj[key]); 
+            
+            // 1. Coba cari key yang persis sama (case-insensitive)
+            const objKeys = Object.keys(obj);
+            for(let pk of possibleKeys) { 
+                const foundKey = objKeys.find(k => k.trim().toLowerCase() === pk.trim().toLowerCase());
+                if(foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null && obj[foundKey] !== '') {
+                    return String(obj[foundKey]);
+                }
             }
+            
+            // 2. Jika secara spesifik mencari kolom foto, jangan gunakan fallback sembarangan (agar tidak me-return ID/NIM)
+            const isPhotoSearch = possibleKeys.some(k => k.toLowerCase().includes('foto') || k.toLowerCase().includes('gambar'));
+            if (isPhotoSearch) return '';
+
+            // 3. Fallback biasa: return kolom pertama jika yang dicari sama sekali tidak ketemu
             const vals = Object.values(obj);
             if (vals.length > 0 && vals[0] !== undefined && vals[0] !== null && vals[0] !== '') return String(vals[0]);
             return '-';
@@ -755,12 +781,15 @@
                 if(appData.dosen.length===0) boxDosen.innerHTML = '<div class="py-10 text-center text-gray-500">Data dosen kosong</div>';
                 else appData.dosen.forEach(d => {
                     const nidn = getCol(d,['NIDN','nidn']), nama = getCol(d,['Nama Dosen','Nama','nama']), jk = getCol(d,['Jenis Kelamin','JK','jk']), prodi = getCol(d,['Program Studi','Prodi','prodi']), status = getCol(d,['Status','status']);
-                    const foto = getCol(d, ['Foto', 'foto', 'URL Foto']);
+                    const rawFoto = getCol(d, ['Foto', 'foto', 'URL Foto', 'Link Foto', 'Gambar']);
+                    const foto = getDirectImageUrl(rawFoto);
                     const statClass = status.toLowerCase()==='aktif' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
                     
                     let avatarHtml = `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl shrink-0"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div>`;
-                    if (foto && foto !== '-' && foto.startsWith('http')) {
-                        avatarHtml = `<img src="${foto}" alt="${nama}" class="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white dark:border-slate-800 shadow-sm" onerror="this.outerHTML='<div class=\\'w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl shrink-0\\'><i class=\\'fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}\\'></i></div>'">`;
+                    if (foto && foto.startsWith('http')) {
+                        // Gunakan API inisial nama yang elegan jika link foto ternyata rusak/kadaluwarsa
+                        const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=random&color=fff`;
+                        avatarHtml = `<img src="${foto}" alt="${nama}" class="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white dark:border-slate-800 shadow-sm" onerror="this.onerror=null; this.src='${fallbackUrl}';">`;
                     }
 
                     boxDosen.innerHTML += `
@@ -792,11 +821,13 @@
                 if(appData.mahasiswa.length===0) boxMhs.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500">Data mahasiswa kosong</div>';
                 else appData.mahasiswa.forEach(m => {
                     const nim = getCol(m,['NIM','nim']), nama = getCol(m,['Nama Mahasiswa','Nama','nama']), jk = getCol(m,['Jenis Kelamin','JK','jk']), prodi = getCol(m,['Prodi','Program Studi','prodi']), smt = getCol(m,['Semester','semester']);
-                    const foto = getCol(m, ['Foto', 'foto', 'URL Foto']);
+                    const rawFoto = getCol(m, ['Foto', 'foto', 'URL Foto', 'Link Foto', 'Gambar']);
+                    const foto = getDirectImageUrl(rawFoto);
 
                     let avatarMhsHtml = `<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xl shrink-0"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div>`;
-                    if (foto && foto !== '-' && foto.startsWith('http')) {
-                        avatarMhsHtml = `<img src="${foto}" alt="${nama}" class="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white dark:border-slate-800 shadow-sm" onerror="this.outerHTML='<div class=\\'w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xl shrink-0\\'><i class=\\'fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}\\'></i></div>'">`;
+                    if (foto && foto.startsWith('http')) {
+                        const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=random&color=fff`;
+                        avatarMhsHtml = `<img src="${foto}" alt="${nama}" class="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-white dark:border-slate-800 shadow-sm" onerror="this.onerror=null; this.src='${fallbackUrl}';">`;
                     }
 
                     boxMhs.innerHTML += `
@@ -1165,8 +1196,8 @@
             document.getElementById('md-jk').value = getCol(dosen, ['Jenis Kelamin', 'JK', 'jk']);
             
             // Set Foto
-            const foto = getCol(dosen, ['Foto', 'foto', 'URL Foto']);
-            document.getElementById('md-foto').value = foto !== '-' ? foto : '';
+            const foto = getCol(dosen, ['Foto', 'foto', 'URL Foto', 'Link Foto', 'Gambar']);
+            document.getElementById('md-foto').value = foto !== '-' && foto !== '' ? foto : '';
             
             // Set checkboxes for Prodi
             const prodis = getCol(dosen, ['Program Studi', 'Prodi', 'prodi']).split(', ');
@@ -1194,8 +1225,8 @@
             document.getElementById('md-semester').value = getCol(mhs, ['Semester', 'semester']);
             
             // Set Foto
-            const foto = getCol(mhs, ['Foto', 'foto', 'URL Foto']);
-            document.getElementById('md-foto').value = foto !== '-' ? foto : '';
+            const foto = getCol(mhs, ['Foto', 'foto', 'URL Foto', 'Link Foto', 'Gambar']);
+            document.getElementById('md-foto').value = foto !== '-' && foto !== '' ? foto : '';
 
             editMode = true;
             currentEditId = nim;
