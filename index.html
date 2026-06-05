@@ -580,7 +580,7 @@
                     <input type="hidden" id="md-type">
                     
                     <div id="wrap-md-kode" class="mb-5 hidden">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kode Data</label>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kode MK</label>
                         <input type="text" id="md-kode" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
                     </div>
 
@@ -614,7 +614,7 @@
                     </div>
 
                     <div id="wrap-md-semester" class="mb-5 hidden">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Semester Aktif</label>
+                        <label id="label-md-semester" class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Semester Aktif</label>
                         <select id="md-semester" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
                             <option value="" disabled selected>Pilih Semester...</option>
                         </select>
@@ -890,8 +890,9 @@
             
             const tMK = document.getElementById('listMasterMK'); if(tMK){ tMK.innerHTML=''; if(appData.mataKuliah.length===0) tMK.innerHTML='<li class="p-3 text-center text-xs text-gray-500">Data kosong</li>';
                 appData.mataKuliah.forEach(mk => {
-                    const k = getCol(mk,['Kode','kode']), n = getCol(mk,['Nama Mata Kuliah','Mata Kuliah','nama']), s = getCol(mk,['SKS','sks']), p = getCol(mk,['Prodi','Program Studi']);
-                    tMK.innerHTML += `<li class="searchable-item flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded searchable">${k}</span><span class="text-[10px] text-gray-500 dark:text-slate-400">${s} SKS</span></div><h5 class="font-bold text-gray-800 dark:text-slate-200 leading-tight searchable">${n}</h5><p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1">${p}</p></div><button class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-red-900/20 w-8 h-8 rounded-lg flex items-center justify-center transition shrink-0"><i class="fas fa-trash text-xs"></i></button></li>`;
+                    const k = getCol(mk,['Kode','Kode MK','kode']), n = getCol(mk,['Nama Mata Kuliah','Mata Kuliah','nama']), s = getCol(mk,['SKS','sks']), p = getCol(mk,['Prodi','Program Studi']), sm = getCol(mk,['Semester','Nama Semester','semester']);
+                    const semesterInfo = (sm && sm !== '-') ? `<span class="text-[10px] text-gray-500 dark:text-slate-400">Semester: ${sm}</span>` : '';
+                    tMK.innerHTML += `<li class="searchable-item flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded searchable">${k}</span><span class="text-[10px] text-gray-500 dark:text-slate-400">${s} SKS</span>${semesterInfo}</div><h5 class="font-bold text-gray-800 dark:text-slate-200 leading-tight searchable">${n}</h5><p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1">${p}</p></div><button class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-red-900/20 w-8 h-8 rounded-lg flex items-center justify-center transition shrink-0"><i class="fas fa-trash text-xs"></i></button></li>`;
                 });
             }
         }
@@ -1430,9 +1431,11 @@
             else if (type === 'tahunAkademik') { t.innerText = 'Tambah Tahun Akademik'; l.innerText = 'Nama Tahun Akademik (Cth: 2024/2025)'; } 
             else if (type === 'matakuliah') {
                 t.innerText = 'Tambah Mata Kuliah'; l.innerText = 'Nama Mata Kuliah';
-                showReq('kode'); showReq('sks'); showReq('prodi');
+                showReq('kode'); showReq('sks'); showReq('prodi'); showReq('semester');
+                document.getElementById('label-md-semester').innerText = 'Semester';
                 document.getElementById('md-prodi').classList.remove('hidden'); document.getElementById('md-prodi-checkboxes').classList.add('hidden');
                 fillSelect('md-prodi', appData.prodi, 'Pilih Prodi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
+                fillSelect('md-semester', appData.semester, 'Pilih Semester...', ['Nama Semester','Semester','nama']);
             } 
             else if (type === 'dosen') {
                 t.innerText = 'Tambah Dosen'; l.innerText = 'Nama Lengkap (beserta gelar)';
@@ -1447,6 +1450,7 @@
             } 
             else if (type === 'mahasiswa') {
                 t.innerText = 'Tambah Mahasiswa'; l.innerText = 'Nama Lengkap Mahasiswa';
+                document.getElementById('label-md-semester').innerText = 'Semester Aktif';
                 showReq('nim'); showReq('jk'); showReq('prodi'); showReq('semester'); showOpt('foto');
                 document.getElementById('md-prodi').classList.remove('hidden'); document.getElementById('md-prodi-checkboxes').classList.add('hidden');
                 fillSelect('md-prodi', appData.prodi, 'Pilih Prodi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
@@ -1477,7 +1481,7 @@
             else if (type === 'metode') { payload.sheetName = 'Metode'; payload.rowData = [v('nama')]; } 
             else if (type === 'semester') { payload.sheetName = 'Semester'; payload.rowData = [v('nama')]; } 
             else if (type === 'tahunAkademik') { payload.sheetName = 'TahunAkademik'; payload.rowData = [v('nama')]; } 
-            else if (type === 'matakuliah') { payload.sheetName = 'MataKuliah'; payload.rowData = [v('kode'), v('nama'), v('sks'), v('prodi')]; } 
+            else if (type === 'matakuliah') { payload.sheetName = 'MataKuliah'; payload.rowData = [v('kode'), v('nama'), v('sks'), v('prodi'), v('semester')]; } 
             else if (type === 'dosen') {
                 const sel = Array.from(document.querySelectorAll('.prodi-checkbox:checked')).map(cb => cb.value).join(', ');
                 if (!sel) { showPopup("Perhatian", "Centang minimal 1 prodi", "warning"); btn.innerHTML=ori; btn.disabled=false; return; }
