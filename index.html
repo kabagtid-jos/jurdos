@@ -76,6 +76,9 @@
         th.sticky-header { position: sticky; top: 0; z-index: 10; }
         
         .mob-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; padding: 0.5rem 0; transition: color 0.3s; }
+        
+        /* Wizard Form Styles */
+        .step-hidden { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased overflow-x-hidden h-screen flex transition-colors duration-300">
@@ -295,9 +298,9 @@
                             </div>
 
                             <!-- Bagian 2: Absensi -->
-                            <div class="pt-6 border-t border-gray-100 dark:border-slate-700">
-                                <div class="flex justify-between items-center mb-4 pb-2">
-                                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Absensi Mahasiswa</h4>
+                            <div>
+                                <div class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-slate-700 pb-2">
+                                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">Absensi Mahasiswa</h4>
                                     <div class="flex gap-2">
                                         <button type="button" onclick="setAllAttendance('Hadir')" class="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-3 py-1.5 rounded-lg font-semibold hover:bg-green-200 transition">Hadir Semua</button>
                                     </div>
@@ -313,7 +316,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="studentAttendanceList">
-                                                <tr><td colspan="2" class="py-10 text-center"><div class="skeleton-box w-48"></div></td></tr>
+                                                <tr><td colspan="2" class="py-10 text-center text-gray-500 text-sm">Pilih Prodi terlebih dahulu</td></tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -339,12 +342,11 @@
                         </div>
                     </div>
                     
-                    <!-- Grid System replacing Table for better mobile UX -->
-                    <div id="cardContainerDosen" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Container Dosen (Berubah menjadi List View) -->
+                    <div id="cardContainerDosen" class="flex flex-col gap-3">
                         <!-- Skeleton Loaders -->
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm"><div class="flex items-center gap-4 mb-4"><div class="w-12 h-12 rounded-full skeleton-box"></div><div><div class="w-32 h-4 mb-2 skeleton-box"></div><div class="w-20 h-3 skeleton-box"></div></div></div><div class="w-full h-8 skeleton-box rounded-lg"></div></div>
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm hidden md:block"><div class="flex items-center gap-4 mb-4"><div class="w-12 h-12 rounded-full skeleton-box"></div><div><div class="w-32 h-4 mb-2 skeleton-box"></div><div class="w-20 h-3 skeleton-box"></div></div></div><div class="w-full h-8 skeleton-box rounded-lg"></div></div>
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm hidden lg:block"><div class="flex items-center gap-4 mb-4"><div class="w-12 h-12 rounded-full skeleton-box"></div><div><div class="w-32 h-4 mb-2 skeleton-box"></div><div class="w-20 h-3 skeleton-box"></div></div></div><div class="w-full h-8 skeleton-box rounded-lg"></div></div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-32 h-4 mb-2 skeleton-box"></div><div class="w-20 h-3 skeleton-box"></div></div></div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-32 h-4 mb-2 skeleton-box"></div><div class="w-20 h-3 skeleton-box"></div></div></div>
                     </div>
                 </div>
 
@@ -536,12 +538,33 @@
         </div>
     </div>
 
+    <!-- CUSTOM CONFIRM MODAL (Hapus Data) -->
+    <div id="confirmModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center transition-all duration-300">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="confirmModalBackdrop"></div>
+        <div id="confirmModalBox" class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-10/12 max-w-sm overflow-hidden transform scale-90 opacity-0 transition-all duration-300 relative z-10">
+            <div class="p-8 text-center">
+                <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 text-4xl mb-5"><i class="fas fa-trash-alt"></i></div>
+                <h3 class="text-2xl font-extrabold text-gray-800 dark:text-white mb-2 tracking-tight">Hapus Data?</h3>
+                <p id="confirmModalMessage" class="text-sm text-gray-500 dark:text-slate-400 mb-8 leading-relaxed">Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="flex gap-3">
+                    <button onclick="closeConfirmModal()" class="w-1/2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-bold py-3.5 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">Batal</button>
+                    <button onclick="executeDelete()" id="btnConfirmDelete" class="w-1/2 bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-xl shadow-md transition-colors flex items-center justify-center">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- CONFIGURATION ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytO29mRmuEq94v1i27tudnmff4ng1CPZ5RR1e2ZpE3jS041aLeeTQfnZrPEPQJl1Bd/exec'; 
         let USE_MOCK_DATA = false;
         let appData = { dosen: [], mahasiswa: [], prodi: [], mataKuliah: [], metode: [], jurnal: [], semester: [] };
         let chartInstance = null; // Store chart object
+        
+        // Globals for Edit/Delete State
+        let editMode = false;
+        let currentEditId = null;
+        let deleteTarget = null;
 
         // --- THEME & INIT ---
         function toggleDarkMode() {
@@ -650,7 +673,6 @@
             return Object.values(obj)[0] || '-'; // Fallback
         }
 
-        // Pindahkan fungsi fillSelect ke global agar bisa diakses dari berbagai tempat termasuk pop-up modal
         function fillSelect(id, arr, label, keys) {
             const el = document.getElementById(id); if(!el) return;
             el.innerHTML = `<option value="" disabled selected>${label}</option>`;
@@ -659,9 +681,16 @@
 
         function renderAllData() {
             // Stats
-            document.getElementById('dashTotalDosen').innerText = appData.dosen.length; document.getElementById('dashTotalMhs').innerText = appData.mahasiswa.length;
+            document.getElementById('dashTotalDosen').innerText = appData.dosen.length; 
+            document.getElementById('dashTotalMhs').innerText = appData.mahasiswa.length;
             let hariIni = 0; const t = new Date();
-            appData.jurnal.forEach(j => { const dV = getCol(j,['Timestamp','Tanggal','tanggal']); if (dV) { const d = new Date(dV); if(!isNaN(d.getTime()) && d.getDate()===t.getDate() && d.getMonth()===t.getMonth() && d.getFullYear()===t.getFullYear()) hariIni++; } });
+            appData.jurnal.forEach(j => { 
+                const dV = getCol(j,['Timestamp','Tanggal','tanggal']); 
+                if (dV) { 
+                    const d = new Date(dV); 
+                    if(!isNaN(d.getTime()) && d.getDate()===t.getDate() && d.getMonth()===t.getMonth() && d.getFullYear()===t.getFullYear()) hariIni++; 
+                } 
+            });
             document.getElementById('dashPresensiHariIni').innerText = hariIni;
 
             // Activity List
@@ -676,20 +705,40 @@
                 });
             }
 
-            // Cards Dosen (Mobile Optimized)
+            // Cards Dosen (Mobile Optimized List View with Edit/Delete)
             const boxDosen = document.getElementById('cardContainerDosen');
-            if(boxDosen){ boxDosen.innerHTML = '';
-                if(appData.dosen.length===0) boxDosen.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500">Data dosen kosong</div>';
+            if(boxDosen){ 
+                boxDosen.innerHTML = '';
+                if(appData.dosen.length===0) boxDosen.innerHTML = '<div class="py-10 text-center text-gray-500">Data dosen kosong</div>';
                 else appData.dosen.forEach(d => {
                     const nidn = getCol(d,['NIDN','nidn']), nama = getCol(d,['Nama Dosen','Nama','nama']), jk = getCol(d,['Jenis Kelamin','JK','jk']), prodi = getCol(d,['Program Studi','Prodi','prodi']), status = getCol(d,['Status','status']);
                     const statClass = status.toLowerCase()==='aktif' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-                    boxDosen.innerHTML += `<div class="card-item bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-soft flex flex-col justify-between"><div class="flex items-start gap-4 mb-4"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div><div><h4 class="font-bold text-gray-800 dark:text-white leading-tight searchable">${nama}</h4><p class="text-xs text-gray-500 dark:text-slate-400 mt-1 searchable">${nidn}</p></div></div><div class="mt-auto pt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center"><div class="text-[10px] font-bold text-gray-400 uppercase max-w-[120px] truncate">${prodi}</div><span class="px-2.5 py-1 rounded-md text-[10px] font-bold ${statClass}"> ${status}</span></div></div>`;
+                    boxDosen.innerHTML += `
+                    <div class="card-item bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-400 dark:text-slate-300 text-xl shrink-0"><i class="fas ${jk.toLowerCase().includes('perempuan')?'fa-female':'fa-male'}"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white leading-tight searchable">${nama}</h4>
+                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                    <span class="text-xs text-gray-500 dark:text-slate-400 searchable font-mono">${nidn}</span>
+                                    <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-slate-600 hidden md:block"></span>
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase truncate max-w-[150px]">${prodi}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end gap-2 mt-2 md:mt-0 pt-3 md:pt-0 border-t border-gray-100 dark:border-slate-700 md:border-none w-full md:w-auto">
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold ${statClass} mr-auto md:mr-0">${status}</span>
+                            <button onclick="editDosen('${nidn}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-slate-700 dark:text-blue-400 transition flex items-center justify-center" title="Edit"><i class="fas fa-edit text-xs"></i></button>
+                            <button onclick="confirmDelete('dosen', '${nidn}', '${nama}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-slate-700 dark:text-red-400 transition flex items-center justify-center" title="Hapus"><i class="fas fa-trash text-xs"></i></button>
+                        </div>
+                    </div>`;
                 });
             }
 
-            // Cards Mahasiswa (Mobile Optimized)
+            // Cards Mahasiswa
             const boxMhs = document.getElementById('cardContainerMhs');
-            if(boxMhs){ boxMhs.innerHTML = '';
+            if(boxMhs){ 
+                boxMhs.innerHTML = '';
                 if(appData.mahasiswa.length===0) boxMhs.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500">Data mahasiswa kosong</div>';
                 else appData.mahasiswa.forEach(m => {
                     const nim = getCol(m,['NIM','nim']), nama = getCol(m,['Nama Mahasiswa','Nama','nama']), jk = getCol(m,['Jenis Kelamin','JK','jk']), prodi = getCol(m,['Prodi','Program Studi','prodi']), smt = getCol(m,['Semester','semester']);
@@ -701,7 +750,7 @@
             fillSelect('jurnalDosen', appData.dosen, 'Pilih Dosen...', ['Nama Dosen','Nama','nama']);
             fillSelect('jurnalProdi', appData.prodi, 'Pilih Program Studi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
             
-            // Set default Mata Kuliah menyuruh pilih prodi dulu
+            // Set default Mata Kuliah
             document.getElementById('jurnalMataKuliah').innerHTML = '<option value="" disabled selected>Pilih Prodi terlebih dahulu...</option>';
             
             fillSelect('jurnalMetode', appData.metode, 'Pilih Metode...', ['Nama Metode','Metode Perkuliahan','Metode','nama']);
@@ -718,7 +767,10 @@
             fillList('listMasterMetode', appData.metode, ['Nama Metode','Metode Perkuliahan','Metode','nama']);
             fillList('listMasterSemester', appData.semester, ['Nama Semester','Semester','nama']);
             
-            const tMK = document.getElementById('listMasterMK'); if(tMK){ tMK.innerHTML=''; if(appData.mataKuliah.length===0) tMK.innerHTML='<li class="p-3 text-center text-xs text-gray-500">Data kosong</li>';
+            const tMK = document.getElementById('listMasterMK'); 
+            if(tMK){ 
+                tMK.innerHTML=''; 
+                if(appData.mataKuliah.length===0) tMK.innerHTML='<li class="p-3 text-center text-xs text-gray-500">Data kosong</li>';
                 appData.mataKuliah.forEach(mk => {
                     const k = getCol(mk,['Kode','kode']), n = getCol(mk,['Nama Mata Kuliah','Mata Kuliah','nama']), s = getCol(mk,['SKS','sks']), p = getCol(mk,['Prodi','Program Studi']);
                     tMK.innerHTML += `<li class="searchable-item flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded searchable">${k}</span><span class="text-[10px] text-gray-500 dark:text-slate-400">${s} SKS</span></div><h5 class="font-bold text-gray-800 dark:text-slate-200 leading-tight searchable">${n}</h5><p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1">${p}</p></div><button class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-red-900/20 w-8 h-8 rounded-lg flex items-center justify-center transition shrink-0"><i class="fas fa-trash text-xs"></i></button></li>`;
@@ -731,62 +783,14 @@
             if(appData.jurnal.length === 0 && appData.mahasiswa.length === 0) return;
             
             // Sembunyikan semua skeleton
-            document.getElementById('chartSkeleton1')?.classList.add('hidden');
-            document.getElementById('chartSkeleton2')?.classList.add('hidden');
-            document.getElementById('chartSkeleton3')?.classList.add('hidden');
+            document.getElementById('chartSkeleton')?.classList.add('hidden');
             
             const isDark = document.documentElement.classList.contains('dark');
             const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
             const textColor = isDark ? '#94a3b8' : '#64748b';
 
-            // 1. CHART PRESENSI DOSEN (Bar Chart)
-            const ctxDosen = document.getElementById('dosenChart');
-            if(ctxDosen) {
-                let counts = [0,0,0,0,0,0,0], labels = [];
-                const today = new Date();
-                for(let i=6; i>=0; i--) {
-                    const d = new Date(today); d.setDate(today.getDate()-i);
-                    labels.push(d.toLocaleDateString('id-ID', {weekday:'short'}));
-                    appData.jurnal.forEach(j => {
-                        const jD = new Date(getCol(j,['Timestamp','Tanggal','tanggal']));
-                        if(!isNaN(jD) && jD.getDate()===d.getDate() && jD.getMonth()===d.getMonth() && jD.getFullYear()===d.getFullYear()) counts[6-i]++;
-                    });
-                }
-
-                if(dosenChartInstance) dosenChartInstance.destroy();
-                dosenChartInstance = new Chart(ctxDosen, {
-                    type: 'bar',
-                    data: { labels: labels, datasets: [{ label: 'Kelas Diselenggarakan', data: counts, backgroundColor: '#0ea5e9', borderRadius: 6, barThickness: 24 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor, drawBorder: false } }, x: { ticks: { color: textColor }, grid: { display: false, drawBorder: false } } } }
-                });
-            }
-
-            // 2. CHART JENIS KELAMIN (Doughnut Chart)
-            const ctxGender = document.getElementById('genderChart');
-            if(ctxGender) {
-                let male = 0, female = 0;
-                appData.mahasiswa.forEach(m => {
-                    const jk = getCol(m, ['Jenis Kelamin', 'JK', 'jk']);
-                    if(jk && jk.toLowerCase().includes('laki')) male++;
-                    else if(jk && jk.toLowerCase().includes('perempuan')) female++;
-                });
-
-                if(genderChartInstance) genderChartInstance.destroy();
-                genderChartInstance = new Chart(ctxGender, {
-                    type: 'doughnut',
-                    data: { 
-                        labels: ['Laki-laki', 'Perempuan'], 
-                        datasets: [{ data: [male, female], backgroundColor: ['#3b82f6', '#ec4899'], borderWidth: 0, hoverOffset: 4 }] 
-                    },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false, cutout: '75%', 
-                        plugins: { legend: { position: 'bottom', labels: { color: textColor, padding: 20, usePointStyle: true, boxWidth: 8 } } } 
-                    }
-                });
-            }
-
-            // 3. CHART PRESENSI MAHASISWA PER BULAN (Line Chart)
-            const ctxMhs = document.getElementById('mhsChart');
+            // CHART PRESENSI MAHASISWA PER BULAN (Line Chart)
+            const ctxMhs = document.getElementById('jurnalChart');
             if(ctxMhs) {
                 let monthlyHadir = new Array(12).fill(0);
                 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -798,15 +802,14 @@
                         if(!isNaN(d.getTime())) {
                             const month = d.getMonth(); // 0 - 11
                             const absensiStr = getCol(j, ['Absensi', 'absensi']) || '';
-                            // Hitung jumlah kata "(Hadir)" dalam string absensi
                             const hadirCount = (absensiStr.match(/\(Hadir\)/gi) || []).length;
                             monthlyHadir[month] += hadirCount;
                         }
                     }
                 });
 
-                if(mhsChartInstance) mhsChartInstance.destroy();
-                mhsChartInstance = new Chart(ctxMhs, {
+                if(chartInstance) chartInstance.destroy();
+                chartInstance = new Chart(ctxMhs, {
                     type: 'line',
                     data: { 
                         labels: monthLabels, 
@@ -824,24 +827,15 @@
             const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
             const textColor = isDark ? '#94a3b8' : '#64748b';
             
-            if(dosenChartInstance) {
-                dosenChartInstance.options.scales.y.grid.color = gridColor;
-                dosenChartInstance.options.scales.y.ticks.color = textColor;
-                dosenChartInstance.options.scales.x.ticks.color = textColor;
-                dosenChartInstance.update();
-            }
-            if(genderChartInstance) {
-                genderChartInstance.options.plugins.legend.labels.color = textColor;
-                genderChartInstance.update();
-            }
-            if(mhsChartInstance) {
-                mhsChartInstance.options.scales.y.grid.color = gridColor;
-                mhsChartInstance.options.scales.y.ticks.color = textColor;
-                mhsChartInstance.options.scales.x.ticks.color = textColor;
-                mhsChartInstance.update();
+            if(chartInstance) {
+                chartInstance.options.scales.y.grid.color = gridColor;
+                chartInstance.options.scales.y.ticks.color = textColor;
+                chartInstance.options.scales.x.ticks.color = textColor;
+                chartInstance.update();
             }
         }
 
+        // --- FILTER FOR JURNAL ---
         function filterMahasiswaByProdi() {
             const selProdi = document.getElementById('jurnalProdi').value;
             const tbody = document.getElementById('studentAttendanceList');
@@ -925,7 +919,7 @@
                 document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
                 const targetPage = document.getElementById(`view-${pageId}`);
                 if(targetPage) { targetPage.classList.remove('hidden'); setTimeout(() => targetPage.classList.add('active'), 10); }
-            }, 200); // 200ms must be < css transition time for smooth overlap
+            }, 200);
 
             // Desktop Nav Update
             document.querySelectorAll('#sidebar .nav-btn').forEach(el => { el.className = 'nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm rounded-xl text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 font-medium transition-all'; el.querySelector('i').classList.replace('text-white', 'text-gray-400'); });
@@ -952,10 +946,14 @@
 
         // --- MASTER DATA MODAL (Setting) ---
         function openMasterModal(type) {
+            editMode = false; currentEditId = null;
             document.getElementById('md-type').value = type;
             const modal = document.getElementById('masterModal'), bg = document.getElementById('masterModalBackdrop'), box = document.getElementById('masterModalBox');
             
             document.getElementById('formMasterData').reset();
+            // Reset readonly state just in case
+            document.getElementById('md-nidn').readOnly = false;
+            
             ['kode','sks','prodi','nidn','status','nim','semester','jk'].forEach(f => {
                 const wrap = document.getElementById(`wrap-md-${f}`);
                 if (wrap) wrap.classList.add('hidden'); // Cek keamanan jika elemen sudah dihapus
@@ -998,6 +996,8 @@
         }
 
         function closeMasterModal() {
+            editMode = false; currentEditId = null;
+            document.getElementById('md-nidn').readOnly = false;
             const modal = document.getElementById('masterModal'), bg = document.getElementById('masterModalBackdrop'), box = document.getElementById('masterModalBox');
             bg.classList.add('opacity-0'); box.classList.add('translate-y-full','md:translate-y-8','opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
@@ -1005,7 +1005,9 @@
 
         function saveMasterData(e) {
             e.preventDefault(); const type = document.getElementById('md-type').value, btn = document.getElementById('btnSaveMaster'), ori = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...'; btn.disabled = true; let payload = { action: 'addMaster' };
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...'; btn.disabled = true; 
+            
+            let payload = { action: editMode ? 'updateMaster' : 'addMaster' };
             
             const v = (id) => document.getElementById(`md-${id}`).value;
             if (type === 'prodi') { payload.sheetName = 'Prodi'; payload.rowData = [v('nama')]; } 
@@ -1015,17 +1017,85 @@
             else if (type === 'dosen') {
                 const sel = Array.from(document.querySelectorAll('.prodi-checkbox:checked')).map(cb => cb.value).join(', ');
                 if (!sel) { showPopup("Perhatian", "Centang minimal 1 prodi", "warning"); btn.innerHTML=ori; btn.disabled=false; return; }
-                payload.sheetName = 'Dosen'; payload.rowData = [v('nidn'), v('nama'), v('jk'), sel, 'Aktif'];
+                payload.sheetName = 'Dosen'; 
+                payload.rowData = [v('nidn'), v('nama'), v('jk'), sel, 'Aktif'];
+                
+                if (editMode) {
+                    payload.idColumn = 'NIDN';
+                    payload.idValue = currentEditId;
+                }
             } 
             else if (type === 'mahasiswa') { payload.sheetName = 'Mahasiswa'; payload.rowData = [v('nim'), v('nama'), v('jk'), v('prodi'), v('semester')]; }
 
             if (USE_MOCK_DATA) {
-                setTimeout(() => { showPopup("Berhasil", "Data ditambahkan (Simulasi)", "success"); closeMasterModal(); btn.innerHTML=ori; btn.disabled=false; }, 800);
+                setTimeout(() => { showPopup("Berhasil", "Data tersimpan (Simulasi)", "success"); closeMasterModal(); btn.innerHTML=ori; btn.disabled=false; }, 800);
             } else {
-                fetch(`${GOOGLE_SCRIPT_URL}?action=addMaster`, { method: 'POST', body: JSON.stringify(payload) }).then(r=>r.json()).then(d => {
-                    if(d.status === 'success') { fetchAllData().then(()=> { closeMasterModal(); showPopup("Sukses", "Data tersimpan di server.", "success"); }); } 
+                fetch(`${GOOGLE_SCRIPT_URL}?action=${payload.action}`, { method: 'POST', body: JSON.stringify(payload) }).then(r=>r.json()).then(d => {
+                    if(d.status === 'success') { fetchAllData().then(()=> { closeMasterModal(); showPopup("Sukses", d.message, "success"); }); } 
                     else showPopup("Gagal", d.message, "error");
                 }).catch(err => showPopup("Error", err, "error")).finally(() => { btn.innerHTML=ori; btn.disabled=false; });
+            }
+        }
+
+        // --- LOGIC EDIT & DELETE DATA ---
+        function editDosen(nidn) {
+            const dosen = appData.dosen.find(d => getCol(d, ['NIDN', 'nidn']) == nidn);
+            if (!dosen) return;
+            
+            openMasterModal('dosen');
+            document.getElementById('masterModalTitle').innerText = 'Edit Data Dosen';
+            
+            // Set values
+            document.getElementById('md-nidn').value = getCol(dosen, ['NIDN', 'nidn']);
+            document.getElementById('md-nidn').readOnly = true; // Kunci NIDN supaya tidak merusak ID
+            document.getElementById('md-nama').value = getCol(dosen, ['Nama Dosen', 'Nama', 'nama']);
+            document.getElementById('md-jk').value = getCol(dosen, ['Jenis Kelamin', 'JK', 'jk']);
+            
+            // Set checkboxes for Prodi
+            const prodis = getCol(dosen, ['Program Studi', 'Prodi', 'prodi']).split(', ');
+            document.querySelectorAll('.prodi-checkbox').forEach(cb => {
+                cb.checked = prodis.includes(cb.value);
+            });
+            
+            editMode = true;
+            currentEditId = nidn;
+        }
+
+        function confirmDelete(type, id, name) {
+            deleteTarget = { type, id };
+            document.getElementById('confirmModalMessage').innerText = `Apakah Anda yakin ingin menghapus data "${name}"?`;
+            
+            const modal = document.getElementById('confirmModal'), bg = document.getElementById('confirmModalBackdrop'), box = document.getElementById('confirmModalBox');
+            modal.classList.remove('hidden');
+            setTimeout(() => { bg.classList.remove('opacity-0'); box.classList.remove('scale-90', 'opacity-0'); box.classList.add('scale-100', 'opacity-100'); }, 10);
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal'), bg = document.getElementById('confirmModalBackdrop'), box = document.getElementById('confirmModalBox');
+            bg.classList.add('opacity-0'); box.classList.remove('scale-100', 'opacity-100'); box.classList.add('scale-90', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            deleteTarget = null;
+        }
+
+        function executeDelete() {
+            if (!deleteTarget) return;
+            const btn = document.getElementById('btnConfirmDelete'), ori = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...'; btn.disabled = true;
+            
+            let payload = { action: 'deleteMaster' };
+            if (deleteTarget.type === 'dosen') {
+                payload.sheetName = 'Dosen'; payload.idColumn = 'NIDN'; payload.idValue = deleteTarget.id;
+            }
+            
+            if (USE_MOCK_DATA) {
+                setTimeout(() => { showPopup("Berhasil", "Data dihapus (Simulasi)", "success"); closeConfirmModal(); btn.innerHTML = ori; btn.disabled = false; }, 800);
+            } else {
+                fetch(`${GOOGLE_SCRIPT_URL}?action=deleteMaster`, { method: 'POST', body: JSON.stringify(payload) })
+                .then(r => r.json()).then(d => {
+                    if (d.status === 'success') {
+                        fetchAllData().then(() => { closeConfirmModal(); showPopup("Sukses", d.message, "success"); });
+                    } else showPopup("Gagal", d.message, "error");
+                }).catch(err => showPopup("Error", err, "error")).finally(() => { btn.innerHTML = ori; btn.disabled = false; });
             }
         }
     </script>
