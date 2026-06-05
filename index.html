@@ -672,14 +672,28 @@
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getMetode`).then(r=>r.json()).catch(()=>({status:'error'})), fetch(`${GOOGLE_SCRIPT_URL}?action=getJurnal`).then(r=>r.json()).catch(()=>({status:'error'})),
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getSemester`).then(r=>r.json()).catch(()=>({status:'error'}))
                 ]);
-                appData.dosen = rD.data || []; appData.mahasiswa = rM.data || []; appData.prodi = rP.data || []; appData.mataKuliah = rMK.data || []; appData.metode = rMe.data || []; appData.jurnal = rJ.data || []; appData.semester = rS.data || [];
+                appData.dosen = Array.isArray(rD.data) ? rD.data : []; 
+                appData.mahasiswa = Array.isArray(rM.data) ? rM.data : []; 
+                appData.prodi = Array.isArray(rP.data) ? rP.data : []; 
+                appData.mataKuliah = Array.isArray(rMK.data) ? rMK.data : []; 
+                appData.metode = Array.isArray(rMe.data) ? rMe.data : []; 
+                appData.jurnal = Array.isArray(rJ.data) ? rJ.data : []; 
+                appData.semester = Array.isArray(rS.data) ? rS.data : [];
                 renderAllData();
-            } catch (err) { showPopup("Koneksi Lemah", "Gagal mengambil beberapa data. Tampilan mungkin tidak lengkap.", "warning"); }
+            } catch (err) { 
+                console.error("Fetch Data Error:", err);
+                showPopup("Informasi", "Tampilan mungkin tidak lengkap. Detail error: " + err.message, "warning"); 
+            }
         }
 
         function getCol(obj, possibleKeys) {
-            for(let key of possibleKeys) { if(obj[key] !== undefined) return obj[key]; }
-            return Object.values(obj)[0] || '-'; // Fallback
+            if (!obj) return '-';
+            for(let key of possibleKeys) { 
+                if(obj[key] !== undefined && obj[key] !== null && obj[key] !== '') return String(obj[key]); 
+            }
+            const vals = Object.values(obj);
+            if (vals.length > 0 && vals[0] !== undefined && vals[0] !== null && vals[0] !== '') return String(vals[0]);
+            return '-';
         }
 
         function fillSelect(id, arr, label, keys) {
