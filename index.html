@@ -76,9 +76,6 @@
         th.sticky-header { position: sticky; top: 0; z-index: 10; }
         
         .mob-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; padding: 0.5rem 0; transition: color 0.3s; }
-        
-        /* Wizard Form Styles */
-        .step-hidden { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased overflow-x-hidden h-screen flex transition-colors duration-300">
@@ -249,13 +246,12 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        <!-- CHART SECTION -->
-                        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-6 transition-colors">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6">Tren Jurnal Mingguan</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- CHART SECTION: MHS -->
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-6 transition-colors">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6">Kehadiran Mahasiswa (Bulanan)</h3>
                             <div class="h-64 w-full relative">
                                 <canvas id="jurnalChart"></canvas>
-                                <!-- Skeleton Overlay while loading -->
                                 <div id="chartSkeleton" class="absolute inset-0 bg-white dark:bg-slate-800 flex items-end justify-around pb-2 px-2 z-10">
                                     <div class="w-10 h-1/3 bg-gray-200 dark:bg-slate-700 rounded-t-sm skeleton-box"></div>
                                     <div class="w-10 h-2/3 bg-gray-200 dark:bg-slate-700 rounded-t-sm skeleton-box"></div>
@@ -266,17 +262,30 @@
                             </div>
                         </div>
 
-                        <!-- RECENT ACTIVITY -->
-                        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-6 transition-colors flex flex-col">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-bold text-gray-800 dark:text-white">Aktivitas Terbaru</h3>
-                                <button class="text-primary hover:text-blue-700 text-sm font-semibold">Lihat Semua</button>
+                        <!-- CHART SECTION: DOSEN -->
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-6 transition-colors">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6">Kelas Dosen (Bulanan)</h3>
+                            <div class="h-64 w-full relative">
+                                <canvas id="dosenMonthChart"></canvas>
+                                <div id="chartSkeletonDosen" class="absolute inset-0 bg-white dark:bg-slate-800 flex items-end justify-around pb-2 px-2 z-10">
+                                    <div class="w-10 h-1/4 bg-gray-200 dark:bg-slate-700 rounded-t-sm skeleton-box"></div>
+                                    <div class="w-10 h-1/2 bg-gray-200 dark:bg-slate-700 rounded-t-sm skeleton-box"></div>
+                                    <div class="w-10 h-3/4 bg-gray-200 dark:bg-slate-700 rounded-t-sm skeleton-box"></div>
+                                    <div class="w-10 h-2/5 bg-gray-200 dark:bg-slate-700 rounded-t-sm skeleton-box"></div>
+                                    <div class="w-10 h-1/3 bg-gray-200 dark:bg-slate-700 rounded-t-sm skeleton-box"></div>
+                                </div>
                             </div>
-                            <div id="recentActivityList" class="space-y-4 flex-1">
-                                <!-- Skeleton Items -->
-                                <div class="flex items-center gap-4 p-3"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-3/4 h-4 mb-2 skeleton-box"></div><div class="w-1/2 h-3 skeleton-box"></div></div></div>
-                                <div class="flex items-center gap-4 p-3"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-3/4 h-4 mb-2 skeleton-box"></div><div class="w-1/2 h-3 skeleton-box"></div></div></div>
-                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8 bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-6 transition-colors flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Aktivitas Terbaru</h3>
+                        </div>
+                        <div id="recentActivityList" class="space-y-4">
+                            <!-- Skeleton Items -->
+                            <div class="flex items-center gap-4 p-3"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-3/4 h-4 mb-2 skeleton-box"></div><div class="w-1/2 h-3 skeleton-box"></div></div></div>
+                            <div class="flex items-center gap-4 p-3"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-3/4 h-4 mb-2 skeleton-box"></div><div class="w-1/2 h-3 skeleton-box"></div></div></div>
                         </div>
                     </div>
                 </div>
@@ -330,7 +339,7 @@
                     </div>
                 </div>
 
-                <!-- VIEW: DOSEN & MAHASISWA (Layout Card untuk Mobile) -->
+                <!-- VIEW: DOSEN (Layout List) -->
                 <div id="view-dosen" class="page-view hidden">
                     <div class="flex justify-end mb-6">
                         <div class="flex gap-3 w-full md:w-auto">
@@ -342,10 +351,8 @@
                         </div>
                     </div>
                     
-                    <!-- Container Dosen (Berubah menjadi List View) -->
                     <div id="cardContainerDosen" class="flex flex-col gap-3">
                         <!-- Skeleton Loaders -->
-                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-32 h-4 mb-2 skeleton-box"></div><div class="w-20 h-3 skeleton-box"></div></div></div>
                         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-full skeleton-box"></div><div class="flex-1"><div class="w-32 h-4 mb-2 skeleton-box"></div><div class="w-20 h-3 skeleton-box"></div></div></div>
                     </div>
                 </div>
@@ -365,7 +372,6 @@
                     <div id="cardContainerMhs" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                         <!-- Skeleton Loaders -->
                          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm"><div class="flex items-start justify-between mb-3"><div class="w-32 h-4 skeleton-box"></div><div class="w-10 h-4 skeleton-box"></div></div><div class="w-48 h-5 mb-4 skeleton-box"></div><div class="flex gap-2"><div class="w-16 h-6 rounded-full skeleton-box"></div><div class="w-16 h-6 rounded-full skeleton-box"></div></div></div>
-                         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm hidden md:block"><div class="flex items-start justify-between mb-3"><div class="w-32 h-4 skeleton-box"></div><div class="w-10 h-4 skeleton-box"></div></div><div class="w-48 h-5 mb-4 skeleton-box"></div><div class="flex gap-2"><div class="w-16 h-6 rounded-full skeleton-box"></div><div class="w-16 h-6 rounded-full skeleton-box"></div></div></div>
                     </div>
                 </div>
 
@@ -452,7 +458,7 @@
         </div>
     </div>
 
-    <!-- MODAL MASTER DATA (Modernized) -->
+    <!-- MODAL MASTER DATA -->
     <div id="masterModal" class="fixed inset-0 z-[60] hidden flex items-end md:items-center justify-center transition-all duration-300">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="masterModalBackdrop" onclick="closeMasterModal()"></div>
@@ -514,7 +520,6 @@
                         <div id="md-prodi-checkboxes" class="hidden space-y-2.5 mt-2 max-h-40 overflow-y-auto p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-900/50"></div>
                     </div>
 
-                    <!-- Input Foto (Menggunakan URL Link Gambar) -->
                     <div id="wrap-md-foto" class="mb-5 hidden">
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">URL Foto / Gambar (Opsional)</label>
                         <div class="relative">
@@ -532,7 +537,7 @@
         </div>
     </div>
     
-    <!-- CUSTOM POPUP ALERT (Modernized) -->
+    <!-- CUSTOM POPUP ALERT -->
     <div id="customPopup" class="fixed inset-0 z-[100] hidden flex items-center justify-center transition-all duration-300">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="customPopupBackdrop"></div>
         <div id="customPopupBox" class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-10/12 max-w-sm overflow-hidden transform scale-90 opacity-0 transition-all duration-400 cubic-bezier(0.175, 0.885, 0.32, 1.275) relative z-10">
@@ -540,14 +545,12 @@
                 <div id="customPopupIcon" class="mx-auto flex items-center justify-center h-20 w-20 rounded-full mb-5 shadow-inner"></div>
                 <h3 id="customPopupTitle" class="text-2xl font-extrabold text-gray-800 dark:text-white mb-2 tracking-tight">Title</h3>
                 <p id="customPopupMessage" class="text-sm text-gray-500 dark:text-slate-400 mb-8 leading-relaxed">Message here</p>
-                <button onclick="closePopup()" class="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition-transform">
-                    Mengerti
-                </button>
+                <button onclick="closePopup()" class="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition-transform">Mengerti</button>
             </div>
         </div>
     </div>
 
-    <!-- CUSTOM CONFIRM MODAL (Hapus Data) -->
+    <!-- CUSTOM CONFIRM MODAL -->
     <div id="confirmModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center transition-all duration-300">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="confirmModalBackdrop"></div>
         <div id="confirmModalBox" class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-10/12 max-w-sm overflow-hidden transform scale-90 opacity-0 transition-all duration-300 relative z-10">
@@ -568,7 +571,9 @@
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytO29mRmuEq94v1i27tudnmff4ng1CPZ5RR1e2ZpE3jS041aLeeTQfnZrPEPQJl1Bd/exec'; 
         let USE_MOCK_DATA = false;
         let appData = { dosen: [], mahasiswa: [], prodi: [], mataKuliah: [], metode: [], jurnal: [], semester: [] };
-        let chartInstance = null; // Store chart object
+        
+        let chartInstance = null; // Store mhs chart object
+        let chartDosenInstance = null; // Store dosen chart object
         
         // Globals for Edit/Delete State
         let editMode = false;
@@ -580,7 +585,7 @@
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.theme = isDark ? 'dark' : 'light';
             updateThemeIcons(isDark);
-            if(chartInstance) updateChartTheme(isDark); // Update chart colors dynamically
+            updateChartTheme(isDark); // Update chart colors dynamically
         }
 
         function updateThemeIcons(isDark) {
@@ -605,9 +610,6 @@
             if (hour >= 5 && hour < 11) greeting = 'Selamat Pagi,';
             else if (hour >= 11 && hour < 15) greeting = 'Selamat Siang,';
             else if (hour >= 15 && hour < 18) greeting = 'Selamat Sore,';
-            
-            const dashEl = document.getElementById('dashGreeting');
-            if (dashEl) dashEl.innerText = greeting;
             
             const mobEl = document.getElementById('mobGreeting');
             if (mobEl) mobEl.innerText = greeting;
@@ -667,9 +669,12 @@
             if (USE_MOCK_DATA) return;
             try {
                 const [rD, rM, rP, rMK, rMe, rJ, rS] = await Promise.all([
-                    fetch(`${GOOGLE_SCRIPT_URL}?action=getDosen`).then(r=>r.json()).catch(()=>({status:'error'})), fetch(`${GOOGLE_SCRIPT_URL}?action=getMahasiswa`).then(r=>r.json()).catch(()=>({status:'error'})),
-                    fetch(`${GOOGLE_SCRIPT_URL}?action=getProdi`).then(r=>r.json()).catch(()=>({status:'error'})), fetch(`${GOOGLE_SCRIPT_URL}?action=getMataKuliah`).then(r=>r.json()).catch(()=>({status:'error'})),
-                    fetch(`${GOOGLE_SCRIPT_URL}?action=getMetode`).then(r=>r.json()).catch(()=>({status:'error'})), fetch(`${GOOGLE_SCRIPT_URL}?action=getJurnal`).then(r=>r.json()).catch(()=>({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getDosen`).then(r=>r.json()).catch(()=>({status:'error'})), 
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getMahasiswa`).then(r=>r.json()).catch(()=>({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getProdi`).then(r=>r.json()).catch(()=>({status:'error'})), 
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getMataKuliah`).then(r=>r.json()).catch(()=>({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getMetode`).then(r=>r.json()).catch(()=>({status:'error'})), 
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getJurnal`).then(r=>r.json()).catch(()=>({status:'error'})),
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getSemester`).then(r=>r.json()).catch(()=>({status:'error'}))
                 ]);
                 appData.dosen = Array.isArray(rD.data) ? rD.data : []; 
@@ -765,7 +770,7 @@
                 });
             }
 
-            // Cards Mahasiswa (With Foto)
+            // Cards Mahasiswa (With Foto and Actions)
             const boxMhs = document.getElementById('cardContainerMhs');
             if(boxMhs){ 
                 boxMhs.innerHTML = '';
@@ -780,8 +785,12 @@
                     }
 
                     boxMhs.innerHTML += `
-                    <div class="card-item bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-soft">
-                        <div class="flex justify-between items-start mb-3">
+                    <div class="card-item bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-soft relative">
+                        <div class="absolute top-4 right-4 flex gap-1.5">
+                            <button onclick="editMahasiswa('${nim}')" class="w-7 h-7 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-slate-700 dark:text-blue-400 flex items-center justify-center transition" title="Edit"><i class="fas fa-edit text-[11px]"></i></button>
+                            <button onclick="confirmDelete('mahasiswa', '${nim}', '${nama}')" class="w-7 h-7 rounded bg-red-50 text-red-600 hover:bg-red-100 dark:bg-slate-700 dark:text-red-400 flex items-center justify-center transition" title="Hapus"><i class="fas fa-trash text-[11px]"></i></button>
+                        </div>
+                        <div class="flex justify-between items-start mb-3 pr-16">
                             <div>
                                 <span class="text-xs font-bold text-primary dark:text-blue-400 searchable block mb-1">${nim}</span>
                                 <span class="text-[10px] bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded text-gray-600 dark:text-slate-300 font-bold">SMT ${smt}</span>
@@ -800,11 +809,11 @@
             // Populate Form Dropdowns
             fillSelect('jurnalDosen', appData.dosen, 'Pilih Dosen...', ['Nama Dosen','Nama','nama']);
             fillSelect('jurnalProdi', appData.prodi, 'Pilih Program Studi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
-            
-            // Set default Mata Kuliah
-            document.getElementById('jurnalMataKuliah').innerHTML = '<option value="" disabled selected>Pilih Prodi terlebih dahulu...</option>';
-            
+            fillSelect('jurnalMataKuliah', appData.mataKuliah, 'Pilih Mata Kuliah...', ['Nama Mata Kuliah','Mata Kuliah','nama']);
             fillSelect('jurnalMetode', appData.metode, 'Pilih Metode...', ['Nama Metode','Metode Perkuliahan','Metode','nama']);
+
+            // Initialize dependency selects properly
+            document.getElementById('jurnalMataKuliah').innerHTML = '<option value="" disabled selected>Pilih Prodi terlebih dahulu...</option>';
 
             // Populate Settings Lists
             const fillList = (id, arr, keys) => {
@@ -818,10 +827,7 @@
             fillList('listMasterMetode', appData.metode, ['Nama Metode','Metode Perkuliahan','Metode','nama']);
             fillList('listMasterSemester', appData.semester, ['Nama Semester','Semester','nama']);
             
-            const tMK = document.getElementById('listMasterMK'); 
-            if(tMK){ 
-                tMK.innerHTML=''; 
-                if(appData.mataKuliah.length===0) tMK.innerHTML='<li class="p-3 text-center text-xs text-gray-500">Data kosong</li>';
+            const tMK = document.getElementById('listMasterMK'); if(tMK){ tMK.innerHTML=''; if(appData.mataKuliah.length===0) tMK.innerHTML='<li class="p-3 text-center text-xs text-gray-500">Data kosong</li>';
                 appData.mataKuliah.forEach(mk => {
                     const k = getCol(mk,['Kode','kode']), n = getCol(mk,['Nama Mata Kuliah','Mata Kuliah','nama']), s = getCol(mk,['SKS','sks']), p = getCol(mk,['Prodi','Program Studi']);
                     tMK.innerHTML += `<li class="searchable-item flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded searchable">${k}</span><span class="text-[10px] text-gray-500 dark:text-slate-400">${s} SKS</span></div><h5 class="font-bold text-gray-800 dark:text-slate-200 leading-tight searchable">${n}</h5><p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1">${p}</p></div><button class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-red-900/20 w-8 h-8 rounded-lg flex items-center justify-center transition shrink-0"><i class="fas fa-trash text-xs"></i></button></li>`;
@@ -834,42 +840,66 @@
             if(appData.jurnal.length === 0 && appData.mahasiswa.length === 0) return;
             
             // Sembunyikan semua skeleton
-            document.getElementById('chartSkeleton')?.classList.add('hidden');
+            const skel1 = document.getElementById('chartSkeleton'); if(skel1) skel1.classList.add('hidden');
+            const skel2 = document.getElementById('chartSkeletonDosen'); if(skel2) skel2.classList.add('hidden');
             
             const isDark = document.documentElement.classList.contains('dark');
             const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
             const textColor = isDark ? '#94a3b8' : '#64748b';
+            const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-            // CHART PRESENSI MAHASISWA PER BULAN (Line Chart)
+            // Data Kolektif Bulanan
+            let monthlyHadirMhs = new Array(12).fill(0);
+            let monthlyKelasDosen = new Array(12).fill(0);
+            
+            appData.jurnal.forEach(j => {
+                const dV = getCol(j, ['Timestamp', 'Tanggal', 'tanggal']);
+                if(dV && dV !== '-') {
+                    const d = new Date(dV);
+                    if(!isNaN(d.getTime())) {
+                        const month = d.getMonth(); // 0 - 11
+                        
+                        // Hitung Mahasiswa Hadir
+                        const absensiStr = getCol(j, ['Absensi', 'absensi']) || '';
+                        const hadirCount = (absensiStr.match(/\(Hadir\)/gi) || []).length;
+                        monthlyHadirMhs[month] += hadirCount;
+
+                        // Hitung Kelas Dosen (1 Jurnal = 1 Kelas)
+                        monthlyKelasDosen[month] += 1;
+                    }
+                }
+            });
+
+            // 1. CHART PRESENSI MAHASISWA PER BULAN (Line Chart)
             const ctxMhs = document.getElementById('jurnalChart');
             if(ctxMhs) {
-                let monthlyHadir = new Array(12).fill(0);
-                const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                
-                appData.jurnal.forEach(j => {
-                    const dV = getCol(j, ['Timestamp', 'Tanggal', 'tanggal']);
-                    if(dV) {
-                        const d = new Date(dV);
-                        if(!isNaN(d.getTime())) {
-                            const month = d.getMonth(); // 0 - 11
-                            const absensiStr = getCol(j, ['Absensi', 'absensi']) || '';
-                            const hadirCount = (absensiStr.match(/\(Hadir\)/gi) || []).length;
-                            monthlyHadir[month] += hadirCount;
-                        }
-                    }
-                });
-
                 if(chartInstance) chartInstance.destroy();
                 chartInstance = new Chart(ctxMhs, {
                     type: 'line',
                     data: { 
                         labels: monthLabels, 
                         datasets: [{ 
-                            label: 'Total Mahasiswa Hadir', data: monthlyHadir, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                            label: 'Total Mhs Hadir', data: monthlyHadirMhs, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', 
                             borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#10b981', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6, fill: true, tension: 0.4
                         }] 
                     },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor, drawBorder: false } }, x: { ticks: { color: textColor }, grid: { display: false, drawBorder: false } } } }
+                });
+            }
+
+            // 2. CHART KELAS DOSEN PER BULAN (Bar Chart)
+            const ctxDosen = document.getElementById('dosenMonthChart');
+            if(ctxDosen) {
+                if(chartDosenInstance) chartDosenInstance.destroy();
+                chartDosenInstance = new Chart(ctxDosen, {
+                    type: 'bar',
+                    data: { 
+                        labels: monthLabels, 
+                        datasets: [{ 
+                            label: 'Total Kelas Diadakan', data: monthlyKelasDosen, backgroundColor: '#0ea5e9', borderRadius: 4, barThickness: 16
+                        }] 
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor, drawBorder: false } }, x: { ticks: { color: textColor }, grid: { display: false, drawBorder: false } } } }
                 });
             }
         }
@@ -883,6 +913,13 @@
                 chartInstance.options.scales.y.ticks.color = textColor;
                 chartInstance.options.scales.x.ticks.color = textColor;
                 chartInstance.update();
+            }
+
+            if(chartDosenInstance) {
+                chartDosenInstance.options.scales.y.grid.color = gridColor;
+                chartDosenInstance.options.scales.y.ticks.color = textColor;
+                chartDosenInstance.options.scales.x.ticks.color = textColor;
+                chartDosenInstance.update();
             }
         }
 
@@ -1004,6 +1041,7 @@
             document.getElementById('formMasterData').reset();
             // Reset readonly state just in case
             document.getElementById('md-nidn').readOnly = false;
+            document.getElementById('md-nim').readOnly = false;
             
             ['kode','sks','prodi','nidn','status','nim','semester','jk', 'foto'].forEach(f => {
                 const wrap = document.getElementById(`wrap-md-${f}`);
@@ -1049,6 +1087,7 @@
         function closeMasterModal() {
             editMode = false; currentEditId = null;
             document.getElementById('md-nidn').readOnly = false;
+            document.getElementById('md-nim').readOnly = false;
             const modal = document.getElementById('masterModal'), bg = document.getElementById('masterModalBackdrop'), box = document.getElementById('masterModalBox');
             bg.classList.add('opacity-0'); box.classList.add('translate-y-full','md:translate-y-8','opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
@@ -1076,7 +1115,15 @@
                     payload.idValue = currentEditId;
                 }
             } 
-            else if (type === 'mahasiswa') { payload.sheetName = 'Mahasiswa'; payload.rowData = [v('nim'), v('nama'), v('jk'), v('prodi'), v('semester'), v('foto')]; }
+            else if (type === 'mahasiswa') { 
+                payload.sheetName = 'Mahasiswa'; 
+                payload.rowData = [v('nim'), v('nama'), v('jk'), v('prodi'), v('semester'), v('foto')]; 
+                
+                if (editMode) {
+                    payload.idColumn = 'NIM';
+                    payload.idValue = currentEditId;
+                }
+            }
 
             if (USE_MOCK_DATA) {
                 setTimeout(() => { showPopup("Berhasil", "Data tersimpan (Simulasi)", "success"); closeMasterModal(); btn.innerHTML=ori; btn.disabled=false; }, 800);
@@ -1116,6 +1163,29 @@
             currentEditId = nidn;
         }
 
+        function editMahasiswa(nim) {
+            const mhs = appData.mahasiswa.find(m => getCol(m, ['NIM', 'nim']) == nim);
+            if (!mhs) return;
+
+            openMasterModal('mahasiswa');
+            document.getElementById('masterModalTitle').innerText = 'Edit Data Mahasiswa';
+
+            // Set values
+            document.getElementById('md-nim').value = getCol(mhs, ['NIM', 'nim']);
+            document.getElementById('md-nim').readOnly = true; // Kunci NIM
+            document.getElementById('md-nama').value = getCol(mhs, ['Nama Mahasiswa', 'Nama', 'nama']);
+            document.getElementById('md-jk').value = getCol(mhs, ['Jenis Kelamin', 'JK', 'jk']);
+            document.getElementById('md-prodi').value = getCol(mhs, ['Prodi', 'Program Studi', 'prodi']);
+            document.getElementById('md-semester').value = getCol(mhs, ['Semester', 'semester']);
+            
+            // Set Foto
+            const foto = getCol(mhs, ['Foto', 'foto', 'URL Foto']);
+            document.getElementById('md-foto').value = foto !== '-' ? foto : '';
+
+            editMode = true;
+            currentEditId = nim;
+        }
+
         function confirmDelete(type, id, name) {
             deleteTarget = { type, id };
             document.getElementById('confirmModalMessage').innerText = `Apakah Anda yakin ingin menghapus data "${name}"?`;
@@ -1140,6 +1210,8 @@
             let payload = { action: 'deleteMaster' };
             if (deleteTarget.type === 'dosen') {
                 payload.sheetName = 'Dosen'; payload.idColumn = 'NIDN'; payload.idValue = deleteTarget.id;
+            } else if (deleteTarget.type === 'mahasiswa') {
+                payload.sheetName = 'Mahasiswa'; payload.idColumn = 'NIM'; payload.idValue = deleteTarget.id;
             }
             
             if (USE_MOCK_DATA) {
