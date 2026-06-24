@@ -472,7 +472,7 @@
                                         <i class="fas fa-table-cells"></i> Rekap Dosen Berbasis Jadwal & Mahasiswa Semester
                                     </div>
                                     <h2 class="text-xl md:text-2xl font-black text-gray-800 dark:text-white tracking-tight">Rekapitulasi Kehadiran</h2>
-                                    <p class="text-xs md:text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-2xl">Rekap dosen dihitung dari jadwal mengajar bulanan; jurnal/presensi hanya menjadi bukti kehadiran pada tanggal terjadwal.</p>
+                                    <p class="text-xs md:text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-2xl">Rekap dosen dihitung dari hari jadwal mengajar bulanan; metode luring/daring tetap diambil dari jurnal/presensi aktual.</p>
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-3 w-full xl:w-auto">
@@ -553,7 +553,7 @@
                                 <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> S = Sakit</span>
                                 <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 border border-red-200"></span> A = Alpha</span>
                                 <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-200"></span> - = Belum ada data</span>
-                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> Dosen: L = Luring, D = Daring, C = Campuran, TH = Tidak Hadir</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> Dosen: L/D/C/TH diambil dari jurnal harian, bukan dari jadwal</span>
                             </div>
 
                             <div id="panelRekapDosen" class="rekap-panel">
@@ -646,7 +646,7 @@
                                 <div class="flex justify-between items-center mb-5 border-b border-gray-200 dark:border-slate-700 pb-3">
                                     <div>
                                         <h4 class="font-bold text-gray-800 dark:text-slate-200">Jadwal Dosen</h4>
-                                        <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Digunakan sebagai dasar persentase rekap kehadiran dosen per bulan.</p>
+                                        <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Digunakan sebagai dasar persentase rekap kehadiran dosen per bulan berdasarkan hari mengajar.</p>
                                     </div>
                                     <button onclick="openMasterModal('jadwalDosen')" class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow-sm font-semibold transition flex items-center gap-1"><i class="fas fa-plus"></i> Baru</button>
                                 </div>
@@ -772,9 +772,19 @@
                         <select id="md-dosen-pengampu" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all"></select>
                     </div>
 
-                    <div id="wrap-md-tanggal-jadwal" class="mb-5 hidden">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tanggal Jadwal Mengajar</label>
-                        <input type="date" id="md-tanggal-jadwal" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                    <div id="wrap-md-hari-jadwal" class="mb-5 hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Hari Mengajar</label>
+                        <select id="md-hari-jadwal" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                            <option value="" disabled selected>Pilih Hari...</option>
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jumat">Jumat</option>
+                            <option value="Sabtu">Sabtu</option>
+                            <option value="Minggu">Minggu</option>
+                        </select>
+                        <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-2">Jadwal dosen dibuat berdasarkan hari perkuliahan. Tanggal rekap bulanan akan dihitung otomatis dari hari ini.</p>
                     </div>
 
                     <div id="wrap-md-mata-kuliah" class="mb-5 hidden">
@@ -1121,30 +1131,29 @@
             if (!el) return;
             el.innerHTML = '';
             if (!appData.jadwalDosen || appData.jadwalDosen.length === 0) {
-                el.innerHTML = '<li class="p-3 text-center text-xs text-gray-500">Belum ada jadwal dosen. Tambahkan jadwal agar persentase dosen dihitung dari kewajiban mengajar bulanan.</li>';
+                el.innerHTML = '<li class="p-3 text-center text-xs text-gray-500">Belum ada jadwal dosen. Tambahkan hari jadwal agar persentase dosen dihitung dari kewajiban mengajar bulanan.</li>';
                 return;
             }
 
             const sorted = [...appData.jadwalDosen].sort((a, b) => {
-                const da = dateKey(getExplicitCol(a, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
-                const db = dateKey(getExplicitCol(b, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
-                return db.localeCompare(da);
+                const da = getDayIndexFromJadwal(a);
+                const db = getDayIndexFromJadwal(b);
+                return da - db || getExplicitCol(a, ['Dosen', 'Nama Dosen', 'dosen']).localeCompare(getExplicitCol(b, ['Dosen', 'Nama Dosen', 'dosen']), 'id');
             }).slice(0, 12);
 
             sorted.forEach(item => {
-                const tanggal = formatDateId(getExplicitCol(item, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
+                const hari = normalizeHariMengajar(getExplicitCol(item, ['Hari', 'Hari Mengajar', 'hari'])) || normalizeHariMengajar(getExplicitCol(item, ['Tanggal', 'Tanggal Jadwal', 'tanggal'])) || '-';
                 const dosen = getExplicitCol(item, ['Dosen', 'Nama Dosen', 'dosen']);
                 const prodi = getExplicitCol(item, ['Prodi', 'Program Studi', 'prodi']);
                 const mk = getExplicitCol(item, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
-                const metode = getExplicitCol(item, ['Metode', 'Metode Mengajar', 'metode']);
                 const status = getExplicitCol(item, ['Status Jadwal', 'Status', 'status']) || 'Aktif';
                 el.innerHTML += `
                     <li class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
                         <div class="flex justify-between gap-3">
                             <div class="min-w-0">
                                 <h5 class="font-black text-gray-800 dark:text-slate-100 leading-tight truncate">${escapeHtml(dosen || '-')}</h5>
-                                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1 truncate">${escapeHtml(tanggal)} · ${escapeHtml(mk || '-')}</p>
-                                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5 truncate">${escapeHtml(prodi || '-')} · ${escapeHtml(metode || '-')}</p>
+                                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1 truncate">${escapeHtml(hari)} · ${escapeHtml(mk || '-')}</p>
+                                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5 truncate">${escapeHtml(prodi || '-')}</p>
                             </div>
                             <span class="shrink-0 h-fit text-[11px] font-black ${normalizeText(status) === 'nonaktif' ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300' : 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-300'} px-2.5 py-1 rounded-lg">${escapeHtml(status)}</span>
                         </div>
@@ -1152,7 +1161,6 @@
                 `;
             });
         }
-
         // --- REKAPITULASI SEMESTER ---
         function populateRekapTahunAkademik() {
             const el = document.getElementById('rekapTahunAkademik');
@@ -1327,6 +1335,122 @@
             return d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
         }
 
+
+        const HARI_MENGAJAR = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+        function normalizeHariMengajar(value) {
+            const original = value ? value.toString().trim() : '';
+            if (!original || original === '-') return '';
+
+            const parsedDate = parseDateValue(original);
+            if (parsedDate) return HARI_MENGAJAR[parsedDate.getDay()];
+
+            const s = normalizeText(original);
+            if (s.includes('senin')) return 'Senin';
+            if (s.includes('selasa')) return 'Selasa';
+            if (s.includes('rabu')) return 'Rabu';
+            if (s.includes('kamis')) return 'Kamis';
+            if (s.includes('jumat') || s.includes("jum'at")) return 'Jumat';
+            if (s.includes('sabtu')) return 'Sabtu';
+            if (s.includes('minggu') || s.includes('ahad')) return 'Minggu';
+
+            const numeric = parseInt(s, 10);
+            if (Number.isFinite(numeric) && numeric >= 0 && numeric <= 6) return HARI_MENGAJAR[numeric];
+            if (Number.isFinite(numeric) && numeric >= 1 && numeric <= 7) return HARI_MENGAJAR[numeric % 7];
+
+            return original;
+        }
+
+        function getDayIndexFromName(hari) {
+            const normalized = normalizeHariMengajar(hari);
+            return HARI_MENGAJAR.findIndex(h => normalizeText(h) === normalizeText(normalized));
+        }
+
+        function getDayIndexFromJadwal(jadwalRow) {
+            const hari = getExplicitCol(jadwalRow, ['Hari', 'Hari Mengajar', 'hari']);
+            const byHari = getDayIndexFromName(hari);
+            if (byHari >= 0) return byHari;
+
+            // Fallback untuk data lama yang masih tersimpan dengan Tanggal Jadwal.
+            const tanggal = getExplicitCol(jadwalRow, ['Tanggal', 'Tanggal Jadwal', 'tanggal']);
+            const date = parseDateValue(tanggal);
+            return date ? date.getDay() : 99;
+        }
+
+        function getJadwalDateKey(jadwalRow) {
+            return jadwalRow.__tanggalRekap || dateKey(getExplicitCol(jadwalRow, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
+        }
+
+        function getMonthRangeFromKey(monthValue) {
+            if (!monthValue || monthValue === 'All') return null;
+            const parts = monthValue.toString().split('-');
+            if (parts.length !== 2) return null;
+            const year = Number(parts[0]);
+            const month = Number(parts[1]) - 1;
+            if (!Number.isFinite(year) || !Number.isFinite(month)) return null;
+            return {
+                start: new Date(year, month, 1),
+                end: new Date(year, month + 1, 0)
+            };
+        }
+
+        function listMonthKeysBetween(startValue, endValue) {
+            const start = parseDateValue(startValue);
+            const end = parseDateValue(endValue);
+            if (!start || !end) return [];
+            const result = [];
+            const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+            const last = new Date(end.getFullYear(), end.getMonth(), 1);
+            while (cursor <= last) {
+                result.push(`${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`);
+                cursor.setMonth(cursor.getMonth() + 1);
+            }
+            return result;
+        }
+
+        function expandJadwalDosenForMonth(rows, bulan) {
+            const range = getMonthRangeFromKey(bulan);
+            if (!range) return [];
+
+            const expanded = [];
+            (rows || []).forEach(row => {
+                const explicitHari = getExplicitCol(row, ['Hari', 'Hari Mengajar', 'hari']);
+                const dayIndex = explicitHari ? getDayIndexFromName(explicitHari) : -1;
+
+                // Data baru: jadwal mingguan berbasis hari.
+                if (dayIndex >= 0 && dayIndex <= 6) {
+                    const cursor = new Date(range.start);
+                    while (cursor <= range.end) {
+                        if (cursor.getDay() === dayIndex) {
+                            const y = cursor.getFullYear();
+                            const m = String(cursor.getMonth() + 1).padStart(2, '0');
+                            const d = String(cursor.getDate()).padStart(2, '0');
+                            expanded.push({
+                                ...row,
+                                __tanggalRekap: `${y}-${m}-${d}`,
+                                __hariJadwal: HARI_MENGAJAR[dayIndex]
+                            });
+                        }
+                        cursor.setDate(cursor.getDate() + 1);
+                    }
+                    return;
+                }
+
+                // Fallback aman untuk data lama yang masih memakai tanggal spesifik.
+                const legacyDateKey = dateKey(getExplicitCol(row, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
+                if (legacyDateKey && monthKey(legacyDateKey) === bulan) {
+                    const date = parseDateValue(legacyDateKey);
+                    expanded.push({
+                        ...row,
+                        __tanggalRekap: legacyDateKey,
+                        __hariJadwal: date ? HARI_MENGAJAR[date.getDay()] : ''
+                    });
+                }
+            });
+
+            return expanded;
+        }
+
         function getRekapDosenBaseJurnal(meta) {
             return appData.jurnal.filter(j => {
                 const tahun = getExplicitCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
@@ -1350,12 +1474,10 @@
         function getRekapDosenBaseJadwal(meta) {
             return (appData.jadwalDosen || []).filter(j => {
                 const tahun = getExplicitCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
-                const tanggal = getExplicitCol(j, ['Tanggal', 'Tanggal Jadwal', 'tanggal']);
                 const statusJadwal = getExplicitCol(j, ['Status Jadwal', 'Status', 'status']);
 
                 if (normalizeText(statusJadwal) === 'nonaktif') return false;
                 if (meta.tahun !== 'All' && tahun && tahun !== '-' && normalizeText(tahun) !== normalizeText(meta.tahun)) return false;
-                if (meta.tahun !== 'All' && (!tahun || tahun === '-') && !dateKey(tanggal)) return false;
 
                 if (!prodiMatchesFilter(getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']), meta.prodi)) return false;
 
@@ -1368,14 +1490,14 @@
                     if (jadwalSemester && normalizeText(jadwalSemester) !== normalizeText(meta.semester)) return false;
                     if (!jadwalSemester && mkSemester && normalizeText(mkSemester) !== normalizeText(meta.semester)) return false;
                 }
-                return true;
+                return getDayIndexFromJadwal(j) >= 0 && getDayIndexFromJadwal(j) <= 6;
             });
         }
 
         function getDosenMonthlyJadwal(meta) {
             const rows = getRekapDosenBaseJadwal(meta);
             if (!meta.bulan || meta.bulan === 'All') return [];
-            return rows.filter(j => monthKey(getExplicitCol(j, ['Tanggal', 'Tanggal Jadwal', 'tanggal'])) === meta.bulan);
+            return expandJadwalDosenForMonth(rows, meta.bulan);
         }
 
         function populateRekapBulan() {
@@ -1386,7 +1508,18 @@
             const meta = getSelectedRekapMeta();
             const monthSet = new Set();
 
-            getRekapDosenBaseJadwal(meta).forEach(j => {
+            const baseJadwal = getRekapDosenBaseJadwal(meta);
+            const semesterConfig = getEffectiveConfig(meta);
+
+            // Jadwal dosen sekarang berbasis hari. Karena itu pilihan bulan
+            // diambil dari rentang Hari Efektif Semester, jurnal yang sudah ada,
+            // atau bulan berjalan sebagai fallback.
+            if (baseJadwal.length > 0 && semesterConfig && semesterConfig.raw) {
+                listMonthKeysBetween(semesterConfig.start, semesterConfig.end).forEach(key => monthSet.add(key));
+            }
+
+            baseJadwal.forEach(j => {
+                // Fallback untuk data JadwalDosen lama yang masih memiliki Tanggal.
                 const key = monthKey(getExplicitCol(j, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
                 if (key) monthSet.add(key);
             });
@@ -1395,6 +1528,11 @@
                 const key = monthKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
                 if (key) monthSet.add(key);
             });
+
+            if (baseJadwal.length > 0 && monthSet.size === 0) {
+                const now = new Date();
+                monthSet.add(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+            }
 
             const list = Array.from(monthSet).sort();
             el.innerHTML = '<option value="All">Pilih Bulan Dosen</option>';
@@ -1415,7 +1553,7 @@
 
         function buildDosenMonthlyColumns(jadwal, jurnal) {
             const scheduleDates = Array.from(new Set(
-                (jadwal || []).map(j => dateKey(getExplicitCol(j, ['Tanggal', 'Tanggal Jadwal', 'tanggal']))).filter(Boolean)
+                (jadwal || []).map(j => getJadwalDateKey(j)).filter(Boolean)
             )).sort();
 
             const jurnalDates = Array.from(new Set(
@@ -1848,10 +1986,10 @@
 
                 if (isDosenTab) {
                     if (meta.bulan && meta.bulan !== 'All') {
-                        const sourceInfo = hasDosenSchedule ? 'Persentase dosen dihitung dari jumlah jadwal mengajar dosen pada bulan yang dipilih.' : 'Belum ada jadwal dosen untuk bulan ini, jadi persentase sementara masih dihitung dari tanggal jurnal yang sudah terisi.';
+                        const sourceInfo = hasDosenSchedule ? 'Persentase dosen dihitung dari jumlah tanggal mengajar dalam bulan terpilih berdasarkan hari jadwal dosen.' : 'Belum ada jadwal dosen berbasis hari untuk bulan ini, jadi persentase sementara masih dihitung dari tanggal jurnal yang sudah terisi.';
                         info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Rekap dosen bulanan:</strong> ${escapeHtml(formatMonthId(meta.bulan))}${prodiInfo}${mkInfo} · ${dosenColumns.length} tanggal/pertemuan. ${sourceInfo} Kode di sel tanggal: H/L, H/D, A/TH, dan seterusnya.`;
                     } else {
-                        info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada bulan dosen yang bisa dipilih.</strong> Rekap dosen akan muncul setelah Jadwal Dosen atau jurnal/presensi dosen memiliki tanggal yang valid.`;
+                        info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada bulan dosen yang bisa dipilih.</strong> Rekap dosen akan muncul setelah Jadwal Dosen berbasis hari atau jurnal/presensi dosen memiliki tanggal yang valid.`;
                     }
                 } else if (semesterConfig.raw) {
                     const fallbackInfo = lastRekapDateFilterFallback ? `<br><span class="text-yellow-600 dark:text-yellow-400 font-semibold">Catatan:</span> tanggal jurnal tidak berada pada rentang Hari Efektif, jadi data tetap ditampilkan tanpa membatasi periode tanggal agar rekap tidak kosong.` : '';
@@ -1899,12 +2037,12 @@
             (jadwal || []).forEach(j => {
                 const nama = getExplicitCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
                 const key = normalizeText(nama);
-                const dKey = dateKey(getExplicitCol(j, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
+                const dKey = getJadwalDateKey(j);
                 if (!key || !dKey || nama === '-') return;
 
                 const jadwalProdi = getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']);
                 const mk = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
-                const metode = getExplicitCol(j, ['Metode', 'Metode Mengajar', 'metode']);
+                const hariJadwal = j.__hariJadwal || normalizeHariMengajar(getExplicitCol(j, ['Hari', 'Hari Mengajar', 'hari'])) || normalizeHariMengajar(getExplicitCol(j, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
                 if (!map[key]) {
                     map[key] = {
                         nama,
@@ -1920,12 +2058,7 @@
                 }
                 if (!map[key].scheduleByDate) map[key].scheduleByDate = {};
                 if (!map[key].scheduleByDate[dKey]) map[key].scheduleByDate[dKey] = [];
-                map[key].scheduleByDate[dKey].push({ mataKuliah: mk, metode, prodi: jadwalProdi });
-                if (metode && metode !== '-') {
-                    map[key].metodeSet.add(metode);
-                    if (!map[key].metodeByDate[dKey]) map[key].metodeByDate[dKey] = new Set();
-                    map[key].metodeByDate[dKey].add(metode);
-                }
+                map[key].scheduleByDate[dKey].push({ mataKuliah: mk, hari: hariJadwal, prodi: jadwalProdi });
                 if (mk && mk !== '-') map[key].extra = mk;
                 if (jadwalProdi && jadwalProdi !== '-') map[key].keterangan = jadwalProdi;
             });
@@ -1991,7 +2124,7 @@
                 const cells = columns.map(c => {
                     const scheduled = c.key && item.scheduleByDate && item.scheduleByDate[c.key];
                     const metodeInfo = c.key ? buildTeachingMethodInfo(item.metodeByDate[c.key]) : { code: '', title: '' };
-                    const scheduleTitle = scheduled ? `Jadwal: ${item.scheduleByDate[c.key].map(x => [x.mataKuliah, x.metode].filter(Boolean).join(' - ')).join('; ')}` : '';
+                    const scheduleTitle = scheduled ? `Jadwal: ${item.scheduleByDate[c.key].map(x => [x.hari, x.mataKuliah].filter(Boolean).join(' - ')).join('; ')}` : '';
                     const title = [metodeInfo.title ? `Metode: ${metodeInfo.title}` : '', scheduleTitle, (hasSchedule && scheduled && !item.statusByDate[c.key]) ? 'Terjadwal, tetapi belum ada jurnal/presensi' : ''].filter(Boolean).join(' | ');
                     const statusValue = c.key ? (item.statusByDate[c.key] || (hasSchedule && scheduled ? 'Alpha' : '')) : '';
                     const codeValue = metodeInfo.code || (hasSchedule && scheduled && !item.statusByDate[c.key] ? 'TH' : '');
@@ -2704,7 +2837,7 @@
             document.getElementById('md-nidn').readOnly = false;
             document.getElementById('md-nim').readOnly = false;
             
-            ['kode','sks','prodi','nidn','status','nim','semester','jk','foto','tahun-akademik','tanggal-mulai','tanggal-selesai','jumlah-hari-efektif','dosen-pengampu','tanggal-jadwal','mata-kuliah','metode-mengajar','status-jadwal'].forEach(f => {
+            ['kode','sks','prodi','nidn','status','nim','semester','jk','foto','tahun-akademik','tanggal-mulai','tanggal-selesai','jumlah-hari-efektif','dosen-pengampu','hari-jadwal','mata-kuliah','metode-mengajar','status-jadwal'].forEach(f => {
                 const wrap = document.getElementById(`wrap-md-${f}`);
                 if (wrap) wrap.classList.add('hidden'); // Cek keamanan jika elemen sudah dihapus
                 const el = document.getElementById(`md-${f}`); if(el) el.required = false;
@@ -2737,13 +2870,12 @@
                 document.getElementById('wrap-md-nama').classList.add('hidden');
                 document.getElementById('md-nama').required = false;
                 document.getElementById('label-md-semester').innerText = 'Semester';
-                showReq('tanggal-jadwal'); showReq('dosen-pengampu'); showReq('prodi'); showReq('mata-kuliah'); showOpt('metode-mengajar'); showReq('tahun-akademik'); showReq('semester'); showOpt('status-jadwal');
+                showReq('hari-jadwal'); showReq('dosen-pengampu'); showReq('prodi'); showReq('mata-kuliah'); showReq('tahun-akademik'); showReq('semester'); showOpt('status-jadwal');
                 document.getElementById('md-prodi').classList.remove('hidden');
                 document.getElementById('md-prodi-checkboxes').classList.add('hidden');
                 fillSelect('md-dosen-pengampu', appData.dosen, 'Pilih Dosen...', ['Nama Dosen','Nama','nama']);
                 fillSelect('md-prodi', appData.prodi, 'Pilih Prodi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
                 fillSelect('md-mata-kuliah', appData.mataKuliah, 'Pilih Mata Kuliah...', ['Nama Mata Kuliah','Mata Kuliah','nama']);
-                fillSelect('md-metode-mengajar', appData.metode, 'Pilih Metode...', ['Nama Metode','Metode Perkuliahan','Metode','nama']);
                 fillSelect('md-tahun-akademik', appData.tahunAkademik, 'Pilih Tahun Akademik...', ['Tahun Akademik','nama']);
                 fillSelect('md-semester', appData.semester, 'Pilih Semester...', ['Nama Semester','Semester','nama']);
                 document.getElementById('md-status-jadwal').value = 'Aktif';
@@ -2801,7 +2933,7 @@
             else if (type === 'semester') { payload.sheetName = 'Semester'; payload.rowData = [v('nama')]; } 
             else if (type === 'tahunAkademik') { payload.sheetName = 'TahunAkademik'; payload.rowData = [v('nama')]; } 
             else if (type === 'hariEfektif') { payload.action = 'saveHariEfektif'; payload.tahunAkademik = v('tahun-akademik'); payload.semester = v('semester'); payload.tanggalMulai = v('tanggal-mulai'); payload.tanggalSelesai = v('tanggal-selesai'); payload.jumlahHariEfektif = v('jumlah-hari-efektif'); } 
-            else if (type === 'jadwalDosen') { payload.action = 'saveJadwalDosen'; payload.tanggal = v('tanggal-jadwal'); payload.dosen = v('dosen-pengampu'); payload.prodi = v('prodi'); payload.mataKuliah = v('mata-kuliah'); payload.metode = v('metode-mengajar'); payload.tahunAkademik = v('tahun-akademik'); payload.semester = v('semester'); payload.statusJadwal = v('status-jadwal') || 'Aktif'; }
+            else if (type === 'jadwalDosen') { payload.action = 'saveJadwalDosen'; payload.hari = v('hari-jadwal'); payload.dosen = v('dosen-pengampu'); payload.prodi = v('prodi'); payload.mataKuliah = v('mata-kuliah'); payload.tahunAkademik = v('tahun-akademik'); payload.semester = v('semester'); payload.statusJadwal = v('status-jadwal') || 'Aktif'; }
             else if (type === 'matakuliah') { payload.sheetName = 'MataKuliah'; payload.rowData = [v('kode'), v('nama'), v('sks'), v('prodi'), v('semester')]; } 
             else if (type === 'dosen') {
                 const sel = Array.from(document.querySelectorAll('.prodi-checkbox:checked')).map(cb => cb.value).join(', ');
