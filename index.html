@@ -1785,7 +1785,7 @@
 
             let items = Object.values(map).filter(item => rowMatchesKeyword(item, meta.keyword));
             items.forEach(item => {
-                item.hadir = columns.filter(c => c.key && getStatusShort(item.statusByDate[c.key]) === 'H').length;
+                item.hadir = columns.filter(c => c.key && item.statusByDate[c.key] && getStatusShort(item.statusByDate[c.key]) === 'H').length;
             });
             items.sort((a, b) => b.hadir - a.hadir || a.nama.localeCompare(b.nama, 'id'));
 
@@ -1859,7 +1859,7 @@
 
             let items = Object.values(map).filter(item => rowMatchesKeyword(item, meta.keyword));
             items.forEach(item => {
-                item.hadir = columns.filter(c => c.key && getStatusShort(item.statusByDate[c.key]) === 'H').length;
+                item.hadir = columns.filter(c => c.key && item.statusByDate[c.key] && getStatusShort(item.statusByDate[c.key]) === 'H').length;
             });
             items.sort((a, b) => b.hadir - a.hadir || a.nama.localeCompare(b.nama, 'id'));
 
