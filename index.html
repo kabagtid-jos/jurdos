@@ -520,11 +520,43 @@
                             </div>
 
                             <div id="panelRekapDosen" class="rekap-panel">
-                                <div id="rekapDosenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                                <div class="overflow-x-auto rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                                    <table class="w-full text-sm text-left whitespace-nowrap">
+                                        <thead class="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 text-[11px] uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
+                                            <tr>
+                                                <th class="px-4 py-4 font-bold">Nama Dosen</th>
+                                                <th class="px-4 py-4 font-bold">Tanggal</th>
+                                                <th class="px-4 py-4 font-bold text-center">H</th>
+                                                <th class="px-4 py-4 font-bold text-center">I</th>
+                                                <th class="px-4 py-4 font-bold text-center">S</th>
+                                                <th class="px-4 py-4 font-bold text-center">A</th>
+                                                <th class="px-4 py-4 font-bold text-center">Total Hadir</th>
+                                                <th class="px-4 py-4 font-bold text-center">Persentase</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="rekapDosenGrid" class="divide-y divide-gray-100 dark:divide-slate-700"></tbody>
+                                    </table>
+                                </div>
                             </div>
 
                             <div id="panelRekapMahasiswa" class="rekap-panel hidden">
-                                <div id="rekapMahasiswaGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                                <div class="overflow-x-auto rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                                    <table class="w-full text-sm text-left whitespace-nowrap">
+                                        <thead class="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 text-[11px] uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
+                                            <tr>
+                                                <th class="px-4 py-4 font-bold">Nama Mahasiswa</th>
+                                                <th class="px-4 py-4 font-bold">Tanggal</th>
+                                                <th class="px-4 py-4 font-bold text-center">H</th>
+                                                <th class="px-4 py-4 font-bold text-center">I</th>
+                                                <th class="px-4 py-4 font-bold text-center">S</th>
+                                                <th class="px-4 py-4 font-bold text-center">A</th>
+                                                <th class="px-4 py-4 font-bold text-center">Total Hadir</th>
+                                                <th class="px-4 py-4 font-bold text-center">Persentase</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="rekapMahasiswaGrid" class="divide-y divide-gray-100 dark:divide-slate-700"></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1103,6 +1135,38 @@
             switchRekapTab(activeRekapTab);
         }
 
+        function getExplicitCol(obj, possibleKeys) {
+            if (!obj) return '';
+            const objKeys = Object.keys(obj);
+            for (let pk of possibleKeys) {
+                const foundKey = objKeys.find(k => k.trim().toLowerCase() === pk.trim().toLowerCase());
+                if (foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null && obj[foundKey] !== '') {
+                    return String(obj[foundKey]);
+                }
+            }
+            return '';
+        }
+
+        function getStatusShort(status) {
+            const normalized = normalizeAttendanceStatus(status);
+            if (normalized === 'Izin') return 'I';
+            if (normalized === 'Sakit') return 'S';
+            if (normalized === 'Alpha') return 'A';
+            return 'H';
+        }
+
+        function buildPercentCell(hadir, total) {
+            const percent = total > 0 ? Math.round((hadir / total) * 100) : 0;
+            return `
+                <div class="flex items-center justify-center gap-3 min-w-[120px]">
+                    <span class="font-black text-gray-800 dark:text-white w-11 text-right">${percent}%</span>
+                    <div class="w-16 h-2 rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden">
+                        <div class="h-full rounded-full bg-primary" style="width:${percent}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderRekapDosenGrid(jurnal) {
             const container = document.getElementById('rekapDosenGrid');
             if (!container) return;
@@ -1115,22 +1179,25 @@
                 if (!map[nama]) {
                     map[nama] = {
                         nama,
+                        hadir: 0,
+                        izin: 0,
+                        sakit: 0,
+                        alpha: 0,
                         total: 0,
-                        prodi: new Set(),
-                        mataKuliah: new Set(),
-                        metode: new Set(),
-                        tahun: new Set(),
                         lastDateValue: '',
                         lastDateObj: null
                     };
                 }
 
                 const item = map[nama];
+                const rawStatus = getExplicitCol(j, ['Status Dosen', 'Kehadiran Dosen', 'Presensi Dosen', 'Status Kehadiran Dosen']);
+                const status = rawStatus ? normalizeAttendanceStatus(rawStatus) : 'Hadir';
+
                 item.total += 1;
-                item.prodi.add(getCol(j, ['Prodi', 'Program Studi', 'prodi']));
-                item.mataKuliah.add(getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']));
-                item.metode.add(getCol(j, ['Metode', 'Metode Perkuliahan', 'metode']));
-                item.tahun.add(getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']));
+                if (status === 'Izin') item.izin += 1;
+                else if (status === 'Sakit') item.sakit += 1;
+                else if (status === 'Alpha') item.alpha += 1;
+                else item.hadir += 1;
 
                 const rawDate = getCol(j, ['Tanggal', 'tanggal']);
                 const dateObj = parseDateValue(rawDate);
@@ -1140,31 +1207,23 @@
                 }
             });
 
-            const items = Object.values(map).sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
+            const items = Object.values(map).sort((a, b) => b.hadir - a.hadir || b.total - a.total || a.nama.localeCompare(b.nama));
             if (items.length === 0) {
                 container.innerHTML = emptyRekapCard('Belum ada rekap dosen', 'Data akan muncul setelah jurnal/presensi dosen tersimpan.');
                 return;
             }
 
             container.innerHTML = items.map(item => `
-                <div class="bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 hover:-translate-y-0.5 transition-transform">
-                    <div class="flex items-start justify-between gap-4 mb-4">
-                        <div class="min-w-0">
-                            <p class="text-[11px] font-bold uppercase tracking-wider text-primary mb-1">Dosen</p>
-                            <h3 class="font-black text-gray-800 dark:text-white text-lg leading-tight truncate">${escapeHtml(item.nama)}</h3>
-                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">Terakhir: ${escapeHtml(formatDateId(item.lastDateValue))}</p>
-                        </div>
-                        <div class="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-300 flex flex-col items-center justify-center shrink-0">
-                            <span class="text-xl font-black leading-none">${item.total}</span>
-                            <span class="text-[9px] font-bold uppercase">kali</span>
-                        </div>
-                    </div>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex items-start gap-3"><i class="fas fa-building text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.prodi)}</span></div>
-                        <div class="flex items-start gap-3"><i class="fas fa-book text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.mataKuliah)}</span></div>
-                        <div class="flex items-start gap-3"><i class="fas fa-chalkboard-teacher text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.metode)}</span></div>
-                    </div>
-                </div>
+                <tr class="hover:bg-gray-50 dark:hover:bg-slate-900/40 transition-colors">
+                    <td class="px-4 py-4 font-bold text-gray-800 dark:text-white min-w-[220px]">${escapeHtml(item.nama)}</td>
+                    <td class="px-4 py-4 text-gray-600 dark:text-slate-300 min-w-[150px]">${escapeHtml(formatDateId(item.lastDateValue))}</td>
+                    <td class="px-4 py-4 text-center font-black text-green-600">${item.hadir}</td>
+                    <td class="px-4 py-4 text-center font-black text-yellow-500">${item.izin}</td>
+                    <td class="px-4 py-4 text-center font-black text-blue-500">${item.sakit}</td>
+                    <td class="px-4 py-4 text-center font-black text-red-500">${item.alpha}</td>
+                    <td class="px-4 py-4 text-center font-black text-gray-800 dark:text-white">${item.hadir}</td>
+                    <td class="px-4 py-4 text-center">${buildPercentCell(item.hadir, item.total)}</td>
+                </tr>
             `).join('');
         }
 
@@ -1189,11 +1248,11 @@
                     if (!map[key]) {
                         map[key] = {
                             nama: a.nama,
-                            total: 0,
                             hadir: 0,
                             izin: 0,
                             sakit: 0,
                             alpha: 0,
+                            total: 0,
                             prodi: new Set(),
                             mataKuliah: new Set(),
                             tahun: new Set(),
@@ -1229,52 +1288,36 @@
                 ].join(' ')).includes(keyword));
             }
 
-            items.sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
+            items.sort((a, b) => b.hadir - a.hadir || b.total - a.total || a.nama.localeCompare(b.nama));
 
             if (items.length === 0) {
                 container.innerHTML = emptyRekapCard('Belum ada rekap mahasiswa', 'Data akan muncul setelah presensi mahasiswa tersimpan pada menu Input Presensi.');
                 return;
             }
 
-            container.innerHTML = items.map(item => {
-                const persenHadir = item.total > 0 ? Math.round((item.hadir / item.total) * 100) : 0;
-                return `
-                    <div class="bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 hover:-translate-y-0.5 transition-transform">
-                        <div class="flex items-start justify-between gap-4 mb-4">
-                            <div class="min-w-0">
-                                <p class="text-[11px] font-bold uppercase tracking-wider text-primary mb-1">Mahasiswa</p>
-                                <h3 class="font-black text-gray-800 dark:text-white text-lg leading-tight truncate">${escapeHtml(item.nama)}</h3>
-                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">Terakhir: ${escapeHtml(formatDateId(item.lastDateValue))}</p>
-                            </div>
-                            <div class="w-14 h-14 rounded-2xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 flex flex-col items-center justify-center shrink-0">
-                                <span class="text-xl font-black leading-none">${persenHadir}%</span>
-                                <span class="text-[9px] font-bold uppercase">hadir</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-4 gap-2 mb-4">
-                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-green-600">${item.hadir}</p><p class="text-[10px] text-gray-500 font-bold">Hadir</p></div>
-                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-yellow-500">${item.izin}</p><p class="text-[10px] text-gray-500 font-bold">Izin</p></div>
-                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-blue-500">${item.sakit}</p><p class="text-[10px] text-gray-500 font-bold">Sakit</p></div>
-                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-red-500">${item.alpha}</p><p class="text-[10px] text-gray-500 font-bold">Alpha</p></div>
-                        </div>
-
-                        <div class="space-y-3 text-sm">
-                            <div class="flex items-start gap-3"><i class="fas fa-building text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.prodi)}</span></div>
-                            <div class="flex items-start gap-3"><i class="fas fa-book text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.mataKuliah)}</span></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            container.innerHTML = items.map(item => `
+                <tr class="hover:bg-gray-50 dark:hover:bg-slate-900/40 transition-colors">
+                    <td class="px-4 py-4 font-bold text-gray-800 dark:text-white min-w-[220px]">${escapeHtml(item.nama)}</td>
+                    <td class="px-4 py-4 text-gray-600 dark:text-slate-300 min-w-[150px]">${escapeHtml(formatDateId(item.lastDateValue))}</td>
+                    <td class="px-4 py-4 text-center font-black text-green-600">${item.hadir}</td>
+                    <td class="px-4 py-4 text-center font-black text-yellow-500">${item.izin}</td>
+                    <td class="px-4 py-4 text-center font-black text-blue-500">${item.sakit}</td>
+                    <td class="px-4 py-4 text-center font-black text-red-500">${item.alpha}</td>
+                    <td class="px-4 py-4 text-center font-black text-gray-800 dark:text-white">${item.hadir}</td>
+                    <td class="px-4 py-4 text-center">${buildPercentCell(item.hadir, item.total)}</td>
+                </tr>
+            `).join('');
         }
 
         function emptyRekapCard(title, message) {
             return `
-                <div class="md:col-span-2 xl:col-span-3 bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-gray-300 dark:border-slate-700 p-10 text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-gray-400 shadow-sm"><i class="fas fa-folder-open text-2xl"></i></div>
-                    <h3 class="font-black text-gray-800 dark:text-white text-lg">${escapeHtml(title)}</h3>
-                    <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">${escapeHtml(message)}</p>
-                </div>
+                <tr>
+                    <td colspan="8" class="px-4 py-12 text-center bg-gray-50 dark:bg-slate-900/40">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-gray-400 shadow-sm"><i class="fas fa-folder-open text-2xl"></i></div>
+                        <h3 class="font-black text-gray-800 dark:text-white text-lg">${escapeHtml(title)}</h3>
+                        <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">${escapeHtml(message)}</p>
+                    </td>
+                </tr>
             `;
         }
 
