@@ -475,7 +475,7 @@
                                     <p class="text-xs md:text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-2xl">Tampilan rekap mengikuti alur absensi semester: nama, keterangan, pertemuan efektif, total hadir, dan persentase kehadiran.</p>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full xl:w-auto">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 w-full xl:w-auto">
                                     <div class="relative sm:w-52">
                                         <select id="rekapTahunAkademik" onchange="renderRekapitulasi()" class="w-full appearance-none bg-gray-50 dark:bg-slate-900/50 px-4 py-3 pr-10 rounded-2xl border border-gray-200 dark:border-slate-700 text-sm font-bold text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all cursor-pointer">
                                             <option value="All">Semua Tahun Akademik</option>
@@ -494,9 +494,15 @@
                                         </select>
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down text-xs"></i></div>
                                     </div>
-                                    <div class="relative sm:w-64">
+                                    <div class="relative sm:w-60">
+                                        <select id="rekapMataKuliah" onchange="renderRekapitulasi()" class="w-full appearance-none bg-gray-50 dark:bg-slate-900/50 px-4 py-3 pr-10 rounded-2xl border border-gray-200 dark:border-slate-700 text-sm font-bold text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all cursor-pointer">
+                                            <option value="All">Semua Mata Kuliah</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down text-xs"></i></div>
+                                    </div>
+                                    <div class="relative sm:w-56">
                                         <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                                        <input type="text" id="searchRekap" oninput="renderRekapitulasi()" placeholder="Cari nama/mata kuliah..." class="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 text-sm text-gray-700 dark:text-white focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
+                                        <input type="text" id="searchRekap" oninput="renderRekapitulasi()" placeholder="Cari nama..." class="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 text-sm text-gray-700 dark:text-white focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
                                     </div>
                                 </div>
                             </div>
@@ -815,6 +821,7 @@
         let searchDosenTerm = '';
         let searchMhsTerm = '';
         let activeRekapTab = 'dosen';
+        let lastRekapDateFilterFallback = false;
 
         // --- THEME & INIT ---
         function toggleDarkMode() {
@@ -1152,6 +1159,54 @@
             else el.value = 'All';
         }
 
+        function populateRekapMataKuliah() {
+            const el = document.getElementById('rekapMataKuliah');
+            if (!el) return;
+
+            const selectedValue = el.value || 'All';
+            const selectedProdi = document.getElementById('rekapProdi')?.value || 'All';
+            const selectedSemester = document.getElementById('rekapSemester')?.value || 'All';
+            const mataKuliahSet = new Set();
+
+            const addMataKuliahValue = (value) => {
+                addCleanOption(mataKuliahSet, value);
+            };
+
+            appData.mataKuliah.forEach(mk => {
+                const namaMk = getExplicitCol(mk, ['Nama Mata Kuliah', 'Mata Kuliah', 'MataKuliah', 'nama']);
+                const mkProdi = getExplicitCol(mk, ['Program Studi', 'Prodi', 'prodi']);
+                const mkSemester = getExplicitCol(mk, ['Semester', 'Nama Semester', 'semester']);
+                if (!prodiMatchesFilter(mkProdi, selectedProdi)) return;
+                if (selectedSemester !== 'All' && mkSemester && mkSemester !== '-' && normalizeText(mkSemester) !== normalizeText(selectedSemester)) return;
+                addMataKuliahValue(namaMk);
+            });
+
+            appData.jurnal.forEach(j => {
+                const namaMk = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
+                const jurnalProdi = getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']);
+                if (!prodiMatchesFilter(jurnalProdi, selectedProdi)) return;
+                if (selectedSemester !== 'All') {
+                    const mkSemester = getMataKuliahSemester(namaMk);
+                    if (mkSemester && normalizeText(mkSemester) !== normalizeText(selectedSemester)) return;
+                }
+                addMataKuliahValue(namaMk);
+            });
+
+            el.innerHTML = '<option value="All">Semua Mata Kuliah</option>';
+            const list = Array.from(mataKuliahSet).sort((a, b) => a.localeCompare(b, 'id', { numeric: true }));
+            list.forEach(v => {
+                el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+            });
+
+            if (list.includes(selectedValue)) el.value = selectedValue;
+            else el.value = 'All';
+        }
+
+        function mataKuliahMatchesFilter(value, selectedMataKuliah) {
+            if (!selectedMataKuliah || selectedMataKuliah === 'All') return true;
+            return normalizeText(value) === normalizeText(selectedMataKuliah);
+        }
+
         function splitProdiValues(value) {
             if (!value || value === '-') return [];
             return value.toString()
@@ -1291,20 +1346,26 @@
                 tahun: document.getElementById('rekapTahunAkademik')?.value || 'All',
                 semester: document.getElementById('rekapSemester')?.value || 'All',
                 prodi: document.getElementById('rekapProdi')?.value || 'All',
+                mataKuliah: document.getElementById('rekapMataKuliah')?.value || 'All',
                 keyword: normalizeText(document.getElementById('searchRekap')?.value || '')
             };
         }
 
         function getEffectiveConfig(meta) {
+            // Konfigurasi Hari Efektif hanya dipakai ketika user memilih Tahun Akademik
+            // atau Semester tertentu. Jika dua filter masih "Semua", rekap tidak boleh
+            // dipaksa mengikuti konfigurasi pertama karena bisa membuat data jurnal kosong.
+            const shouldUseConfig = meta.tahun !== 'All' || meta.semester !== 'All';
+
             const candidates = appData.hariEfektif.filter(he => {
                 const tahun = getExplicitCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
                 const semester = getExplicitCol(he, ['Semester', 'Nama Semester', 'semester']);
-                const yearMatch = meta.tahun === 'All' || tahun === meta.tahun;
+                const yearMatch = meta.tahun === 'All' || normalizeText(tahun) === normalizeText(meta.tahun);
                 const semMatch = meta.semester === 'All' || normalizeText(semester) === normalizeText(meta.semester);
                 return yearMatch && semMatch;
             });
 
-            const selected = candidates[0] || null;
+            const selected = shouldUseConfig ? (candidates[0] || null) : null;
             const count = selected ? parseInt(getExplicitCol(selected, ['Jumlah Hari Efektif', 'Jumlah Pertemuan', 'Hari Efektif', 'jumlah']), 10) : 0;
             return {
                 raw: selected,
@@ -1327,12 +1388,25 @@
         }
 
         function getRekapFilteredJurnal(meta, config) {
-            return appData.jurnal.filter(j => {
+            lastRekapDateFilterFallback = false;
+
+            const baseRows = appData.jurnal.filter(j => {
                 const tahun = getExplicitCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
-                const yearMatch = meta.tahun === 'All' || tahun === meta.tahun;
+                const tanggal = getExplicitCol(j, ['Tanggal', 'tanggal']);
+                let yearMatch = meta.tahun === 'All' || normalizeText(tahun) === normalizeText(meta.tahun);
+
+                // Data jurnal lama mungkin belum memiliki kolom Tahun Akademik.
+                // Jika user memilih Tahun Akademik dan ada konfigurasi Hari Efektif,
+                // izinkan baris lama masuk selama tanggalnya berada pada periode semester.
+                if (!yearMatch && config && config.raw && (!tahun || tahun === '-')) {
+                    yearMatch = isDateInsideConfig(tanggal, config);
+                }
                 if (!yearMatch) return false;
+
                 if (!prodiMatchesFilter(getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']), meta.prodi)) return false;
-                if (!isDateInsideConfig(getExplicitCol(j, ['Tanggal', 'tanggal']), config)) return false;
+
+                const mataKuliah = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
+                if (!mataKuliahMatchesFilter(mataKuliah, meta.mataKuliah)) return false;
 
                 if (meta.semester !== 'All') {
                     const mkSemester = getMataKuliahSemester(getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']));
@@ -1342,6 +1416,20 @@
                 }
                 return true;
             });
+
+            const shouldApplyDateRange = config && config.raw && (meta.tahun !== 'All' || meta.semester !== 'All');
+            if (!shouldApplyDateRange) return baseRows;
+
+            const dateFilteredRows = baseRows.filter(j => isDateInsideConfig(getExplicitCol(j, ['Tanggal', 'tanggal']), config));
+
+            // Jangan sampai rekap kosong hanya karena tanggal konfigurasi Hari Efektif
+            // tidak sama dengan tanggal jurnal yang sudah tersimpan.
+            if (dateFilteredRows.length === 0 && baseRows.length > 0) {
+                lastRekapDateFilterFallback = true;
+                return baseRows;
+            }
+
+            return dateFilteredRows;
         }
 
         function buildSemesterColumns(jurnal, config) {
@@ -1407,6 +1495,7 @@
             populateRekapTahunAkademik();
             populateRekapSemester();
             populateRekapProdi();
+            populateRekapMataKuliah();
 
             const meta = getSelectedRekapMeta();
             const config = getEffectiveConfig(meta);
@@ -1431,7 +1520,11 @@
             if (info) {
                 if (config.raw) {
                     const prodiInfo = meta.prodi && meta.prodi !== 'All' ? ` · Prodi ${escapeHtml(meta.prodi)}` : '';
-                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Hari efektif aktif:</strong> ${escapeHtml(config.tahun)} · ${escapeHtml(config.semester)}${prodiInfo} · ${columns.length} pertemuan · periode ${escapeHtml(formatDateId(config.start))} s.d. ${escapeHtml(formatDateId(config.end))}.`;
+                    const mkInfo = meta.mataKuliah && meta.mataKuliah !== 'All' ? ` · Mata Kuliah ${escapeHtml(meta.mataKuliah)}` : '';
+                    const fallbackInfo = lastRekapDateFilterFallback ? `<br><span class="text-yellow-600 dark:text-yellow-400 font-semibold">Catatan:</span> tanggal jurnal tidak berada pada rentang Hari Efektif, jadi data tetap ditampilkan tanpa membatasi periode tanggal agar rekap tidak kosong.` : '';
+                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Hari efektif aktif:</strong> ${escapeHtml(config.tahun)} · ${escapeHtml(config.semester)}${prodiInfo}${mkInfo} · ${columns.length} pertemuan · periode ${escapeHtml(formatDateId(config.start))} s.d. ${escapeHtml(formatDateId(config.end))}.${fallbackInfo}`;
+                } else if (appData.hariEfektif && appData.hariEfektif.length > 0 && meta.tahun === 'All' && meta.semester === 'All') {
+                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Rekap semua data.</strong> Pilih Tahun Akademik atau Semester tertentu agar konfigurasi Hari Efektif Semester dipakai untuk jumlah kolom dan persentase.`;
                 } else {
                     info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada konfigurasi hari efektif.</strong> Rekap memakai jumlah tanggal jurnal yang sudah terisi sebagai kolom sementara. Tambahkan Hari Efektif Semester di menu Pengaturan agar persentase dihitung per semester.`;
                 }
@@ -1449,19 +1542,22 @@
             if (!container) return;
 
             const map = {};
-            appData.dosen.forEach(d => {
-                const nama = getCol(d, ['Nama Dosen', 'Nama', 'nama']);
-                if (!nama || nama === '-') return;
-                const dosenProdi = getCol(d, ['Program Studi', 'Prodi', 'prodi']);
-                if (!prodiMatchesFilter(dosenProdi, meta.prodi)) return;
-                map[normalizeText(nama)] = {
-                    nama,
-                    keterangan: dosenProdi,
-                    extra: getCol(d, ['NIDN', 'NIP', 'nidn']),
-                    statusByDate: {},
-                    hadir: 0
-                };
-            });
+            const useMasterRows = !meta.mataKuliah || meta.mataKuliah === 'All';
+            if (useMasterRows) {
+                appData.dosen.forEach(d => {
+                    const nama = getCol(d, ['Nama Dosen', 'Nama', 'nama']);
+                    if (!nama || nama === '-') return;
+                    const dosenProdi = getCol(d, ['Program Studi', 'Prodi', 'prodi']);
+                    if (!prodiMatchesFilter(dosenProdi, meta.prodi)) return;
+                    map[normalizeText(nama)] = {
+                        nama,
+                        keterangan: dosenProdi,
+                        extra: getCol(d, ['NIDN', 'NIP', 'nidn']),
+                        statusByDate: {},
+                        hadir: 0
+                    };
+                });
+            }
 
             jurnal.forEach(j => {
                 const nama = getExplicitCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
@@ -1511,21 +1607,24 @@
             if (!container) return;
 
             const map = {};
-            appData.mahasiswa.forEach(m => {
-                const nama = getCol(m, ['Nama Mahasiswa', 'Nama', 'nama']);
-                if (!nama || nama === '-') return;
-                const semester = getCol(m, ['Semester', 'Nama Semester', 'semester']);
-                const mhsProdi = getCol(m, ['Prodi', 'Program Studi', 'prodi']);
-                if (!prodiMatchesFilter(mhsProdi, meta.prodi)) return;
-                if (meta.semester !== 'All' && semester && semester !== '-' && normalizeText(semester) !== normalizeText(meta.semester)) return;
-                map[normalizeText(nama)] = {
-                    nama,
-                    keterangan: mhsProdi,
-                    extra: `${getCol(m, ['NIM', 'nim'])} · Semester ${semester}`,
-                    statusByDate: {},
-                    hadir: 0
-                };
-            });
+            const useMasterRows = !meta.mataKuliah || meta.mataKuliah === 'All';
+            if (useMasterRows) {
+                appData.mahasiswa.forEach(m => {
+                    const nama = getCol(m, ['Nama Mahasiswa', 'Nama', 'nama']);
+                    if (!nama || nama === '-') return;
+                    const semester = getCol(m, ['Semester', 'Nama Semester', 'semester']);
+                    const mhsProdi = getCol(m, ['Prodi', 'Program Studi', 'prodi']);
+                    if (!prodiMatchesFilter(mhsProdi, meta.prodi)) return;
+                    if (meta.semester !== 'All' && semester && semester !== '-' && normalizeText(semester) !== normalizeText(meta.semester)) return;
+                    map[normalizeText(nama)] = {
+                        nama,
+                        keterangan: mhsProdi,
+                        extra: `${getCol(m, ['NIM', 'nim'])} · Semester ${semester}`,
+                        statusByDate: {},
+                        hadir: 0
+                    };
+                });
+            }
 
             jurnal.forEach(j => {
                 const dKey = dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
