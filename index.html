@@ -464,14 +464,69 @@
 
                 <!-- VIEW: REKAP -->
                 <div id="view-rekap" class="page-view hidden">
-                    <!-- Empty State for Empty Features -->
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-10 shadow-soft border border-gray-100 dark:border-slate-700 text-center">
-                        <div class="w-32 h-32 mx-auto mb-6 bg-blue-50 dark:bg-slate-700 rounded-full flex items-center justify-center">
-                            <i class="fas fa-file-excel text-5xl text-primary opacity-50"></i>
+                    <div class="space-y-6">
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-5 md:p-7 transition-colors">
+                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                                <div>
+                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary dark:text-blue-300 text-xs font-bold mb-3">
+                                        <i class="fas fa-chart-bar"></i> Rekapitulasi
+                                    </div>
+                                    <h2 class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white tracking-tight">Daftar Rekapitulasi Kehadiran</h2>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 mt-2 max-w-2xl">Rekap kehadiran dosen dan mahasiswa dihitung dari data jurnal/presensi yang sudah tersimpan.</p>
+                                </div>
+
+                                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                                    <div class="relative sm:w-64">
+                                        <select id="rekapTahunAkademik" onchange="renderRekapitulasi()" class="w-full appearance-none bg-gray-50 dark:bg-slate-900/50 px-4 py-3 pr-10 rounded-2xl border border-gray-200 dark:border-slate-700 text-sm font-bold text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all cursor-pointer">
+                                            <option value="All">Semua Tahun Akademik</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down text-xs"></i></div>
+                                    </div>
+                                    <div class="relative sm:w-72">
+                                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                                        <input type="text" id="searchRekap" oninput="renderRekapitulasi()" placeholder="Cari nama/prodi/mata kuliah..." class="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 text-sm text-gray-700 dark:text-white focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-6">
+                                <div class="rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-blue-500 dark:text-blue-300">Total Jurnal</p>
+                                    <h3 id="rekapStatJurnal" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
+                                </div>
+                                <div class="rounded-2xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-900/40 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300">Dosen Tercatat</p>
+                                    <h3 id="rekapStatDosen" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
+                                </div>
+                                <div class="rounded-2xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/40 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-300">Mahasiswa Hadir</p>
+                                    <h3 id="rekapStatHadir" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
+                                </div>
+                                <div class="rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-red-500 dark:text-red-300">Tidak Hadir</p>
+                                    <h3 id="rekapStatTidakHadir" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Modul Ekspor Segera Hadir</h3>
-                        <p class="text-gray-500 dark:text-slate-400 max-w-md mx-auto mb-8">Fitur untuk memfilter dan mengunduh laporan rekapitulasi lengkap dalam format Excel/PDF sedang dalam tahap pengembangan.</p>
-                        <button class="bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-bold py-2.5 px-6 rounded-xl cursor-not-allowed">Nantikan Pembaruannya</button>
+
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-4 md:p-6 transition-colors">
+                            <div class="flex bg-gray-100 dark:bg-slate-900/60 rounded-2xl p-1 mb-6 border border-gray-200 dark:border-slate-700">
+                                <button type="button" onclick="switchRekapTab('dosen')" id="tabRekapDosen" class="rekap-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all bg-white dark:bg-slate-800 text-primary shadow-sm">
+                                    <i class="fas fa-user-tie mr-2"></i> Kehadiran Dosen
+                                </button>
+                                <button type="button" onclick="switchRekapTab('mahasiswa')" id="tabRekapMahasiswa" class="rekap-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all text-gray-500 dark:text-slate-400 hover:text-primary">
+                                    <i class="fas fa-users mr-2"></i> Kehadiran Mahasiswa
+                                </button>
+                            </div>
+
+                            <div id="panelRekapDosen" class="rekap-panel">
+                                <div id="rekapDosenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                            </div>
+
+                            <div id="panelRekapMahasiswa" class="rekap-panel hidden">
+                                <div id="rekapMahasiswaGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -688,6 +743,7 @@
         let currentPageMhs = 1;
         let searchDosenTerm = '';
         let searchMhsTerm = '';
+        let activeRekapTab = 'dosen';
 
         // --- THEME & INIT ---
         function toggleDarkMode() {
@@ -860,6 +916,9 @@
             // TABEL MAHASISWA (Dipisah ke fungsi agar mendukung pagination)
             renderTableMhs();
 
+            // GRID REKAPITULASI
+            renderRekapitulasi();
+
             // Populate Form Dropdowns
             fillSelect('jurnalDosen', appData.dosen, 'Pilih Dosen...', ['Nama Dosen','Nama','nama']);
             fillSelect('jurnalProdi', appData.prodi, 'Pilih Program Studi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
@@ -889,6 +948,334 @@
                     tMK.innerHTML += `<li class="searchable-item flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded searchable">${k}</span><span class="text-[10px] text-gray-500 dark:text-slate-400">${s} SKS</span>${semesterInfo}</div><h5 class="font-bold text-gray-800 dark:text-slate-200 leading-tight searchable">${n}</h5><p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1">${p}</p></div><button class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-red-900/20 w-8 h-8 rounded-lg flex items-center justify-center transition shrink-0"><i class="fas fa-trash text-xs"></i></button></li>`;
                 });
             }
+        }
+
+        // --- REKAPITULASI GRID ---
+        function populateRekapTahunAkademik() {
+            const el = document.getElementById('rekapTahunAkademik');
+            if (!el) return;
+
+            const selectedValue = el.value || 'All';
+            const years = new Set();
+
+            appData.tahunAkademik.forEach(ta => {
+                const v = getCol(ta, ['Tahun Akademik', 'nama']);
+                if (v && v !== '-') years.add(v);
+            });
+
+            appData.jurnal.forEach(j => {
+                const v = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
+                if (v && v !== '-') years.add(v);
+            });
+
+            el.innerHTML = '<option value="All">Semua Tahun Akademik</option>';
+            Array.from(years).sort().reverse().forEach(v => {
+                el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+            });
+
+            if (Array.from(years).includes(selectedValue)) el.value = selectedValue;
+            else el.value = 'All';
+        }
+
+        function switchRekapTab(tab) {
+            activeRekapTab = tab === 'mahasiswa' ? 'mahasiswa' : 'dosen';
+
+            const tabDosen = document.getElementById('tabRekapDosen');
+            const tabMhs = document.getElementById('tabRekapMahasiswa');
+            const panelDosen = document.getElementById('panelRekapDosen');
+            const panelMhs = document.getElementById('panelRekapMahasiswa');
+
+            const activeClass = 'flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all bg-white dark:bg-slate-800 text-primary shadow-sm';
+            const inactiveClass = 'flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all text-gray-500 dark:text-slate-400 hover:text-primary';
+
+            if (tabDosen) tabDosen.className = activeRekapTab === 'dosen' ? activeClass : inactiveClass;
+            if (tabMhs) tabMhs.className = activeRekapTab === 'mahasiswa' ? activeClass : inactiveClass;
+            if (panelDosen) panelDosen.classList.toggle('hidden', activeRekapTab !== 'dosen');
+            if (panelMhs) panelMhs.classList.toggle('hidden', activeRekapTab !== 'mahasiswa');
+        }
+
+        function getRekapFilteredJurnal() {
+            const tahunEl = document.getElementById('rekapTahunAkademik');
+            const searchEl = document.getElementById('searchRekap');
+            const selectedYear = tahunEl ? tahunEl.value : 'All';
+            const keyword = searchEl ? normalizeText(searchEl.value) : '';
+
+            return appData.jurnal.filter(j => {
+                const tahun = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
+                const yearMatch = selectedYear === 'All' || tahun === selectedYear;
+                if (!yearMatch) return false;
+
+                if (!keyword) return true;
+                const searchable = [
+                    getCol(j, ['Tanggal', 'tanggal']),
+                    getCol(j, ['Dosen', 'Nama Dosen', 'dosen']),
+                    getCol(j, ['Prodi', 'Program Studi', 'prodi']),
+                    getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']),
+                    getCol(j, ['Metode', 'Metode Perkuliahan', 'metode']),
+                    getCol(j, ['Absensi', 'absensi']),
+                    tahun
+                ].join(' ');
+                return normalizeText(searchable).includes(keyword);
+            });
+        }
+
+        function parseAttendanceString(absensi) {
+            if (!absensi || absensi === '-') return [];
+
+            return absensi.toString().split(/,\s*/).map(item => {
+                const cleaned = item.trim();
+                if (!cleaned) return null;
+
+                const match = cleaned.match(/^(.*?)\s*\((Hadir|Izin|Sakit|Alpha|Alfa)\)$/i);
+                if (match) {
+                    return {
+                        nama: match[1].trim(),
+                        status: normalizeAttendanceStatus(match[2])
+                    };
+                }
+
+                return { nama: cleaned, status: 'Hadir' };
+            }).filter(Boolean);
+        }
+
+        function normalizeAttendanceStatus(status) {
+            const s = normalizeText(status);
+            if (s === 'izin') return 'Izin';
+            if (s === 'sakit') return 'Sakit';
+            if (s === 'alpha' || s === 'alfa') return 'Alpha';
+            return 'Hadir';
+        }
+
+        function parseDateValue(value) {
+            if (!value || value === '-') return null;
+            const nativeDate = new Date(value);
+            if (!isNaN(nativeDate.getTime())) return nativeDate;
+
+            const text = value.toString().trim();
+            const match = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+            if (match) {
+                const d = new Date(`${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`);
+                if (!isNaN(d.getTime())) return d;
+            }
+            return null;
+        }
+
+        function formatDateId(value) {
+            const date = parseDateValue(value);
+            if (!date) return value && value !== '-' ? value : '-';
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function setToLimitedText(setValue, limit = 2) {
+            const arr = Array.from(setValue).filter(v => v && v !== '-');
+            if (arr.length === 0) return '-';
+            if (arr.length <= limit) return arr.map(escapeHtml).join(', ');
+            return `${arr.slice(0, limit).map(escapeHtml).join(', ')} +${arr.length - limit}`;
+        }
+
+        function renderRekapitulasi() {
+            populateRekapTahunAkademik();
+
+            const jurnal = getRekapFilteredJurnal();
+            const parsedAttendances = [];
+            const dosenSet = new Set();
+
+            jurnal.forEach(j => {
+                const dosen = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
+                if (dosen && dosen !== '-') dosenSet.add(dosen);
+                parseAttendanceString(getCol(j, ['Absensi', 'absensi'])).forEach(a => parsedAttendances.push(a));
+            });
+
+            const hadirCount = parsedAttendances.filter(a => a.status === 'Hadir').length;
+            const tidakHadirCount = parsedAttendances.filter(a => a.status !== 'Hadir').length;
+
+            const statJurnal = document.getElementById('rekapStatJurnal');
+            const statDosen = document.getElementById('rekapStatDosen');
+            const statHadir = document.getElementById('rekapStatHadir');
+            const statTidakHadir = document.getElementById('rekapStatTidakHadir');
+            if (statJurnal) statJurnal.innerText = jurnal.length;
+            if (statDosen) statDosen.innerText = dosenSet.size;
+            if (statHadir) statHadir.innerText = hadirCount;
+            if (statTidakHadir) statTidakHadir.innerText = tidakHadirCount;
+
+            renderRekapDosenGrid(jurnal);
+            renderRekapMahasiswaGrid(jurnal);
+            switchRekapTab(activeRekapTab);
+        }
+
+        function renderRekapDosenGrid(jurnal) {
+            const container = document.getElementById('rekapDosenGrid');
+            if (!container) return;
+
+            const map = {};
+            jurnal.forEach(j => {
+                const nama = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
+                if (!nama || nama === '-') return;
+
+                if (!map[nama]) {
+                    map[nama] = {
+                        nama,
+                        total: 0,
+                        prodi: new Set(),
+                        mataKuliah: new Set(),
+                        metode: new Set(),
+                        tahun: new Set(),
+                        lastDateValue: '',
+                        lastDateObj: null
+                    };
+                }
+
+                const item = map[nama];
+                item.total += 1;
+                item.prodi.add(getCol(j, ['Prodi', 'Program Studi', 'prodi']));
+                item.mataKuliah.add(getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']));
+                item.metode.add(getCol(j, ['Metode', 'Metode Perkuliahan', 'metode']));
+                item.tahun.add(getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']));
+
+                const rawDate = getCol(j, ['Tanggal', 'tanggal']);
+                const dateObj = parseDateValue(rawDate);
+                if (!item.lastDateObj || (dateObj && dateObj > item.lastDateObj)) {
+                    item.lastDateObj = dateObj;
+                    item.lastDateValue = rawDate;
+                }
+            });
+
+            const items = Object.values(map).sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
+            if (items.length === 0) {
+                container.innerHTML = emptyRekapCard('Belum ada rekap dosen', 'Data akan muncul setelah jurnal/presensi dosen tersimpan.');
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 hover:-translate-y-0.5 transition-transform">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-primary mb-1">Dosen</p>
+                            <h3 class="font-black text-gray-800 dark:text-white text-lg leading-tight truncate">${escapeHtml(item.nama)}</h3>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">Terakhir: ${escapeHtml(formatDateId(item.lastDateValue))}</p>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-300 flex flex-col items-center justify-center shrink-0">
+                            <span class="text-xl font-black leading-none">${item.total}</span>
+                            <span class="text-[9px] font-bold uppercase">kali</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start gap-3"><i class="fas fa-building text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.prodi)}</span></div>
+                        <div class="flex items-start gap-3"><i class="fas fa-book text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.mataKuliah)}</span></div>
+                        <div class="flex items-start gap-3"><i class="fas fa-chalkboard-teacher text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.metode)}</span></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRekapMahasiswaGrid(jurnal) {
+            const container = document.getElementById('rekapMahasiswaGrid');
+            if (!container) return;
+
+            const keyword = normalizeText(document.getElementById('searchRekap')?.value || '');
+            const map = {};
+
+            jurnal.forEach(j => {
+                const prodi = getCol(j, ['Prodi', 'Program Studi', 'prodi']);
+                const mk = getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
+                const tahun = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
+                const rawDate = getCol(j, ['Tanggal', 'tanggal']);
+                const dateObj = parseDateValue(rawDate);
+
+                parseAttendanceString(getCol(j, ['Absensi', 'absensi'])).forEach(a => {
+                    const key = normalizeText(a.nama);
+                    if (!key) return;
+
+                    if (!map[key]) {
+                        map[key] = {
+                            nama: a.nama,
+                            total: 0,
+                            hadir: 0,
+                            izin: 0,
+                            sakit: 0,
+                            alpha: 0,
+                            prodi: new Set(),
+                            mataKuliah: new Set(),
+                            tahun: new Set(),
+                            lastDateValue: '',
+                            lastDateObj: null
+                        };
+                    }
+
+                    const item = map[key];
+                    item.total += 1;
+                    if (a.status === 'Hadir') item.hadir += 1;
+                    else if (a.status === 'Izin') item.izin += 1;
+                    else if (a.status === 'Sakit') item.sakit += 1;
+                    else item.alpha += 1;
+
+                    item.prodi.add(prodi);
+                    item.mataKuliah.add(mk);
+                    item.tahun.add(tahun);
+                    if (!item.lastDateObj || (dateObj && dateObj > item.lastDateObj)) {
+                        item.lastDateObj = dateObj;
+                        item.lastDateValue = rawDate;
+                    }
+                });
+            });
+
+            let items = Object.values(map);
+            if (keyword) {
+                items = items.filter(item => normalizeText([
+                    item.nama,
+                    Array.from(item.prodi).join(' '),
+                    Array.from(item.mataKuliah).join(' '),
+                    Array.from(item.tahun).join(' ')
+                ].join(' ')).includes(keyword));
+            }
+
+            items.sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
+
+            if (items.length === 0) {
+                container.innerHTML = emptyRekapCard('Belum ada rekap mahasiswa', 'Data akan muncul setelah presensi mahasiswa tersimpan pada menu Input Presensi.');
+                return;
+            }
+
+            container.innerHTML = items.map(item => {
+                const persenHadir = item.total > 0 ? Math.round((item.hadir / item.total) * 100) : 0;
+                return `
+                    <div class="bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 hover:-translate-y-0.5 transition-transform">
+                        <div class="flex items-start justify-between gap-4 mb-4">
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-primary mb-1">Mahasiswa</p>
+                                <h3 class="font-black text-gray-800 dark:text-white text-lg leading-tight truncate">${escapeHtml(item.nama)}</h3>
+                                <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">Terakhir: ${escapeHtml(formatDateId(item.lastDateValue))}</p>
+                            </div>
+                            <div class="w-14 h-14 rounded-2xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 flex flex-col items-center justify-center shrink-0">
+                                <span class="text-xl font-black leading-none">${persenHadir}%</span>
+                                <span class="text-[9px] font-bold uppercase">hadir</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 mb-4">
+                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-green-600">${item.hadir}</p><p class="text-[10px] text-gray-500 font-bold">Hadir</p></div>
+                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-yellow-500">${item.izin}</p><p class="text-[10px] text-gray-500 font-bold">Izin</p></div>
+                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-blue-500">${item.sakit}</p><p class="text-[10px] text-gray-500 font-bold">Sakit</p></div>
+                            <div class="rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 p-2 text-center"><p class="text-lg font-black text-red-500">${item.alpha}</p><p class="text-[10px] text-gray-500 font-bold">Alpha</p></div>
+                        </div>
+
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start gap-3"><i class="fas fa-building text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.prodi)}</span></div>
+                            <div class="flex items-start gap-3"><i class="fas fa-book text-gray-400 mt-0.5 w-4"></i><span class="text-gray-600 dark:text-slate-300">${setToLimitedText(item.mataKuliah)}</span></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function emptyRekapCard(title, message) {
+            return `
+                <div class="md:col-span-2 xl:col-span-3 bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-gray-300 dark:border-slate-700 p-10 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-gray-400 shadow-sm"><i class="fas fa-folder-open text-2xl"></i></div>
+                    <h3 class="font-black text-gray-800 dark:text-white text-lg">${escapeHtml(title)}</h3>
+                    <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">${escapeHtml(message)}</p>
+                </div>
+            `;
         }
 
         // --- PAGINATION & TABLE RENDERING LOGIC ---
@@ -1450,6 +1837,8 @@
             document.querySelectorAll('.mob-nav-btn').forEach(el => { el.classList.replace('text-primary', 'text-gray-400'); el.classList.add('dark:text-slate-500'); });
             const mobBtn = document.getElementById(`mob-nav-${pageId}`);
             if(mobBtn) { mobBtn.classList.replace('text-gray-400', 'text-primary'); mobBtn.classList.remove('dark:text-slate-500'); }
+
+            if (pageId === 'rekap') renderRekapitulasi();
         }
 
         function filterTable(inputId, containerId) {
