@@ -963,6 +963,18 @@
             arr.forEach(item => { const v = getCol(item, keys); if(v && v!=='-') el.innerHTML += `<option value="${v}">${v}</option>`; });
         }
 
+        function populateCleanTahunSelect(id, label, includeAll = false) {
+            const el = document.getElementById(id); if (!el) return;
+            const selectedValue = el.value || (includeAll ? 'All' : '');
+            const years = new Set();
+            appData.tahunAkademik.forEach(ta => addCleanOption(years, getExplicitCol(ta, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik', 'nama'])));
+            appData.hariEfektif.forEach(he => addCleanOption(years, getExplicitCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik'])));
+            const list = Array.from(years).sort().reverse();
+            el.innerHTML = includeAll ? `<option value="All">${label}</option>` : `<option value="" disabled selected>${label}</option>`;
+            list.forEach(v => { el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`; });
+            if (list.includes(selectedValue) || (includeAll && selectedValue === 'All')) el.value = selectedValue;
+        }
+
         function renderAllData() {
             // Stats Tetap (Tidak terpengaruh filter)
             document.getElementById('dashTotalDosen').innerText = appData.dosen.length; 
@@ -971,14 +983,7 @@
             if (prodiEl) prodiEl.innerText = appData.prodi.length;
 
             // Populate Filter Tahun Akademik Dashboard
-            const filterEl = document.getElementById('filterTahunAkademik');
-            const currFilter = filterEl.value; // Simpan pilihan yang sedang aktif
-            filterEl.innerHTML = '<option value="All">Semua Tahun Akademik</option>';
-            appData.tahunAkademik.forEach(ta => {
-                const v = getCol(ta, ['Tahun Akademik', 'nama']);
-                if(v && v !== '-') filterEl.innerHTML += `<option value="${v}">${v}</option>`;
-            });
-            if (currFilter && currFilter !== 'All') filterEl.value = currFilter;
+            populateCleanTahunSelect('filterTahunAkademik', 'Semua Tahun Akademik', true);
 
             // Panggil fungsi spesifik render Dashboard
             renderDashboardData();
@@ -997,7 +1002,7 @@
             fillSelect('jurnalProdi', appData.prodi, 'Pilih Program Studi...', ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
             fillSelect('jurnalMataKuliah', appData.mataKuliah, 'Pilih Mata Kuliah...', ['Nama Mata Kuliah','Mata Kuliah','nama']);
             fillSelect('jurnalMetode', appData.metode, 'Pilih Metode...', ['Nama Metode','Metode Perkuliahan','Metode','nama']);
-            fillSelect('jurnalTahunAkademik', appData.tahunAkademik, 'Pilih Tahun...', ['Tahun Akademik', 'nama']);
+            populateCleanTahunSelect('jurnalTahunAkademik', 'Pilih Tahun...', false);
 
             document.getElementById('jurnalMataKuliah').innerHTML = '<option value="" disabled selected>Pilih Prodi terlebih dahulu...</option>';
 
@@ -1060,27 +1065,27 @@
             const selectedValue = el.value || 'All';
             const years = new Set();
 
+            // Penting: gunakan getExplicitCol agar dropdown tidak mengambil kolom pertama
+            // seperti Tanggal ketika header Tahun Akademik tidak ditemukan.
             appData.tahunAkademik.forEach(ta => {
-                const v = getCol(ta, ['Tahun Akademik', 'nama']);
-                if (v && v !== '-') years.add(v);
+                addCleanOption(years, getExplicitCol(ta, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik', 'nama']));
             });
 
             appData.hariEfektif.forEach(he => {
-                const v = getCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
-                if (v && v !== '-') years.add(v);
+                addCleanOption(years, getExplicitCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']));
             });
 
             appData.jurnal.forEach(j => {
-                const v = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
-                if (v && v !== '-') years.add(v);
+                addCleanOption(years, getExplicitCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']));
             });
 
             el.innerHTML = '<option value="All">Semua Tahun Akademik</option>';
-            Array.from(years).sort().reverse().forEach(v => {
+            const list = Array.from(years).sort().reverse();
+            list.forEach(v => {
                 el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
             });
 
-            if (Array.from(years).includes(selectedValue)) el.value = selectedValue;
+            if (list.includes(selectedValue)) el.value = selectedValue;
             else el.value = 'All';
         }
 
@@ -1092,24 +1097,22 @@
             const semesters = new Set();
 
             appData.semester.forEach(s => {
-                const v = getCol(s, ['Nama Semester', 'Semester', 'nama']);
-                if (v && v !== '-') semesters.add(v);
+                addCleanOption(semesters, getExplicitCol(s, ['Nama Semester', 'Semester', 'nama']));
             });
             appData.hariEfektif.forEach(he => {
-                const v = getCol(he, ['Semester', 'Nama Semester', 'semester']);
-                if (v && v !== '-') semesters.add(v);
+                addCleanOption(semesters, getExplicitCol(he, ['Semester', 'Nama Semester', 'semester']));
             });
             appData.mataKuliah.forEach(mk => {
-                const v = getCol(mk, ['Semester', 'Nama Semester', 'semester']);
-                if (v && v !== '-') semesters.add(v);
+                addCleanOption(semesters, getExplicitCol(mk, ['Semester', 'Nama Semester', 'semester']));
             });
 
             el.innerHTML = '<option value="All">Semua Semester</option>';
-            Array.from(semesters).sort((a, b) => a.localeCompare(b, 'id', { numeric: true })).forEach(v => {
+            const list = Array.from(semesters).sort((a, b) => a.localeCompare(b, 'id', { numeric: true }));
+            list.forEach(v => {
                 el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
             });
 
-            if (Array.from(semesters).includes(selectedValue)) el.value = selectedValue;
+            if (list.includes(selectedValue)) el.value = selectedValue;
             else el.value = 'All';
         }
 
@@ -1120,20 +1123,32 @@
             const selectedValue = el.value || 'All';
             const prodis = new Set();
 
+            const addProdiValues = (value) => {
+                splitProdiValues(value).forEach(v => addCleanOption(prodis, v));
+            };
+
+            // Penting: gunakan kolom eksplisit. Jika header tidak cocok, jangan fallback
+            // ke kolom pertama, karena kolom pertama Jurnal biasanya Tanggal.
             appData.prodi.forEach(p => {
-                const v = getCol(p, ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']);
-                if (v && v !== '-') prodis.add(v);
+                addProdiValues(getExplicitCol(p, ['Nama Program Studi','Nama Prodi','Nama','Prodi','prodi']));
             });
-            appData.dosen.forEach(d => splitProdiValues(getCol(d, ['Program Studi','Prodi','prodi'])).forEach(v => prodis.add(v)));
-            appData.mahasiswa.forEach(m => splitProdiValues(getCol(m, ['Prodi','Program Studi','prodi'])).forEach(v => prodis.add(v)));
-            appData.jurnal.forEach(j => splitProdiValues(getCol(j, ['Prodi','Program Studi','prodi'])).forEach(v => prodis.add(v)));
+            appData.dosen.forEach(d => {
+                addProdiValues(getExplicitCol(d, ['Program Studi','Prodi','prodi']));
+            });
+            appData.mahasiswa.forEach(m => {
+                addProdiValues(getExplicitCol(m, ['Prodi','Program Studi','prodi']));
+            });
+            appData.jurnal.forEach(j => {
+                addProdiValues(getExplicitCol(j, ['Prodi','Program Studi','prodi']));
+            });
 
             el.innerHTML = '<option value="All">Semua Prodi</option>';
-            Array.from(prodis).sort((a, b) => a.localeCompare(b, 'id')).forEach(v => {
+            const list = Array.from(prodis).sort((a, b) => a.localeCompare(b, 'id'));
+            list.forEach(v => {
                 el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
             });
 
-            if (Array.from(prodis).includes(selectedValue)) el.value = selectedValue;
+            if (list.includes(selectedValue)) el.value = selectedValue;
             else el.value = 'All';
         }
 
@@ -1238,10 +1253,30 @@
             for (let pk of possibleKeys) {
                 const foundKey = objKeys.find(k => k.trim().toLowerCase() === pk.trim().toLowerCase());
                 if (foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null && obj[foundKey] !== '') {
-                    return String(obj[foundKey]);
+                    return String(obj[foundKey]).trim();
                 }
             }
             return '';
+        }
+
+        function isLikelySpreadsheetDate(value) {
+            const text = (value || '').toString().trim();
+            if (!text || text === '-') return false;
+            // Contoh data salah yang sempat masuk ke dropdown: 2026-06-14T17:00:00.000Z
+            if (/^\d{4}-\d{2}-\d{2}T/.test(text)) return true;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return true;
+            if (/^\d{1,2}[\/-]\d{1,2}[\/-]\d{4}$/.test(text)) return true;
+            return false;
+        }
+
+        function isValidRekapOption(value) {
+            const text = (value || '').toString().trim();
+            return !!text && text !== '-' && !isLikelySpreadsheetDate(text);
+        }
+
+        function addCleanOption(set, value) {
+            const text = (value || '').toString().trim();
+            if (isValidRekapOption(text)) set.add(text);
         }
 
         function getMataKuliahSemester(mataKuliahName) {
@@ -1262,21 +1297,21 @@
 
         function getEffectiveConfig(meta) {
             const candidates = appData.hariEfektif.filter(he => {
-                const tahun = getCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
-                const semester = getCol(he, ['Semester', 'Nama Semester', 'semester']);
+                const tahun = getExplicitCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
+                const semester = getExplicitCol(he, ['Semester', 'Nama Semester', 'semester']);
                 const yearMatch = meta.tahun === 'All' || tahun === meta.tahun;
                 const semMatch = meta.semester === 'All' || normalizeText(semester) === normalizeText(meta.semester);
                 return yearMatch && semMatch;
             });
 
             const selected = candidates[0] || null;
-            const count = selected ? parseInt(getCol(selected, ['Jumlah Hari Efektif', 'Jumlah Pertemuan', 'Hari Efektif', 'jumlah']), 10) : 0;
+            const count = selected ? parseInt(getExplicitCol(selected, ['Jumlah Hari Efektif', 'Jumlah Pertemuan', 'Hari Efektif', 'jumlah']), 10) : 0;
             return {
                 raw: selected,
-                tahun: selected ? getCol(selected, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']) : meta.tahun,
-                semester: selected ? getCol(selected, ['Semester', 'Nama Semester', 'semester']) : meta.semester,
-                start: selected ? getCol(selected, ['Tanggal Mulai', 'Mulai', 'Tanggal Awal']) : '',
-                end: selected ? getCol(selected, ['Tanggal Selesai', 'Selesai', 'Tanggal Akhir']) : '',
+                tahun: selected ? getExplicitCol(selected, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']) : meta.tahun,
+                semester: selected ? getExplicitCol(selected, ['Semester', 'Nama Semester', 'semester']) : meta.semester,
+                start: selected ? getExplicitCol(selected, ['Tanggal Mulai', 'Mulai', 'Tanggal Awal']) : '',
+                end: selected ? getExplicitCol(selected, ['Tanggal Selesai', 'Selesai', 'Tanggal Akhir']) : '',
                 total: Number.isFinite(count) && count > 0 ? count : 0
             };
         }
@@ -1293,14 +1328,14 @@
 
         function getRekapFilteredJurnal(meta, config) {
             return appData.jurnal.filter(j => {
-                const tahun = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
+                const tahun = getExplicitCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
                 const yearMatch = meta.tahun === 'All' || tahun === meta.tahun;
                 if (!yearMatch) return false;
-                if (!prodiMatchesFilter(getCol(j, ['Prodi', 'Program Studi', 'prodi']), meta.prodi)) return false;
-                if (!isDateInsideConfig(getCol(j, ['Tanggal', 'tanggal']), config)) return false;
+                if (!prodiMatchesFilter(getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']), meta.prodi)) return false;
+                if (!isDateInsideConfig(getExplicitCol(j, ['Tanggal', 'tanggal']), config)) return false;
 
                 if (meta.semester !== 'All') {
-                    const mkSemester = getMataKuliahSemester(getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']));
+                    const mkSemester = getMataKuliahSemester(getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']));
                     const semByConfig = config.raw ? normalizeText(config.semester) === normalizeText(meta.semester) : true;
                     if (mkSemester && normalizeText(mkSemester) !== normalizeText(meta.semester)) return false;
                     if (!mkSemester && !semByConfig) return false;
@@ -1311,7 +1346,7 @@
 
         function buildSemesterColumns(jurnal, config) {
             const dates = Array.from(new Set(
-                jurnal.map(j => dateKey(getCol(j, ['Tanggal', 'tanggal']))).filter(Boolean)
+                jurnal.map(j => dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']))).filter(Boolean)
             )).sort();
 
             const total = config.total > 0 ? config.total : Math.max(dates.length, 1);
@@ -1379,7 +1414,7 @@
             const { columns, filledDates } = buildSemesterColumns(jurnal, config);
             const dosenSet = new Set();
             jurnal.forEach(j => {
-                const dosen = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
+                const dosen = getExplicitCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
                 if (dosen && dosen !== '-') dosenSet.add(dosen);
             });
 
@@ -1429,15 +1464,15 @@
             });
 
             jurnal.forEach(j => {
-                const nama = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
+                const nama = getExplicitCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
                 const key = normalizeText(nama);
                 if (!key || nama === '-') return;
                 if (!map[key]) {
-                    const jurnalProdi = getCol(j, ['Prodi', 'Program Studi', 'prodi']);
+                    const jurnalProdi = getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']);
                     if (!prodiMatchesFilter(jurnalProdi, meta.prodi)) return;
-                    map[key] = { nama, keterangan: jurnalProdi, extra: getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']), statusByDate: {}, hadir: 0 };
+                    map[key] = { nama, keterangan: jurnalProdi, extra: getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']), statusByDate: {}, hadir: 0 };
                 }
-                const dKey = dateKey(getCol(j, ['Tanggal', 'tanggal']));
+                const dKey = dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
                 if (!dKey) return;
                 const rawStatus = getExplicitCol(j, ['Status Dosen', 'Kehadiran Dosen', 'Presensi Dosen', 'Status Kehadiran Dosen']);
                 map[key].statusByDate[dKey] = rawStatus ? normalizeAttendanceStatus(rawStatus) : 'Hadir';
@@ -1493,11 +1528,11 @@
             });
 
             jurnal.forEach(j => {
-                const dKey = dateKey(getCol(j, ['Tanggal', 'tanggal']));
+                const dKey = dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
                 if (!dKey) return;
-                const prodi = getCol(j, ['Prodi', 'Program Studi', 'prodi']);
-                const mk = getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
-                parseAttendanceString(getCol(j, ['Absensi', 'absensi'])).forEach(a => {
+                const prodi = getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']);
+                const mk = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
+                parseAttendanceString(getExplicitCol(j, ['Absensi', 'absensi'])).forEach(a => {
                     const key = normalizeText(a.nama);
                     if (!key) return;
                     if (!map[key]) {
