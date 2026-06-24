@@ -2271,7 +2271,7 @@
             else if (type === 'metode') { payload.sheetName = 'Metode'; payload.rowData = [v('nama')]; } 
             else if (type === 'semester') { payload.sheetName = 'Semester'; payload.rowData = [v('nama')]; } 
             else if (type === 'tahunAkademik') { payload.sheetName = 'TahunAkademik'; payload.rowData = [v('nama')]; } 
-            else if (type === 'hariEfektif') { payload.sheetName = 'HariEfektif'; payload.rowData = [v('tahun-akademik'), v('semester'), v('tanggal-mulai'), v('tanggal-selesai'), v('jumlah-hari-efektif')]; } 
+            else if (type === 'hariEfektif') { payload.action = 'saveHariEfektif'; payload.tahunAkademik = v('tahun-akademik'); payload.semester = v('semester'); payload.tanggalMulai = v('tanggal-mulai'); payload.tanggalSelesai = v('tanggal-selesai'); payload.jumlahHariEfektif = v('jumlah-hari-efektif'); } 
             else if (type === 'matakuliah') { payload.sheetName = 'MataKuliah'; payload.rowData = [v('kode'), v('nama'), v('sks'), v('prodi'), v('semester')]; } 
             else if (type === 'dosen') {
                 const sel = Array.from(document.querySelectorAll('.prodi-checkbox:checked')).map(cb => cb.value).join(', ');
