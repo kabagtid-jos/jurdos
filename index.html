@@ -2058,12 +2058,9 @@
             items.forEach(item => {
                 item.hadir = columns.filter(c => {
                     if (!c.key) return false;
-                    if (hasSchedule && !(item.scheduleByDate && item.scheduleByDate[c.key])) return false;
                     return item.statusByDate[c.key] && getStatusShort(item.statusByDate[c.key]) === 'H';
                 }).length;
-                item.totalJadwal = hasSchedule
-                    ? columns.filter(c => c.key && item.scheduleByDate && item.scheduleByDate[c.key]).length
-                    : columns.length;
+                item.totalJadwal = columns.length;
             });
             items.sort((a, b) => b.hadir - a.hadir || a.nama.localeCompare(b.nama, 'id'));
 
