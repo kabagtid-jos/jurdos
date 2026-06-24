@@ -469,13 +469,13 @@
                             <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
                                 <div>
                                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary dark:text-blue-300 text-xs font-bold mb-3">
-                                        <i class="fas fa-table-cells"></i> Rekap Semester
+                                        <i class="fas fa-table-cells"></i> Rekap Dosen Bulanan & Mahasiswa Semester
                                     </div>
-                                    <h2 class="text-xl md:text-2xl font-black text-gray-800 dark:text-white tracking-tight">Rekapitulasi Kehadiran Semester</h2>
-                                    <p class="text-xs md:text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-2xl">Tampilan rekap mengikuti alur absensi semester: nama, keterangan, pertemuan efektif, total hadir, dan persentase kehadiran.</p>
+                                    <h2 class="text-xl md:text-2xl font-black text-gray-800 dark:text-white tracking-tight">Rekapitulasi Kehadiran</h2>
+                                    <p class="text-xs md:text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-2xl">Rekap dosen ditampilkan per bulan, sedangkan rekap mahasiswa tetap mengikuti hari efektif semester.</p>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 w-full xl:w-auto">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-3 w-full xl:w-auto">
                                     <div class="relative sm:w-52">
                                         <select id="rekapTahunAkademik" onchange="renderRekapitulasi()" class="w-full appearance-none bg-gray-50 dark:bg-slate-900/50 px-4 py-3 pr-10 rounded-2xl border border-gray-200 dark:border-slate-700 text-sm font-bold text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all cursor-pointer">
                                             <option value="All">Semua Tahun Akademik</option>
@@ -500,6 +500,12 @@
                                         </select>
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down text-xs"></i></div>
                                     </div>
+                                    <div id="wrapRekapBulan" class="relative sm:w-48">
+                                        <select id="rekapBulan" onchange="renderRekapitulasi()" class="w-full appearance-none bg-gray-50 dark:bg-slate-900/50 px-4 py-3 pr-10 rounded-2xl border border-gray-200 dark:border-slate-700 text-sm font-bold text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all cursor-pointer">
+                                            <option value="All">Pilih Bulan Dosen</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down text-xs"></i></div>
+                                    </div>
                                     <div class="relative sm:w-56">
                                         <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                                         <input type="text" id="searchRekap" oninput="renderRekapitulasi()" placeholder="Cari nama..." class="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 text-sm text-gray-700 dark:text-white focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
@@ -509,25 +515,25 @@
 
                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
                                 <div class="rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 p-3">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider text-blue-500 dark:text-blue-300">Jurnal Semester</p>
+                                    <p id="rekapLabelJurnal" class="text-[10px] font-bold uppercase tracking-wider text-blue-500 dark:text-blue-300">Jurnal Semester</p>
                                     <h3 id="rekapStatJurnal" class="text-xl md:text-2xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
                                 <div class="rounded-2xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-900/40 p-3">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300">Dosen Tercatat</p>
+                                    <p id="rekapLabelOrang" class="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-300">Dosen Tercatat</p>
                                     <h3 id="rekapStatDosen" class="text-xl md:text-2xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
                                 <div class="rounded-2xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/40 p-3">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider text-green-600 dark:text-green-300">Hari Efektif</p>
+                                    <p id="rekapLabelKolom" class="text-[10px] font-bold uppercase tracking-wider text-green-600 dark:text-green-300">Hari Efektif</p>
                                     <h3 id="rekapStatHadir" class="text-xl md:text-2xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
                                 <div class="rounded-2xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-900/40 p-3">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-300">Tanggal Terisi</p>
+                                    <p id="rekapLabelTanggal" class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-300">Tanggal Terisi</p>
                                     <h3 id="rekapStatTidakHadir" class="text-xl md:text-2xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
                             </div>
 
                             <div id="rekapEffectiveInfo" class="mt-4 text-xs text-gray-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-2xl px-4 py-3 leading-relaxed">
-                                Atur hari efektif semester terlebih dahulu melalui menu Pengaturan agar persentase menggunakan denominator semester yang benar.
+                                Rekap dosen memakai filter bulan. Rekap mahasiswa memakai hari efektif semester dari menu Pengaturan.
                             </div>
                         </div>
 
@@ -1202,6 +1208,87 @@
             else el.value = 'All';
         }
 
+
+        function monthKey(value) {
+            const d = parseDateValue(value);
+            if (!d) return '';
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            return `${y}-${m}`;
+        }
+
+        function formatMonthId(value) {
+            if (!value || value === 'All') return '-';
+            const parts = value.toString().split('-');
+            if (parts.length !== 2) return value;
+            const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+            if (isNaN(d.getTime())) return value;
+            return d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        }
+
+        function getRekapDosenBaseJurnal(meta) {
+            return appData.jurnal.filter(j => {
+                const tahun = getExplicitCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
+                const tanggal = getExplicitCol(j, ['Tanggal', 'tanggal']);
+                if (meta.tahun !== 'All' && tahun && tahun !== '-' && normalizeText(tahun) !== normalizeText(meta.tahun)) return false;
+                if (meta.tahun !== 'All' && (!tahun || tahun === '-') && !dateKey(tanggal)) return false;
+
+                if (!prodiMatchesFilter(getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']), meta.prodi)) return false;
+
+                const mataKuliah = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
+                if (!mataKuliahMatchesFilter(mataKuliah, meta.mataKuliah)) return false;
+
+                if (meta.semester !== 'All') {
+                    const mkSemester = getMataKuliahSemester(mataKuliah);
+                    if (mkSemester && normalizeText(mkSemester) !== normalizeText(meta.semester)) return false;
+                }
+                return true;
+            });
+        }
+
+        function populateRekapBulan() {
+            const el = document.getElementById('rekapBulan');
+            if (!el) return;
+
+            const selectedValue = el.value || 'All';
+            const meta = getSelectedRekapMeta();
+            const monthSet = new Set();
+
+            getRekapDosenBaseJurnal(meta).forEach(j => {
+                const key = monthKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
+                if (key) monthSet.add(key);
+            });
+
+            const list = Array.from(monthSet).sort();
+            el.innerHTML = '<option value="All">Pilih Bulan Dosen</option>';
+            list.forEach(v => {
+                el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(formatMonthId(v))}</option>`;
+            });
+
+            if (list.includes(selectedValue)) el.value = selectedValue;
+            else if (list.length > 0) el.value = list[list.length - 1];
+            else el.value = 'All';
+        }
+
+        function getDosenMonthlyJurnal(meta) {
+            const rows = getRekapDosenBaseJurnal(meta);
+            if (!meta.bulan || meta.bulan === 'All') return [];
+            return rows.filter(j => monthKey(getExplicitCol(j, ['Tanggal', 'tanggal'])) === meta.bulan);
+        }
+
+        function buildDosenMonthlyColumns(jurnal) {
+            const dates = Array.from(new Set(
+                jurnal.map(j => dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']))).filter(Boolean)
+            )).sort();
+
+            const columns = dates.map((key, index) => ({
+                number: index + 1,
+                key,
+                label: formatDateId(key)
+            }));
+            return { columns, filledDates: dates.length };
+        }
+
         function mataKuliahMatchesFilter(value, selectedMataKuliah) {
             if (!selectedMataKuliah || selectedMataKuliah === 'All') return true;
             return normalizeText(value) === normalizeText(selectedMataKuliah);
@@ -1221,13 +1308,14 @@
             return splitProdiValues(value).some(v => normalizeText(v) === target || normalizeText(v).includes(target) || target.includes(normalizeText(v)));
         }
 
-        function switchRekapTab(tab) {
+        function switchRekapTab(tab, shouldRender = true) {
             activeRekapTab = tab === 'mahasiswa' ? 'mahasiswa' : 'dosen';
 
             const tabDosen = document.getElementById('tabRekapDosen');
             const tabMhs = document.getElementById('tabRekapMahasiswa');
             const panelDosen = document.getElementById('panelRekapDosen');
             const panelMhs = document.getElementById('panelRekapMahasiswa');
+            const wrapBulan = document.getElementById('wrapRekapBulan');
 
             const activeClass = 'rekap-tab-btn flex-1 px-3 py-2.5 rounded-xl text-sm font-extrabold transition-all bg-white dark:bg-slate-800 text-primary shadow-sm';
             const inactiveClass = 'rekap-tab-btn flex-1 px-3 py-2.5 rounded-xl text-sm font-extrabold transition-all text-gray-500 dark:text-slate-400 hover:text-primary';
@@ -1236,6 +1324,9 @@
             if (tabMhs) tabMhs.className = activeRekapTab === 'mahasiswa' ? activeClass : inactiveClass;
             if (panelDosen) panelDosen.classList.toggle('hidden', activeRekapTab !== 'dosen');
             if (panelMhs) panelMhs.classList.toggle('hidden', activeRekapTab !== 'mahasiswa');
+            if (wrapBulan) wrapBulan.classList.toggle('hidden', activeRekapTab !== 'dosen');
+
+            if (shouldRender) renderRekapitulasi();
         }
 
         function normalizeAttendanceStatus(status) {
@@ -1347,6 +1438,7 @@
                 semester: document.getElementById('rekapSemester')?.value || 'All',
                 prodi: document.getElementById('rekapProdi')?.value || 'All',
                 mataKuliah: document.getElementById('rekapMataKuliah')?.value || 'All',
+                bulan: document.getElementById('rekapBulan')?.value || 'All',
                 keyword: normalizeText(document.getElementById('searchRekap')?.value || '')
             };
         }
@@ -1496,45 +1588,84 @@
             populateRekapSemester();
             populateRekapProdi();
             populateRekapMataKuliah();
+            populateRekapBulan();
 
             const meta = getSelectedRekapMeta();
-            const config = getEffectiveConfig(meta);
-            const jurnal = getRekapFilteredJurnal(meta, config);
-            const { columns, filledDates } = buildSemesterColumns(jurnal, config);
+            const semesterConfig = getEffectiveConfig(meta);
+            const jurnalMahasiswa = getRekapFilteredJurnal(meta, semesterConfig);
+            const { columns: mahasiswaColumns, filledDates: mahasiswaFilledDates } = buildSemesterColumns(jurnalMahasiswa, semesterConfig);
+            const jurnalDosen = getDosenMonthlyJurnal(meta);
+            const { columns: dosenColumns, filledDates: dosenFilledDates } = buildDosenMonthlyColumns(jurnalDosen);
+
             const dosenSet = new Set();
-            jurnal.forEach(j => {
+            jurnalDosen.forEach(j => {
                 const dosen = getExplicitCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
                 if (dosen && dosen !== '-') dosenSet.add(dosen);
             });
 
+            const mahasiswaSet = new Set();
+            jurnalMahasiswa.forEach(j => {
+                parseAttendanceString(getExplicitCol(j, ['Absensi', 'absensi'])).forEach(a => {
+                    if (a.nama) mahasiswaSet.add(a.nama);
+                });
+            });
+
+            const isDosenTab = activeRekapTab === 'dosen';
             const statJurnal = document.getElementById('rekapStatJurnal');
-            const statDosen = document.getElementById('rekapStatDosen');
-            const statHadir = document.getElementById('rekapStatHadir');
+            const statOrang = document.getElementById('rekapStatDosen');
+            const statKolom = document.getElementById('rekapStatHadir');
             const statTanggal = document.getElementById('rekapStatTidakHadir');
-            if (statJurnal) statJurnal.innerText = jurnal.length;
-            if (statDosen) statDosen.innerText = dosenSet.size;
-            if (statHadir) statHadir.innerText = columns.length;
-            if (statTanggal) statTanggal.innerText = filledDates;
+            const labelJurnal = document.getElementById('rekapLabelJurnal');
+            const labelOrang = document.getElementById('rekapLabelOrang');
+            const labelKolom = document.getElementById('rekapLabelKolom');
+            const labelTanggal = document.getElementById('rekapLabelTanggal');
+
+            if (isDosenTab) {
+                if (labelJurnal) labelJurnal.innerText = 'Jurnal Bulan';
+                if (labelOrang) labelOrang.innerText = 'Dosen Tercatat';
+                if (labelKolom) labelKolom.innerText = 'Pertemuan Bulan';
+                if (labelTanggal) labelTanggal.innerText = 'Tanggal Terisi';
+                if (statJurnal) statJurnal.innerText = jurnalDosen.length;
+                if (statOrang) statOrang.innerText = dosenSet.size;
+                if (statKolom) statKolom.innerText = dosenColumns.length;
+                if (statTanggal) statTanggal.innerText = dosenFilledDates;
+            } else {
+                if (labelJurnal) labelJurnal.innerText = 'Jurnal Semester';
+                if (labelOrang) labelOrang.innerText = 'Mahasiswa Tercatat';
+                if (labelKolom) labelKolom.innerText = 'Hari Efektif';
+                if (labelTanggal) labelTanggal.innerText = 'Tanggal Terisi';
+                if (statJurnal) statJurnal.innerText = jurnalMahasiswa.length;
+                if (statOrang) statOrang.innerText = mahasiswaSet.size;
+                if (statKolom) statKolom.innerText = mahasiswaColumns.length;
+                if (statTanggal) statTanggal.innerText = mahasiswaFilledDates;
+            }
 
             const info = document.getElementById('rekapEffectiveInfo');
             if (info) {
-                if (config.raw) {
-                    const prodiInfo = meta.prodi && meta.prodi !== 'All' ? ` · Prodi ${escapeHtml(meta.prodi)}` : '';
-                    const mkInfo = meta.mataKuliah && meta.mataKuliah !== 'All' ? ` · Mata Kuliah ${escapeHtml(meta.mataKuliah)}` : '';
+                const prodiInfo = meta.prodi && meta.prodi !== 'All' ? ` · Prodi ${escapeHtml(meta.prodi)}` : '';
+                const mkInfo = meta.mataKuliah && meta.mataKuliah !== 'All' ? ` · Mata Kuliah ${escapeHtml(meta.mataKuliah)}` : '';
+
+                if (isDosenTab) {
+                    if (meta.bulan && meta.bulan !== 'All') {
+                        info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Rekap dosen bulanan:</strong> ${escapeHtml(formatMonthId(meta.bulan))}${prodiInfo}${mkInfo} · ${dosenColumns.length} tanggal/pertemuan terisi. Persentase dosen dihitung dari jumlah tanggal jurnal pada bulan yang dipilih, bukan dari Hari Efektif Semester.`;
+                    } else {
+                        info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada bulan dosen yang bisa dipilih.</strong> Rekap dosen akan muncul setelah jurnal/presensi dosen memiliki tanggal yang valid.`;
+                    }
+                } else if (semesterConfig.raw) {
                     const fallbackInfo = lastRekapDateFilterFallback ? `<br><span class="text-yellow-600 dark:text-yellow-400 font-semibold">Catatan:</span> tanggal jurnal tidak berada pada rentang Hari Efektif, jadi data tetap ditampilkan tanpa membatasi periode tanggal agar rekap tidak kosong.` : '';
-                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Hari efektif aktif:</strong> ${escapeHtml(config.tahun)} · ${escapeHtml(config.semester)}${prodiInfo}${mkInfo} · ${columns.length} pertemuan · periode ${escapeHtml(formatDateId(config.start))} s.d. ${escapeHtml(formatDateId(config.end))}.${fallbackInfo}`;
+                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Hari efektif aktif:</strong> ${escapeHtml(semesterConfig.tahun)} · ${escapeHtml(semesterConfig.semester)}${prodiInfo}${mkInfo} · ${mahasiswaColumns.length} pertemuan · periode ${escapeHtml(formatDateId(semesterConfig.start))} s.d. ${escapeHtml(formatDateId(semesterConfig.end))}.${fallbackInfo}`;
                 } else if (appData.hariEfektif && appData.hariEfektif.length > 0 && meta.tahun === 'All' && meta.semester === 'All') {
-                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Rekap semua data.</strong> Pilih Tahun Akademik atau Semester tertentu agar konfigurasi Hari Efektif Semester dipakai untuk jumlah kolom dan persentase.`;
+                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Rekap mahasiswa semua data.</strong> Pilih Tahun Akademik atau Semester tertentu agar konfigurasi Hari Efektif Semester dipakai untuk jumlah kolom dan persentase.`;
                 } else {
-                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada konfigurasi hari efektif.</strong> Rekap memakai jumlah tanggal jurnal yang sudah terisi sebagai kolom sementara. Tambahkan Hari Efektif Semester di menu Pengaturan agar persentase dihitung per semester.`;
+                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada konfigurasi hari efektif.</strong> Rekap mahasiswa memakai jumlah tanggal jurnal yang sudah terisi sebagai kolom sementara. Tambahkan Hari Efektif Semester di menu Pengaturan agar persentase dihitung per semester.`;
                 }
             }
 
-            buildRekapHead('rekapDosenHead', 'Nama Dosen', columns);
-            buildRekapHead('rekapMahasiswaHead', 'Nama Mahasiswa', columns);
-            renderRekapDosenGrid(jurnal, columns, meta);
-            renderRekapMahasiswaGrid(jurnal, columns, meta);
-            switchRekapTab(activeRekapTab);
+            buildRekapHead('rekapDosenHead', 'Nama Dosen', dosenColumns);
+            buildRekapHead('rekapMahasiswaHead', 'Nama Mahasiswa', mahasiswaColumns);
+            renderRekapDosenGrid(jurnalDosen, dosenColumns, meta);
+            renderRekapMahasiswaGrid(jurnalMahasiswa, mahasiswaColumns, meta);
+            switchRekapTab(activeRekapTab, false);
         }
 
         function renderRekapDosenGrid(jurnal, columns, meta) {
