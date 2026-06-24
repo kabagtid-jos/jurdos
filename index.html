@@ -466,19 +466,25 @@
                 <div id="view-rekap" class="page-view hidden">
                     <div class="space-y-6">
                         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-5 md:p-7 transition-colors">
-                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
                                 <div>
                                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary dark:text-blue-300 text-xs font-bold mb-3">
-                                        <i class="fas fa-chart-bar"></i> Rekapitulasi
+                                        <i class="fas fa-table-cells"></i> Rekap Semester
                                     </div>
-                                    <h2 class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white tracking-tight">Daftar Rekapitulasi Kehadiran</h2>
-                                    <p class="text-sm text-gray-500 dark:text-slate-400 mt-2 max-w-2xl">Rekap kehadiran dosen dan mahasiswa dihitung dari data jurnal/presensi yang sudah tersimpan.</p>
+                                    <h2 class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white tracking-tight">Rekapitulasi Kehadiran Semester</h2>
+                                    <p class="text-sm text-gray-500 dark:text-slate-400 mt-2 max-w-2xl">Tampilan rekap mengikuti alur absensi semester: nama, keterangan, pertemuan efektif, total hadir, dan persentase kehadiran.</p>
                                 </div>
 
-                                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                                    <div class="relative sm:w-64">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full xl:w-auto">
+                                    <div class="relative sm:w-56">
                                         <select id="rekapTahunAkademik" onchange="renderRekapitulasi()" class="w-full appearance-none bg-gray-50 dark:bg-slate-900/50 px-4 py-3 pr-10 rounded-2xl border border-gray-200 dark:border-slate-700 text-sm font-bold text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all cursor-pointer">
                                             <option value="All">Semua Tahun Akademik</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down text-xs"></i></div>
+                                    </div>
+                                    <div class="relative sm:w-48">
+                                        <select id="rekapSemester" onchange="renderRekapitulasi()" class="w-full appearance-none bg-gray-50 dark:bg-slate-900/50 px-4 py-3 pr-10 rounded-2xl border border-gray-200 dark:border-slate-700 text-sm font-bold text-gray-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all cursor-pointer">
+                                            <option value="All">Semua Semester</option>
                                         </select>
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down text-xs"></i></div>
                                     </div>
@@ -491,7 +497,7 @@
 
                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-6">
                                 <div class="rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 p-4">
-                                    <p class="text-[11px] font-bold uppercase tracking-wider text-blue-500 dark:text-blue-300">Total Jurnal</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-blue-500 dark:text-blue-300">Jurnal Semester</p>
                                     <h3 id="rekapStatJurnal" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
                                 <div class="rounded-2xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-900/40 p-4">
@@ -499,18 +505,22 @@
                                     <h3 id="rekapStatDosen" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
                                 <div class="rounded-2xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/40 p-4">
-                                    <p class="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-300">Mahasiswa Hadir</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-300">Hari Efektif</p>
                                     <h3 id="rekapStatHadir" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
-                                <div class="rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40 p-4">
-                                    <p class="text-[11px] font-bold uppercase tracking-wider text-red-500 dark:text-red-300">Tidak Hadir</p>
+                                <div class="rounded-2xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-900/40 p-4">
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-300">Tanggal Terisi</p>
                                     <h3 id="rekapStatTidakHadir" class="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mt-1">0</h3>
                                 </div>
+                            </div>
+
+                            <div id="rekapEffectiveInfo" class="mt-5 text-xs md:text-sm text-gray-500 dark:text-slate-400 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-2xl px-4 py-3 leading-relaxed">
+                                Atur hari efektif semester terlebih dahulu melalui menu Pengaturan agar persentase menggunakan denominator semester yang benar.
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-soft dark:shadow-soft-dark border border-gray-100 dark:border-slate-700 p-4 md:p-6 transition-colors">
-                            <div class="flex bg-gray-100 dark:bg-slate-900/60 rounded-2xl p-1 mb-6 border border-gray-200 dark:border-slate-700">
+                            <div class="flex bg-gray-100 dark:bg-slate-900/60 rounded-2xl p-1 mb-5 border border-gray-200 dark:border-slate-700">
                                 <button type="button" onclick="switchRekapTab('dosen')" id="tabRekapDosen" class="rekap-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all bg-white dark:bg-slate-800 text-primary shadow-sm">
                                     <i class="fas fa-user-tie mr-2"></i> Kehadiran Dosen
                                 </button>
@@ -519,21 +529,18 @@
                                 </button>
                             </div>
 
+                            <div class="flex flex-wrap gap-3 mb-5 text-xs font-bold text-gray-500 dark:text-slate-400">
+                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-100 border border-green-200"></span> H = Hadir</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-100 border border-yellow-200"></span> I = Izin</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> S = Sakit</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 border border-red-200"></span> A = Alpha</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-200"></span> - = Belum ada data</span>
+                            </div>
+
                             <div id="panelRekapDosen" class="rekap-panel">
                                 <div class="overflow-x-auto rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-                                    <table class="w-full text-sm text-left whitespace-nowrap">
-                                        <thead class="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 text-[11px] uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
-                                            <tr>
-                                                <th class="px-4 py-4 font-bold">Nama Dosen</th>
-                                                <th class="px-4 py-4 font-bold">Tanggal</th>
-                                                <th class="px-4 py-4 font-bold text-center">H</th>
-                                                <th class="px-4 py-4 font-bold text-center">I</th>
-                                                <th class="px-4 py-4 font-bold text-center">S</th>
-                                                <th class="px-4 py-4 font-bold text-center">A</th>
-                                                <th class="px-4 py-4 font-bold text-center">Total Hadir</th>
-                                                <th class="px-4 py-4 font-bold text-center">Persentase</th>
-                                            </tr>
-                                        </thead>
+                                    <table class="w-full text-xs md:text-sm text-center whitespace-nowrap border-separate border-spacing-0">
+                                        <thead id="rekapDosenHead" class="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 text-[11px] uppercase tracking-wider"></thead>
                                         <tbody id="rekapDosenGrid" class="divide-y divide-gray-100 dark:divide-slate-700"></tbody>
                                     </table>
                                 </div>
@@ -541,19 +548,8 @@
 
                             <div id="panelRekapMahasiswa" class="rekap-panel hidden">
                                 <div class="overflow-x-auto rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-                                    <table class="w-full text-sm text-left whitespace-nowrap">
-                                        <thead class="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 text-[11px] uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
-                                            <tr>
-                                                <th class="px-4 py-4 font-bold">Nama Mahasiswa</th>
-                                                <th class="px-4 py-4 font-bold">Tanggal</th>
-                                                <th class="px-4 py-4 font-bold text-center">H</th>
-                                                <th class="px-4 py-4 font-bold text-center">I</th>
-                                                <th class="px-4 py-4 font-bold text-center">S</th>
-                                                <th class="px-4 py-4 font-bold text-center">A</th>
-                                                <th class="px-4 py-4 font-bold text-center">Total Hadir</th>
-                                                <th class="px-4 py-4 font-bold text-center">Persentase</th>
-                                            </tr>
-                                        </thead>
+                                    <table class="w-full text-xs md:text-sm text-center whitespace-nowrap border-separate border-spacing-0">
+                                        <thead id="rekapMahasiswaHead" class="bg-gray-50 dark:bg-slate-900/60 text-gray-500 dark:text-slate-400 text-[11px] uppercase tracking-wider"></thead>
                                         <tbody id="rekapMahasiswaGrid" class="divide-y divide-gray-100 dark:divide-slate-700"></tbody>
                                     </table>
                                 </div>
@@ -608,6 +604,20 @@
                                     <button onclick="openMasterModal('tahunAkademik')" class="bg-white dark:bg-slate-800 hover:bg-gray-100 text-primary text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm font-semibold transition flex items-center gap-1"><i class="fas fa-plus"></i> Baru</button>
                                 </div>
                                 <ul id="listMasterTahunAkademik" class="space-y-3 text-sm">
+                                    <li class="p-3 text-center"><div class="w-full h-8 skeleton-box rounded-lg"></div></li>
+                                </ul>
+                            </div>
+
+                            <!-- Card: Hari Efektif Semester -->
+                            <div class="bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 md:col-span-2">
+                                <div class="flex justify-between items-center mb-5 border-b border-gray-200 dark:border-slate-700 pb-3">
+                                    <div>
+                                        <h4 class="font-bold text-gray-800 dark:text-slate-200">Hari Efektif Semester</h4>
+                                        <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Digunakan sebagai dasar kolom pertemuan dan persentase pada menu Rekapitulasi.</p>
+                                    </div>
+                                    <button onclick="openMasterModal('hariEfektif')" class="bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg shadow-sm font-semibold transition flex items-center gap-1"><i class="fas fa-plus"></i> Baru</button>
+                                </div>
+                                <ul id="listMasterHariEfektif" class="space-y-3 text-sm">
                                     <li class="p-3 text-center"><div class="w-full h-8 skeleton-box rounded-lg"></div></li>
                                 </ul>
                             </div>
@@ -701,6 +711,29 @@
                         </select>
                     </div>
 
+                    <div id="wrap-md-tahun-akademik" class="mb-5 hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tahun Akademik</label>
+                        <select id="md-tahun-akademik" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                            <option value="" disabled selected>Pilih Tahun Akademik...</option>
+                        </select>
+                    </div>
+
+                    <div id="wrap-md-tanggal-mulai" class="mb-5 hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tanggal Mulai Semester</label>
+                        <input type="date" id="md-tanggal-mulai" onchange="setSemesterEndDate()" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                    </div>
+
+                    <div id="wrap-md-tanggal-selesai" class="mb-5 hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tanggal Selesai Semester</label>
+                        <input type="date" id="md-tanggal-selesai" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                        <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-2">Satu semester umumnya 6 bulan. Isi tanggal selesai sesuai kalender akademik.</p>
+                    </div>
+
+                    <div id="wrap-md-jumlah-hari-efektif" class="mb-5 hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jumlah Hari/Pertemuan Efektif</label>
+                        <input type="number" id="md-jumlah-hari-efektif" min="1" max="40" value="24" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all">
+                    </div>
+
                     <div id="wrap-md-prodi" class="mb-6 hidden">
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Program Studi</label>
                         <select id="md-prodi" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary focus:bg-white outline-none transition-all"></select>
@@ -757,7 +790,7 @@
         // --- CONFIGURATION ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytO29mRmuEq94v1i27tudnmff4ng1CPZ5RR1e2ZpE3jS041aLeeTQfnZrPEPQJl1Bd/exec'; 
         let USE_MOCK_DATA = false;
-        let appData = { dosen: [], mahasiswa: [], prodi: [], mataKuliah: [], metode: [], jurnal: [], semester: [], tahunAkademik: [] };
+        let appData = { dosen: [], mahasiswa: [], prodi: [], mataKuliah: [], metode: [], jurnal: [], semester: [], tahunAkademik: [], hariEfektif: [] };
         
         let chartInstance = null; // Store mhs chart object
         let chartDosenInstance = null; // Store dosen chart object
@@ -864,7 +897,7 @@
         async function fetchAllData() {
             if (USE_MOCK_DATA) return;
             try {
-                const [rD, rM, rP, rMK, rMe, rJ, rS, rTA] = await Promise.all([
+                const [rD, rM, rP, rMK, rMe, rJ, rS, rTA, rHE] = await Promise.all([
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getDosen`).then(r=>r.json()).catch(()=>({status:'error'})), 
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getMahasiswa`).then(r=>r.json()).catch(()=>({status:'error'})),
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getProdi`).then(r=>r.json()).catch(()=>({status:'error'})), 
@@ -872,7 +905,8 @@
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getMetode`).then(r=>r.json()).catch(()=>({status:'error'})), 
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getJurnal`).then(r=>r.json()).catch(()=>({status:'error'})),
                     fetch(`${GOOGLE_SCRIPT_URL}?action=getSemester`).then(r=>r.json()).catch(()=>({status:'error'})),
-                    fetch(`${GOOGLE_SCRIPT_URL}?action=getTahunAkademik`).then(r=>r.json()).catch(()=>({status:'error'}))
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getTahunAkademik`).then(r=>r.json()).catch(()=>({status:'error'})),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getHariEfektif`).then(r=>r.json()).catch(()=>({status:'error'}))
                 ]);
                 appData.dosen = Array.isArray(rD.data) ? rD.data : []; 
                 appData.mahasiswa = Array.isArray(rM.data) ? rM.data : []; 
@@ -882,6 +916,7 @@
                 appData.jurnal = Array.isArray(rJ.data) ? rJ.data : []; 
                 appData.semester = Array.isArray(rS.data) ? rS.data : [];
                 appData.tahunAkademik = Array.isArray(rTA.data) ? rTA.data : [];
+                appData.hariEfektif = Array.isArray(rHE.data) ? rHE.data : [];
                 
                 renderAllData();
             } catch (err) { 
@@ -972,6 +1007,7 @@
             fillList('listMasterMetode', appData.metode, ['Nama Metode','Metode Perkuliahan','Metode','nama']);
             fillList('listMasterSemester', appData.semester, ['Nama Semester','Semester','nama']);
             fillList('listMasterTahunAkademik', appData.tahunAkademik, ['Tahun Akademik','nama']);
+            renderHariEfektifList();
             
             const tMK = document.getElementById('listMasterMK'); if(tMK){ tMK.innerHTML=''; if(appData.mataKuliah.length===0) tMK.innerHTML='<li class="p-3 text-center text-xs text-gray-500">Data kosong</li>';
                 appData.mataKuliah.forEach(mk => {
@@ -982,7 +1018,35 @@
             }
         }
 
-        // --- REKAPITULASI GRID ---
+        function renderHariEfektifList() {
+            const el = document.getElementById('listMasterHariEfektif');
+            if (!el) return;
+            el.innerHTML = '';
+            if (!appData.hariEfektif || appData.hariEfektif.length === 0) {
+                el.innerHTML = '<li class="p-3 text-center text-xs text-gray-500">Belum ada konfigurasi hari efektif semester</li>';
+                return;
+            }
+            appData.hariEfektif.forEach(item => {
+                const tahun = getCol(item, ['Tahun Akademik','TahunAkademik','tahunAkademik']);
+                const semester = getCol(item, ['Semester','Nama Semester','semester']);
+                const mulai = formatDateId(getCol(item, ['Tanggal Mulai','Mulai','Tanggal Awal']));
+                const selesai = formatDateId(getCol(item, ['Tanggal Selesai','Selesai','Tanggal Akhir']));
+                const jumlah = getCol(item, ['Jumlah Hari Efektif','Jumlah Pertemuan','Hari Efektif','jumlah']);
+                el.innerHTML += `
+                    <li class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                        <div class="flex justify-between gap-3">
+                            <div>
+                                <h5 class="font-black text-gray-800 dark:text-slate-100 leading-tight">${escapeHtml(tahun)} · ${escapeHtml(semester)}</h5>
+                                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">${escapeHtml(mulai)} s.d. ${escapeHtml(selesai)}</p>
+                            </div>
+                            <span class="shrink-0 h-fit text-[11px] font-black bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-300 px-2.5 py-1 rounded-lg">${escapeHtml(jumlah)} pertemuan</span>
+                        </div>
+                    </li>
+                `;
+            });
+        }
+
+        // --- REKAPITULASI SEMESTER ---
         function populateRekapTahunAkademik() {
             const el = document.getElementById('rekapTahunAkademik');
             if (!el) return;
@@ -992,6 +1056,11 @@
 
             appData.tahunAkademik.forEach(ta => {
                 const v = getCol(ta, ['Tahun Akademik', 'nama']);
+                if (v && v !== '-') years.add(v);
+            });
+
+            appData.hariEfektif.forEach(he => {
+                const v = getCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
                 if (v && v !== '-') years.add(v);
             });
 
@@ -1009,6 +1078,35 @@
             else el.value = 'All';
         }
 
+        function populateRekapSemester() {
+            const el = document.getElementById('rekapSemester');
+            if (!el) return;
+
+            const selectedValue = el.value || 'All';
+            const semesters = new Set();
+
+            appData.semester.forEach(s => {
+                const v = getCol(s, ['Nama Semester', 'Semester', 'nama']);
+                if (v && v !== '-') semesters.add(v);
+            });
+            appData.hariEfektif.forEach(he => {
+                const v = getCol(he, ['Semester', 'Nama Semester', 'semester']);
+                if (v && v !== '-') semesters.add(v);
+            });
+            appData.mataKuliah.forEach(mk => {
+                const v = getCol(mk, ['Semester', 'Nama Semester', 'semester']);
+                if (v && v !== '-') semesters.add(v);
+            });
+
+            el.innerHTML = '<option value="All">Semua Semester</option>';
+            Array.from(semesters).sort((a, b) => a.localeCompare(b, 'id', { numeric: true })).forEach(v => {
+                el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`;
+            });
+
+            if (Array.from(semesters).includes(selectedValue)) el.value = selectedValue;
+            else el.value = 'All';
+        }
+
         function switchRekapTab(tab) {
             activeRekapTab = tab === 'mahasiswa' ? 'mahasiswa' : 'dosen';
 
@@ -1017,8 +1115,8 @@
             const panelDosen = document.getElementById('panelRekapDosen');
             const panelMhs = document.getElementById('panelRekapMahasiswa');
 
-            const activeClass = 'flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all bg-white dark:bg-slate-800 text-primary shadow-sm';
-            const inactiveClass = 'flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all text-gray-500 dark:text-slate-400 hover:text-primary';
+            const activeClass = 'rekap-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all bg-white dark:bg-slate-800 text-primary shadow-sm';
+            const inactiveClass = 'rekap-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-extrabold transition-all text-gray-500 dark:text-slate-400 hover:text-primary';
 
             if (tabDosen) tabDosen.className = activeRekapTab === 'dosen' ? activeClass : inactiveClass;
             if (tabMhs) tabMhs.className = activeRekapTab === 'mahasiswa' ? activeClass : inactiveClass;
@@ -1026,29 +1124,20 @@
             if (panelMhs) panelMhs.classList.toggle('hidden', activeRekapTab !== 'mahasiswa');
         }
 
-        function getRekapFilteredJurnal() {
-            const tahunEl = document.getElementById('rekapTahunAkademik');
-            const searchEl = document.getElementById('searchRekap');
-            const selectedYear = tahunEl ? tahunEl.value : 'All';
-            const keyword = searchEl ? normalizeText(searchEl.value) : '';
+        function normalizeAttendanceStatus(status) {
+            const s = normalizeText(status);
+            if (s === 'izin' || s === 'i') return 'Izin';
+            if (s === 'sakit' || s === 's') return 'Sakit';
+            if (s === 'alpha' || s === 'alfa' || s === 'a') return 'Alpha';
+            return 'Hadir';
+        }
 
-            return appData.jurnal.filter(j => {
-                const tahun = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
-                const yearMatch = selectedYear === 'All' || tahun === selectedYear;
-                if (!yearMatch) return false;
-
-                if (!keyword) return true;
-                const searchable = [
-                    getCol(j, ['Tanggal', 'tanggal']),
-                    getCol(j, ['Dosen', 'Nama Dosen', 'dosen']),
-                    getCol(j, ['Prodi', 'Program Studi', 'prodi']),
-                    getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']),
-                    getCol(j, ['Metode', 'Metode Perkuliahan', 'metode']),
-                    getCol(j, ['Absensi', 'absensi']),
-                    tahun
-                ].join(' ');
-                return normalizeText(searchable).includes(keyword);
-            });
+        function getStatusShort(status) {
+            const normalized = normalizeAttendanceStatus(status);
+            if (normalized === 'Izin') return 'I';
+            if (normalized === 'Sakit') return 'S';
+            if (normalized === 'Alpha') return 'A';
+            return 'H';
         }
 
         function parseAttendanceString(absensi) {
@@ -1058,7 +1147,7 @@
                 const cleaned = item.trim();
                 if (!cleaned) return null;
 
-                const match = cleaned.match(/^(.*?)\s*\((Hadir|Izin|Sakit|Alpha|Alfa)\)$/i);
+                const match = cleaned.match(/^(.*?)\s*\((Hadir|Izin|Sakit|Alpha|Alfa|H|I|S|A)\)$/i);
                 if (match) {
                     return {
                         nama: match[1].trim(),
@@ -1068,14 +1157,6 @@
 
                 return { nama: cleaned, status: 'Hadir' };
             }).filter(Boolean);
-        }
-
-        function normalizeAttendanceStatus(status) {
-            const s = normalizeText(status);
-            if (s === 'izin') return 'Izin';
-            if (s === 'sakit') return 'Sakit';
-            if (s === 'alpha' || s === 'alfa') return 'Alpha';
-            return 'Hadir';
         }
 
         function parseDateValue(value) {
@@ -1092,47 +1173,19 @@
             return null;
         }
 
+        function dateKey(value) {
+            const d = parseDateValue(value);
+            if (!d) return '';
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
         function formatDateId(value) {
             const date = parseDateValue(value);
             if (!date) return value && value !== '-' ? value : '-';
             return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-        }
-
-        function setToLimitedText(setValue, limit = 2) {
-            const arr = Array.from(setValue).filter(v => v && v !== '-');
-            if (arr.length === 0) return '-';
-            if (arr.length <= limit) return arr.map(escapeHtml).join(', ');
-            return `${arr.slice(0, limit).map(escapeHtml).join(', ')} +${arr.length - limit}`;
-        }
-
-        function renderRekapitulasi() {
-            populateRekapTahunAkademik();
-
-            const jurnal = getRekapFilteredJurnal();
-            const parsedAttendances = [];
-            const dosenSet = new Set();
-
-            jurnal.forEach(j => {
-                const dosen = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
-                if (dosen && dosen !== '-') dosenSet.add(dosen);
-                parseAttendanceString(getCol(j, ['Absensi', 'absensi'])).forEach(a => parsedAttendances.push(a));
-            });
-
-            const hadirCount = parsedAttendances.filter(a => a.status === 'Hadir').length;
-            const tidakHadirCount = parsedAttendances.filter(a => a.status !== 'Hadir').length;
-
-            const statJurnal = document.getElementById('rekapStatJurnal');
-            const statDosen = document.getElementById('rekapStatDosen');
-            const statHadir = document.getElementById('rekapStatHadir');
-            const statTidakHadir = document.getElementById('rekapStatTidakHadir');
-            if (statJurnal) statJurnal.innerText = jurnal.length;
-            if (statDosen) statDosen.innerText = dosenSet.size;
-            if (statHadir) statHadir.innerText = hadirCount;
-            if (statTidakHadir) statTidakHadir.innerText = tidakHadirCount;
-
-            renderRekapDosenGrid(jurnal);
-            renderRekapMahasiswaGrid(jurnal);
-            switchRekapTab(activeRekapTab);
         }
 
         function getExplicitCol(obj, possibleKeys) {
@@ -1147,172 +1200,293 @@
             return '';
         }
 
-        function getStatusShort(status) {
-            const normalized = normalizeAttendanceStatus(status);
-            if (normalized === 'Izin') return 'I';
-            if (normalized === 'Sakit') return 'S';
-            if (normalized === 'Alpha') return 'A';
-            return 'H';
+        function getMataKuliahSemester(mataKuliahName) {
+            const target = normalizeText(mataKuliahName);
+            if (!target) return '';
+            const mk = appData.mataKuliah.find(item => normalizeText(getCol(item, ['Nama Mata Kuliah', 'Mata Kuliah', 'nama'])) === target);
+            return mk ? getCol(mk, ['Semester', 'Nama Semester', 'semester']) : '';
+        }
+
+        function getSelectedRekapMeta() {
+            return {
+                tahun: document.getElementById('rekapTahunAkademik')?.value || 'All',
+                semester: document.getElementById('rekapSemester')?.value || 'All',
+                keyword: normalizeText(document.getElementById('searchRekap')?.value || '')
+            };
+        }
+
+        function getEffectiveConfig(meta) {
+            const candidates = appData.hariEfektif.filter(he => {
+                const tahun = getCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
+                const semester = getCol(he, ['Semester', 'Nama Semester', 'semester']);
+                const yearMatch = meta.tahun === 'All' || tahun === meta.tahun;
+                const semMatch = meta.semester === 'All' || normalizeText(semester) === normalizeText(meta.semester);
+                return yearMatch && semMatch;
+            });
+
+            const selected = candidates[0] || null;
+            const count = selected ? parseInt(getCol(selected, ['Jumlah Hari Efektif', 'Jumlah Pertemuan', 'Hari Efektif', 'jumlah']), 10) : 0;
+            return {
+                raw: selected,
+                tahun: selected ? getCol(selected, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']) : meta.tahun,
+                semester: selected ? getCol(selected, ['Semester', 'Nama Semester', 'semester']) : meta.semester,
+                start: selected ? getCol(selected, ['Tanggal Mulai', 'Mulai', 'Tanggal Awal']) : '',
+                end: selected ? getCol(selected, ['Tanggal Selesai', 'Selesai', 'Tanggal Akhir']) : '',
+                total: Number.isFinite(count) && count > 0 ? count : 0
+            };
+        }
+
+        function isDateInsideConfig(rawDate, config) {
+            const current = parseDateValue(rawDate);
+            if (!current || !config || !config.raw) return true;
+            const start = parseDateValue(config.start);
+            const end = parseDateValue(config.end);
+            if (start && current < start) return false;
+            if (end && current > end) return false;
+            return true;
+        }
+
+        function getRekapFilteredJurnal(meta, config) {
+            return appData.jurnal.filter(j => {
+                const tahun = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
+                const yearMatch = meta.tahun === 'All' || tahun === meta.tahun;
+                if (!yearMatch) return false;
+                if (!isDateInsideConfig(getCol(j, ['Tanggal', 'tanggal']), config)) return false;
+
+                if (meta.semester !== 'All') {
+                    const mkSemester = getMataKuliahSemester(getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']));
+                    const semByConfig = config.raw ? normalizeText(config.semester) === normalizeText(meta.semester) : true;
+                    if (mkSemester && normalizeText(mkSemester) !== normalizeText(meta.semester)) return false;
+                    if (!mkSemester && !semByConfig) return false;
+                }
+                return true;
+            });
+        }
+
+        function buildSemesterColumns(jurnal, config) {
+            const dates = Array.from(new Set(
+                jurnal.map(j => dateKey(getCol(j, ['Tanggal', 'tanggal']))).filter(Boolean)
+            )).sort();
+
+            const total = config.total > 0 ? config.total : Math.max(dates.length, 1);
+            const columns = [];
+            for (let i = 0; i < total; i++) {
+                columns.push({
+                    number: i + 1,
+                    key: dates[i] || '',
+                    label: dates[i] ? formatDateId(dates[i]) : ''
+                });
+            }
+            return { columns, filledDates: dates.length };
+        }
+
+        function buildRekapHead(headId, nameLabel, columns) {
+            const head = document.getElementById(headId);
+            if (!head) return;
+            const dayHeaders = columns.map(c => `
+                <th class="px-3 py-3 border-r border-gray-200 dark:border-slate-700 min-w-[42px]">
+                    <div class="font-black text-gray-600 dark:text-slate-300">${c.number}</div>
+                    <div class="text-[9px] normal-case tracking-normal font-medium text-gray-400 dark:text-slate-500 mt-0.5">${c.label ? escapeHtml(c.label.replace(/\s\d{4}$/,'')) : '-'}</div>
+                </th>
+            `).join('');
+
+            head.innerHTML = `
+                <tr>
+                    <th class="px-4 py-4 text-left font-black sticky left-0 z-20 bg-gray-50 dark:bg-slate-900/60 border-r border-gray-200 dark:border-slate-700 min-w-[220px]">${nameLabel}</th>
+                    <th class="px-4 py-4 text-left font-black bg-gray-50 dark:bg-slate-900/60 border-r border-gray-200 dark:border-slate-700 min-w-[220px]">Keterangan</th>
+                    ${dayHeaders}
+                    <th class="px-4 py-4 font-black bg-gray-50 dark:bg-slate-900/60 border-l border-gray-200 dark:border-slate-700 min-w-[90px]">Total H</th>
+                    <th class="px-4 py-4 font-black bg-gray-50 dark:bg-slate-900/60 min-w-[95px]">% Keh</th>
+                </tr>
+            `;
+        }
+
+        function statusCell(status) {
+            const short = status ? getStatusShort(status) : '-';
+            let cls = 'bg-gray-50 dark:bg-slate-900/30 text-gray-400';
+            if (short === 'H') cls = 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-black';
+            else if (short === 'I') cls = 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 font-black';
+            else if (short === 'S') cls = 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-black';
+            else if (short === 'A') cls = 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-black';
+            return `<td class="px-3 py-3 border-r border-gray-100 dark:border-slate-800 ${cls}">${short}</td>`;
         }
 
         function buildPercentCell(hadir, total) {
             const percent = total > 0 ? Math.round((hadir / total) * 100) : 0;
-            return `
-                <div class="flex items-center justify-center gap-3 min-w-[120px]">
-                    <span class="font-black text-gray-800 dark:text-white w-11 text-right">${percent}%</span>
-                    <div class="w-16 h-2 rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden">
-                        <div class="h-full rounded-full bg-primary" style="width:${percent}%"></div>
-                    </div>
-                </div>
-            `;
+            const textColor = percent >= 75 ? 'text-green-600' : percent >= 50 ? 'text-yellow-600' : 'text-red-500';
+            return `<span class="font-black ${textColor}">${percent}%</span>`;
         }
 
-        function renderRekapDosenGrid(jurnal) {
+        function rowMatchesKeyword(item, keyword) {
+            if (!keyword) return true;
+            return normalizeText([item.nama, item.keterangan, item.extra].join(' ')).includes(keyword);
+        }
+
+        function renderRekapitulasi() {
+            populateRekapTahunAkademik();
+            populateRekapSemester();
+
+            const meta = getSelectedRekapMeta();
+            const config = getEffectiveConfig(meta);
+            const jurnal = getRekapFilteredJurnal(meta, config);
+            const { columns, filledDates } = buildSemesterColumns(jurnal, config);
+            const dosenSet = new Set();
+            jurnal.forEach(j => {
+                const dosen = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
+                if (dosen && dosen !== '-') dosenSet.add(dosen);
+            });
+
+            const statJurnal = document.getElementById('rekapStatJurnal');
+            const statDosen = document.getElementById('rekapStatDosen');
+            const statHadir = document.getElementById('rekapStatHadir');
+            const statTanggal = document.getElementById('rekapStatTidakHadir');
+            if (statJurnal) statJurnal.innerText = jurnal.length;
+            if (statDosen) statDosen.innerText = dosenSet.size;
+            if (statHadir) statHadir.innerText = columns.length;
+            if (statTanggal) statTanggal.innerText = filledDates;
+
+            const info = document.getElementById('rekapEffectiveInfo');
+            if (info) {
+                if (config.raw) {
+                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Hari efektif aktif:</strong> ${escapeHtml(config.tahun)} · ${escapeHtml(config.semester)} · ${columns.length} pertemuan · periode ${escapeHtml(formatDateId(config.start))} s.d. ${escapeHtml(formatDateId(config.end))}.`;
+                } else {
+                    info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada konfigurasi hari efektif.</strong> Rekap memakai jumlah tanggal jurnal yang sudah terisi sebagai kolom sementara. Tambahkan Hari Efektif Semester di menu Pengaturan agar persentase dihitung per semester.`;
+                }
+            }
+
+            buildRekapHead('rekapDosenHead', 'Nama Dosen', columns);
+            buildRekapHead('rekapMahasiswaHead', 'Nama Mahasiswa', columns);
+            renderRekapDosenGrid(jurnal, columns, meta);
+            renderRekapMahasiswaGrid(jurnal, columns, meta);
+            switchRekapTab(activeRekapTab);
+        }
+
+        function renderRekapDosenGrid(jurnal, columns, meta) {
             const container = document.getElementById('rekapDosenGrid');
             if (!container) return;
 
             const map = {};
-            jurnal.forEach(j => {
-                const nama = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
+            appData.dosen.forEach(d => {
+                const nama = getCol(d, ['Nama Dosen', 'Nama', 'nama']);
                 if (!nama || nama === '-') return;
-
-                if (!map[nama]) {
-                    map[nama] = {
-                        nama,
-                        hadir: 0,
-                        izin: 0,
-                        sakit: 0,
-                        alpha: 0,
-                        total: 0,
-                        lastDateValue: '',
-                        lastDateObj: null
-                    };
-                }
-
-                const item = map[nama];
-                const rawStatus = getExplicitCol(j, ['Status Dosen', 'Kehadiran Dosen', 'Presensi Dosen', 'Status Kehadiran Dosen']);
-                const status = rawStatus ? normalizeAttendanceStatus(rawStatus) : 'Hadir';
-
-                item.total += 1;
-                if (status === 'Izin') item.izin += 1;
-                else if (status === 'Sakit') item.sakit += 1;
-                else if (status === 'Alpha') item.alpha += 1;
-                else item.hadir += 1;
-
-                const rawDate = getCol(j, ['Tanggal', 'tanggal']);
-                const dateObj = parseDateValue(rawDate);
-                if (!item.lastDateObj || (dateObj && dateObj > item.lastDateObj)) {
-                    item.lastDateObj = dateObj;
-                    item.lastDateValue = rawDate;
-                }
+                map[normalizeText(nama)] = {
+                    nama,
+                    keterangan: getCol(d, ['Program Studi', 'Prodi', 'prodi']),
+                    extra: getCol(d, ['NIDN', 'NIP', 'nidn']),
+                    statusByDate: {},
+                    hadir: 0
+                };
             });
 
-            const items = Object.values(map).sort((a, b) => b.hadir - a.hadir || b.total - a.total || a.nama.localeCompare(b.nama));
+            jurnal.forEach(j => {
+                const nama = getCol(j, ['Dosen', 'Nama Dosen', 'dosen']);
+                const key = normalizeText(nama);
+                if (!key || nama === '-') return;
+                if (!map[key]) {
+                    map[key] = { nama, keterangan: getCol(j, ['Prodi', 'Program Studi', 'prodi']), extra: getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']), statusByDate: {}, hadir: 0 };
+                }
+                const dKey = dateKey(getCol(j, ['Tanggal', 'tanggal']));
+                if (!dKey) return;
+                const rawStatus = getExplicitCol(j, ['Status Dosen', 'Kehadiran Dosen', 'Presensi Dosen', 'Status Kehadiran Dosen']);
+                map[key].statusByDate[dKey] = rawStatus ? normalizeAttendanceStatus(rawStatus) : 'Hadir';
+            });
+
+            let items = Object.values(map).filter(item => rowMatchesKeyword(item, meta.keyword));
+            items.forEach(item => {
+                item.hadir = columns.filter(c => c.key && getStatusShort(item.statusByDate[c.key]) === 'H').length;
+            });
+            items.sort((a, b) => b.hadir - a.hadir || a.nama.localeCompare(b.nama, 'id'));
+
             if (items.length === 0) {
-                container.innerHTML = emptyRekapCard('Belum ada rekap dosen', 'Data akan muncul setelah jurnal/presensi dosen tersimpan.');
+                container.innerHTML = emptyRekapCard('Belum ada rekap dosen', 'Data akan muncul setelah jurnal/presensi dosen tersimpan.', columns.length + 4);
                 return;
             }
 
-            container.innerHTML = items.map(item => `
-                <tr class="hover:bg-gray-50 dark:hover:bg-slate-900/40 transition-colors">
-                    <td class="px-4 py-4 font-bold text-gray-800 dark:text-white min-w-[220px]">${escapeHtml(item.nama)}</td>
-                    <td class="px-4 py-4 text-gray-600 dark:text-slate-300 min-w-[150px]">${escapeHtml(formatDateId(item.lastDateValue))}</td>
-                    <td class="px-4 py-4 text-center font-black text-green-600">${item.hadir}</td>
-                    <td class="px-4 py-4 text-center font-black text-yellow-500">${item.izin}</td>
-                    <td class="px-4 py-4 text-center font-black text-blue-500">${item.sakit}</td>
-                    <td class="px-4 py-4 text-center font-black text-red-500">${item.alpha}</td>
-                    <td class="px-4 py-4 text-center font-black text-gray-800 dark:text-white">${item.hadir}</td>
-                    <td class="px-4 py-4 text-center">${buildPercentCell(item.hadir, item.total)}</td>
-                </tr>
-            `).join('');
+            container.innerHTML = items.map(item => {
+                const cells = columns.map(c => statusCell(c.key ? item.statusByDate[c.key] : '')).join('');
+                return `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-900/40 transition-colors">
+                        <td class="px-4 py-3 text-left sticky left-0 z-10 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 min-w-[220px]">
+                            <div class="font-black text-gray-800 dark:text-white leading-tight">${escapeHtml(item.nama)}</div>
+                            <div class="text-[11px] text-gray-400 mt-1">${escapeHtml(item.extra || '-')}</div>
+                        </td>
+                        <td class="px-4 py-3 text-left text-gray-600 dark:text-slate-300 border-r border-gray-200 dark:border-slate-700 min-w-[220px]">${escapeHtml(item.keterangan || '-')}</td>
+                        ${cells}
+                        <td class="px-4 py-3 font-black text-gray-800 dark:text-white border-l border-gray-200 dark:border-slate-700">${item.hadir}</td>
+                        <td class="px-4 py-3">${buildPercentCell(item.hadir, columns.length)}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function renderRekapMahasiswaGrid(jurnal) {
+        function renderRekapMahasiswaGrid(jurnal, columns, meta) {
             const container = document.getElementById('rekapMahasiswaGrid');
             if (!container) return;
 
-            const keyword = normalizeText(document.getElementById('searchRekap')?.value || '');
             const map = {};
+            appData.mahasiswa.forEach(m => {
+                const nama = getCol(m, ['Nama Mahasiswa', 'Nama', 'nama']);
+                if (!nama || nama === '-') return;
+                const semester = getCol(m, ['Semester', 'Nama Semester', 'semester']);
+                if (meta.semester !== 'All' && semester && semester !== '-' && normalizeText(semester) !== normalizeText(meta.semester)) return;
+                map[normalizeText(nama)] = {
+                    nama,
+                    keterangan: getCol(m, ['Prodi', 'Program Studi', 'prodi']),
+                    extra: `${getCol(m, ['NIM', 'nim'])} · Semester ${semester}`,
+                    statusByDate: {},
+                    hadir: 0
+                };
+            });
 
             jurnal.forEach(j => {
+                const dKey = dateKey(getCol(j, ['Tanggal', 'tanggal']));
+                if (!dKey) return;
                 const prodi = getCol(j, ['Prodi', 'Program Studi', 'prodi']);
                 const mk = getCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
-                const tahun = getCol(j, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik']);
-                const rawDate = getCol(j, ['Tanggal', 'tanggal']);
-                const dateObj = parseDateValue(rawDate);
-
                 parseAttendanceString(getCol(j, ['Absensi', 'absensi'])).forEach(a => {
                     const key = normalizeText(a.nama);
                     if (!key) return;
-
                     if (!map[key]) {
-                        map[key] = {
-                            nama: a.nama,
-                            hadir: 0,
-                            izin: 0,
-                            sakit: 0,
-                            alpha: 0,
-                            total: 0,
-                            prodi: new Set(),
-                            mataKuliah: new Set(),
-                            tahun: new Set(),
-                            lastDateValue: '',
-                            lastDateObj: null
-                        };
+                        map[key] = { nama: a.nama, keterangan: prodi, extra: mk, statusByDate: {}, hadir: 0 };
                     }
-
-                    const item = map[key];
-                    item.total += 1;
-                    if (a.status === 'Hadir') item.hadir += 1;
-                    else if (a.status === 'Izin') item.izin += 1;
-                    else if (a.status === 'Sakit') item.sakit += 1;
-                    else item.alpha += 1;
-
-                    item.prodi.add(prodi);
-                    item.mataKuliah.add(mk);
-                    item.tahun.add(tahun);
-                    if (!item.lastDateObj || (dateObj && dateObj > item.lastDateObj)) {
-                        item.lastDateObj = dateObj;
-                        item.lastDateValue = rawDate;
-                    }
+                    map[key].statusByDate[dKey] = a.status;
+                    if (mk && mk !== '-') map[key].extra = mk;
+                    if (prodi && prodi !== '-') map[key].keterangan = prodi;
                 });
             });
 
-            let items = Object.values(map);
-            if (keyword) {
-                items = items.filter(item => normalizeText([
-                    item.nama,
-                    Array.from(item.prodi).join(' '),
-                    Array.from(item.mataKuliah).join(' '),
-                    Array.from(item.tahun).join(' ')
-                ].join(' ')).includes(keyword));
-            }
-
-            items.sort((a, b) => b.hadir - a.hadir || b.total - a.total || a.nama.localeCompare(b.nama));
+            let items = Object.values(map).filter(item => rowMatchesKeyword(item, meta.keyword));
+            items.forEach(item => {
+                item.hadir = columns.filter(c => c.key && getStatusShort(item.statusByDate[c.key]) === 'H').length;
+            });
+            items.sort((a, b) => b.hadir - a.hadir || a.nama.localeCompare(b.nama, 'id'));
 
             if (items.length === 0) {
-                container.innerHTML = emptyRekapCard('Belum ada rekap mahasiswa', 'Data akan muncul setelah presensi mahasiswa tersimpan pada menu Input Presensi.');
+                container.innerHTML = emptyRekapCard('Belum ada rekap mahasiswa', 'Data akan muncul setelah presensi mahasiswa tersimpan pada menu Input Presensi.', columns.length + 4);
                 return;
             }
 
-            container.innerHTML = items.map(item => `
-                <tr class="hover:bg-gray-50 dark:hover:bg-slate-900/40 transition-colors">
-                    <td class="px-4 py-4 font-bold text-gray-800 dark:text-white min-w-[220px]">${escapeHtml(item.nama)}</td>
-                    <td class="px-4 py-4 text-gray-600 dark:text-slate-300 min-w-[150px]">${escapeHtml(formatDateId(item.lastDateValue))}</td>
-                    <td class="px-4 py-4 text-center font-black text-green-600">${item.hadir}</td>
-                    <td class="px-4 py-4 text-center font-black text-yellow-500">${item.izin}</td>
-                    <td class="px-4 py-4 text-center font-black text-blue-500">${item.sakit}</td>
-                    <td class="px-4 py-4 text-center font-black text-red-500">${item.alpha}</td>
-                    <td class="px-4 py-4 text-center font-black text-gray-800 dark:text-white">${item.hadir}</td>
-                    <td class="px-4 py-4 text-center">${buildPercentCell(item.hadir, item.total)}</td>
-                </tr>
-            `).join('');
+            container.innerHTML = items.map(item => {
+                const cells = columns.map(c => statusCell(c.key ? item.statusByDate[c.key] : '')).join('');
+                return `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-900/40 transition-colors">
+                        <td class="px-4 py-3 text-left sticky left-0 z-10 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 min-w-[220px]">
+                            <div class="font-black text-gray-800 dark:text-white leading-tight">${escapeHtml(item.nama)}</div>
+                            <div class="text-[11px] text-gray-400 mt-1">${escapeHtml(item.extra || '-')}</div>
+                        </td>
+                        <td class="px-4 py-3 text-left text-gray-600 dark:text-slate-300 border-r border-gray-200 dark:border-slate-700 min-w-[220px]">${escapeHtml(item.keterangan || '-')}</td>
+                        ${cells}
+                        <td class="px-4 py-3 font-black text-gray-800 dark:text-white border-l border-gray-200 dark:border-slate-700">${item.hadir}</td>
+                        <td class="px-4 py-3">${buildPercentCell(item.hadir, columns.length)}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function emptyRekapCard(title, message) {
+        function emptyRekapCard(title, message, colspan = 8) {
             return `
                 <tr>
-                    <td colspan="8" class="px-4 py-12 text-center bg-gray-50 dark:bg-slate-900/40">
+                    <td colspan="${colspan}" class="px-4 py-12 text-center bg-gray-50 dark:bg-slate-900/40">
                         <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-gray-400 shadow-sm"><i class="fas fa-folder-open text-2xl"></i></div>
                         <h3 class="font-black text-gray-800 dark:text-white text-lg">${escapeHtml(title)}</h3>
                         <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">${escapeHtml(message)}</p>
@@ -1901,6 +2075,21 @@
             });
         }
 
+        function setSemesterEndDate() {
+            const startEl = document.getElementById('md-tanggal-mulai');
+            const endEl = document.getElementById('md-tanggal-selesai');
+            if (!startEl || !endEl || !startEl.value) return;
+            const start = new Date(startEl.value);
+            if (isNaN(start.getTime())) return;
+            const end = new Date(start);
+            end.setMonth(end.getMonth() + 6);
+            end.setDate(end.getDate() - 1);
+            const yyyy = end.getFullYear();
+            const mm = String(end.getMonth() + 1).padStart(2, '0');
+            const dd = String(end.getDate()).padStart(2, '0');
+            endEl.value = `${yyyy}-${mm}-${dd}`;
+        }
+
         // --- MASTER DATA MODAL (Setting) ---
         function openMasterModal(type) {
             editMode = false; currentEditId = null;
@@ -1912,11 +2101,15 @@
             document.getElementById('md-nidn').readOnly = false;
             document.getElementById('md-nim').readOnly = false;
             
-            ['kode','sks','prodi','nidn','status','nim','semester','jk', 'foto'].forEach(f => {
+            ['kode','sks','prodi','nidn','status','nim','semester','jk','foto','tahun-akademik','tanggal-mulai','tanggal-selesai','jumlah-hari-efektif'].forEach(f => {
                 const wrap = document.getElementById(`wrap-md-${f}`);
                 if (wrap) wrap.classList.add('hidden'); // Cek keamanan jika elemen sudah dihapus
                 const el = document.getElementById(`md-${f}`); if(el) el.required = false;
             });
+
+            document.getElementById('wrap-md-nama').classList.remove('hidden');
+            document.getElementById('md-nama').required = true;
+            document.getElementById('label-md-semester').innerText = 'Semester Aktif';
 
             const t = document.getElementById('masterModalTitle'), l = document.getElementById('label-md-nama');
             const showReq = (id) => { document.getElementById(`wrap-md-${id}`).classList.remove('hidden'); document.getElementById(`md-${id}`).required = true; };
@@ -1926,6 +2119,16 @@
             else if (type === 'metode') { t.innerText = 'Tambah Metode'; l.innerText = 'Nama Metode'; } 
             else if (type === 'semester') { t.innerText = 'Tambah Semester'; l.innerText = 'Input Semester'; } 
             else if (type === 'tahunAkademik') { t.innerText = 'Tambah Tahun Akademik'; l.innerText = 'Nama Tahun Akademik (Cth: 2024/2025)'; } 
+            else if (type === 'hariEfektif') {
+                t.innerText = 'Tambah Hari Efektif Semester';
+                document.getElementById('wrap-md-nama').classList.add('hidden');
+                document.getElementById('md-nama').required = false;
+                document.getElementById('label-md-semester').innerText = 'Semester';
+                showReq('tahun-akademik'); showReq('semester'); showReq('tanggal-mulai'); showReq('tanggal-selesai'); showReq('jumlah-hari-efektif');
+                fillSelect('md-tahun-akademik', appData.tahunAkademik, 'Pilih Tahun Akademik...', ['Tahun Akademik','nama']);
+                fillSelect('md-semester', appData.semester, 'Pilih Semester...', ['Nama Semester','Semester','nama']);
+                document.getElementById('md-jumlah-hari-efektif').value = 24;
+            }
             else if (type === 'matakuliah') {
                 t.innerText = 'Tambah Mata Kuliah'; l.innerText = 'Nama Mata Kuliah';
                 showReq('kode'); showReq('sks'); showReq('prodi'); showReq('semester');
@@ -1978,6 +2181,7 @@
             else if (type === 'metode') { payload.sheetName = 'Metode'; payload.rowData = [v('nama')]; } 
             else if (type === 'semester') { payload.sheetName = 'Semester'; payload.rowData = [v('nama')]; } 
             else if (type === 'tahunAkademik') { payload.sheetName = 'TahunAkademik'; payload.rowData = [v('nama')]; } 
+            else if (type === 'hariEfektif') { payload.sheetName = 'HariEfektif'; payload.rowData = [v('tahun-akademik'), v('semester'), v('tanggal-mulai'), v('tanggal-selesai'), v('jumlah-hari-efektif')]; } 
             else if (type === 'matakuliah') { payload.sheetName = 'MataKuliah'; payload.rowData = [v('kode'), v('nama'), v('sks'), v('prodi'), v('semester')]; } 
             else if (type === 'dosen') {
                 const sel = Array.from(document.querySelectorAll('.prodi-checkbox:checked')).map(cb => cb.value).join(', ');
