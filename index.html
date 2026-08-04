@@ -492,7 +492,7 @@
                                         <i class="fas fa-table-cells"></i> Rekap Dosen Berbasis Jadwal & Mahasiswa Semester
                                     </div>
                                     <h2 class="text-xl md:text-2xl font-black text-gray-800 dark:text-white tracking-tight">Rekapitulasi Kehadiran</h2>
-                                    <p class="text-xs md:text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-2xl">Rekap dosen dihitung dari hari jadwal mengajar bulanan; metode luring/daring tetap diambil dari jurnal/presensi aktual.</p>
+                                    <p class="text-xs md:text-sm text-gray-500 dark:text-slate-400 mt-1 max-w-2xl">Rekap dosen dihitung per sesi jadwal yang sudah berlangsung dalam bulan terpilih; metode luring/daring tetap diambil dari jurnal/presensi aktual.</p>
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-3 w-full xl:w-auto">
@@ -573,7 +573,7 @@
                                 <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> S = Sakit</span>
                                 <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 border border-red-200"></span> A = Alpha</span>
                                 <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-200"></span> - = Belum ada data</span>
-                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> Dosen: L/D/C/TH diambil dari jurnal harian, bukan dari jadwal</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> Dosen: setiap sesi dihitung dari tanggal, dosen, mata kuliah, dan prodi; L/D/C/TH diambil dari jurnal</span>
                             </div>
 
                             <div class="rekap-no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 p-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700">
@@ -1444,16 +1444,72 @@
             return result;
         }
 
-        function expandJadwalKuliahForDosenMonth(rows, bulan) {
-            const range = getMonthRangeFromKey(bulan);
-            if (!range) return [];
+        function getTodayDateKey() {
+            return dateKey(new Date());
+        }
+
+        function getDosenScheduleSlotKey(dateKeyValue, dosen, mataKuliah, prodi) {
+            return [dateKeyValue, normalizeText(dosen), normalizeText(mataKuliah), normalizeText(prodi)].join('|');
+        }
+
+        function getEffectiveConfigForJadwalRow(row, meta) {
+            const tahunJadwal = getExplicitCol(row, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
+            const semesterJadwal = getExplicitCol(row, ['Semester', 'Nama Semester', 'semester']);
+
+            const candidates = (appData.hariEfektif || []).filter(he => {
+                const tahun = getExplicitCol(he, ['Tahun Akademik', 'TahunAkademik', 'tahunAkademik', 'Nama Tahun Akademik']);
+                const semester = getExplicitCol(he, ['Semester', 'Nama Semester', 'semester']);
+                const yearMatch = tahunJadwal
+                    ? normalizeText(tahun) === normalizeText(tahunJadwal)
+                    : (meta.tahun === 'All' || normalizeText(tahun) === normalizeText(meta.tahun));
+                const semesterMatch = semesterJadwal
+                    ? normalizeText(semester) === normalizeText(semesterJadwal)
+                    : (meta.semester === 'All' || normalizeText(semester) === normalizeText(meta.semester));
+                return yearMatch && semesterMatch;
+            });
+
+            const selected = candidates[0] || null;
+            return {
+                raw: selected,
+                start: selected ? getExplicitCol(selected, ['Tanggal Mulai', 'Mulai', 'Tanggal Awal']) : '',
+                end: selected ? getExplicitCol(selected, ['Tanggal Selesai', 'Selesai', 'Tanggal Akhir']) : ''
+            };
+        }
+
+        function getDosenMonthActiveRange(bulan, config) {
+            const monthRange = getMonthRangeFromKey(bulan);
+            if (!monthRange) return null;
+
+            let start = new Date(monthRange.start);
+            let end = new Date(monthRange.end);
+            const configStart = config && config.raw ? parseDateValue(config.start) : null;
+            const configEnd = config && config.raw ? parseDateValue(config.end) : null;
+            const today = parseDateValue(getTodayDateKey());
+
+            if (configStart && configStart > start) start = configStart;
+            if (configEnd && configEnd < end) end = configEnd;
+            if (today && today < end) end = today;
+
+            return start <= end ? { start, end } : null;
+        }
+
+        function expandJadwalKuliahForDosenMonth(rows, bulan, meta = {}) {
+            if (!bulan || bulan === 'All') return [];
 
             const expanded = [];
             (rows || []).forEach(row => {
-                const explicitHari = getExplicitCol(row, ['Hari', 'Hari Mengajar', 'hari']);
-                const dayIndex = explicitHari ? getDayIndexFromName(explicitHari) : -1;
+                const config = getEffectiveConfigForJadwalRow(row, meta);
+                const range = getDosenMonthActiveRange(bulan, config);
+                if (!range) return;
 
-                // Data baru: jadwal mingguan berbasis hari.
+                const explicitHari = getExplicitCol(row, ['Hari', 'Hari Kuliah', 'Hari Mengajar', 'hari']);
+                const dayIndex = explicitHari ? getDayIndexFromName(explicitHari) : -1;
+                const dosen = getExplicitCol(row, ['Dosen Pengampu', 'Dosen', 'Nama Dosen', 'dosen']);
+                const mataKuliah = getExplicitCol(row, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
+                const prodi = getExplicitCol(row, ['Prodi', 'Program Studi', 'prodi']);
+
+                // Jadwal mingguan dihitung hanya pada tanggal yang sudah berlangsung
+                // dan hanya di dalam periode efektif semester.
                 if (dayIndex >= 0 && dayIndex <= 6) {
                     const cursor = new Date(range.start);
                     while (cursor <= range.end) {
@@ -1461,10 +1517,12 @@
                             const y = cursor.getFullYear();
                             const m = String(cursor.getMonth() + 1).padStart(2, '0');
                             const d = String(cursor.getDate()).padStart(2, '0');
+                            const dKey = `${y}-${m}-${d}`;
                             expanded.push({
                                 ...row,
-                                __tanggalRekap: `${y}-${m}-${d}`,
-                                __hariJadwal: HARI_MENGAJAR[dayIndex]
+                                __tanggalRekap: dKey,
+                                __hariJadwal: HARI_MENGAJAR[dayIndex],
+                                __slotKey: getDosenScheduleSlotKey(dKey, dosen, mataKuliah, prodi)
                             });
                         }
                         cursor.setDate(cursor.getDate() + 1);
@@ -1472,14 +1530,15 @@
                     return;
                 }
 
-                // Fallback aman untuk data lama yang masih memakai tanggal spesifik.
+                // Kompatibilitas untuk jadwal lama yang memakai tanggal tertentu.
                 const legacyDateKey = dateKey(getExplicitCol(row, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
-                if (legacyDateKey && monthKey(legacyDateKey) === bulan) {
-                    const date = parseDateValue(legacyDateKey);
+                const legacyDate = parseDateValue(legacyDateKey);
+                if (legacyDateKey && legacyDate && legacyDate >= range.start && legacyDate <= range.end) {
                     expanded.push({
                         ...row,
                         __tanggalRekap: legacyDateKey,
-                        __hariJadwal: date ? HARI_MENGAJAR[date.getDay()] : ''
+                        __hariJadwal: HARI_MENGAJAR[legacyDate.getDay()] || '',
+                        __slotKey: getDosenScheduleSlotKey(legacyDateKey, dosen, mataKuliah, prodi)
                     });
                 }
             });
@@ -1535,7 +1594,7 @@
         function getDosenMonthlyJadwal(meta) {
             const rows = getRekapDosenBaseJadwal(meta);
             if (!meta.bulan || meta.bulan === 'All') return [];
-            return expandJadwalKuliahForDosenMonth(rows, meta.bulan);
+            return expandJadwalKuliahForDosenMonth(rows, meta.bulan, meta);
         }
 
         function populateRekapBulan() {
@@ -1578,15 +1637,28 @@
                 el.innerHTML += `<option value="${escapeHtml(v)}">${escapeHtml(formatMonthId(v))}</option>`;
             });
 
-            if (list.includes(selectedValue)) el.value = selectedValue;
-            else if (list.length > 0) el.value = list[list.length - 1];
-            else el.value = 'All';
+            if (list.includes(selectedValue)) {
+                el.value = selectedValue;
+            } else if (list.length > 0) {
+                const now = new Date();
+                const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                const elapsedMonths = list.filter(v => v <= currentMonthKey);
+                el.value = list.includes(currentMonthKey)
+                    ? currentMonthKey
+                    : (elapsedMonths[elapsedMonths.length - 1] || list[0]);
+            } else {
+                el.value = 'All';
+            }
         }
 
         function getDosenMonthlyJurnal(meta) {
             const rows = getRekapDosenBaseJurnal(meta);
             if (!meta.bulan || meta.bulan === 'All') return [];
-            return rows.filter(j => monthKey(getExplicitCol(j, ['Tanggal', 'tanggal'])) === meta.bulan);
+            const todayKey = getTodayDateKey();
+            return rows.filter(j => {
+                const dKey = dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
+                return dKey && monthKey(dKey) === meta.bulan && dKey <= todayKey;
+            });
         }
 
         function buildDosenMonthlyColumns(jadwal, jurnal) {
@@ -2088,10 +2160,13 @@
             return `<td class="px-1.5 py-1.5 border-r border-gray-100 dark:border-slate-800 ${cls}"${titleAttr}><div class="min-h-[24px] flex flex-col items-center justify-center leading-none"><span>${short}</span>${methodHtml}</div></td>`;
         }
 
-        function buildPercentCell(hadir, total) {
-            const percent = total > 0 ? Math.round((hadir / total) * 100) : 0;
+        function buildPercentCell(hadir, total, hasValidSchedule = true) {
+            if (!hasValidSchedule || total <= 0) {
+                return '<span class="font-black text-gray-400" title="Persentase tidak dihitung karena jadwal kuliah belum tersedia">-</span>';
+            }
+            const percent = Math.round((hadir / total) * 100);
             const textColor = percent >= 75 ? 'text-green-600' : percent >= 50 ? 'text-yellow-600' : 'text-red-500';
-            return `<span class="font-black ${textColor}">${percent}%</span>`;
+            return `<span class="font-black ${textColor}" title="${hadir} hadir dari ${total} sesi terjadwal">${percent}%</span>`;
         }
 
         function rowMatchesKeyword(item, keyword) {
@@ -2170,8 +2245,8 @@
 
                 if (isDosenTab) {
                     if (meta.bulan && meta.bulan !== 'All') {
-                        const sourceInfo = hasDosenSchedule ? 'Persentase dosen dihitung dari jumlah tanggal mengajar dalam bulan terpilih berdasarkan Jadwal Kuliah.' : 'Belum ada Jadwal Kuliah berbasis hari untuk bulan ini, jadi persentase sementara masih dihitung dari tanggal jurnal yang sudah terisi.';
-                        info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Rekap dosen bulanan:</strong> ${escapeHtml(formatMonthId(meta.bulan))}${prodiInfo}${mkInfo} · ${dosenColumns.length} tanggal/pertemuan. ${sourceInfo} Kode di sel tanggal: H/L, H/D, A/TH, dan seterusnya.`;
+                        const sourceInfo = hasDosenSchedule ? 'Persentase dosen dihitung per sesi jadwal yang sudah berlangsung. Untuk bulan berjalan, jadwal setelah hari ini belum masuk perhitungan.' : 'Jadwal Kuliah belum tersedia, sehingga persentase dosen tidak dihitung dan ditampilkan sebagai tanda -.';
+                        info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Rekap dosen bulanan:</strong> ${escapeHtml(formatMonthId(meta.bulan))}${prodiInfo}${mkInfo} · ${jadwalKuliahDosen.length} sesi pada ${dosenColumns.length} tanggal. ${sourceInfo} Jika ada beberapa sesi pada tanggal yang sama, sel menampilkan jumlah hadir/jumlah sesi.`;
                     } else {
                         info.innerHTML = `<strong class="text-gray-700 dark:text-slate-200">Belum ada bulan dosen yang bisa dipilih.</strong> Rekap dosen akan muncul setelah Jadwal Kuliah berbasis hari atau jurnal/presensi dosen memiliki tanggal yang valid.`;
                     }
@@ -2193,11 +2268,89 @@
             switchRekapTab(activeRekapTab, false);
         }
 
+        function buildDosenSessionCell(item, column, hasSchedule) {
+            const dKey = column.key;
+            if (!dKey) return statusCell('');
+
+            const sessions = item.scheduleByDate && item.scheduleByDate[dKey]
+                ? item.scheduleByDate[dKey]
+                : [];
+
+            if (!hasSchedule || sessions.length === 0) {
+                const fallbackStatus = item.fallbackStatusByDate ? item.fallbackStatusByDate[dKey] : '';
+                const fallbackMethods = item.fallbackMethodsByDate ? item.fallbackMethodsByDate[dKey] : null;
+                const methodInfo = buildTeachingMethodInfo(fallbackMethods);
+                return statusCell(fallbackStatus, methodInfo.title ? `Metode: ${methodInfo.title}` : '', methodInfo.code);
+            }
+
+            let hadir = 0;
+            let izin = 0;
+            let sakit = 0;
+            let alpha = 0;
+            const methodSet = new Set();
+            const detail = [];
+
+            sessions.forEach(session => {
+                const status = item.statusBySession[session.slotKey] || 'Alpha';
+                const short = getStatusShort(status);
+                if (short === 'H') hadir++;
+                else if (short === 'I') izin++;
+                else if (short === 'S') sakit++;
+                else alpha++;
+
+                const sessionMethods = item.methodsBySession[session.slotKey];
+                if (sessionMethods) sessionMethods.forEach(method => methodSet.add(method));
+                detail.push(`${session.mataKuliah || 'Mata kuliah'}: ${status}`);
+            });
+
+            const total = sessions.length;
+            const methodInfo = buildTeachingMethodInfo(methodSet);
+            const title = [
+                `Jadwal ${total} sesi`,
+                `Hadir ${hadir}`,
+                izin ? `Izin ${izin}` : '',
+                sakit ? `Sakit ${sakit}` : '',
+                alpha ? `Tidak hadir ${alpha}` : '',
+                detail.join('; '),
+                methodInfo.title ? `Metode: ${methodInfo.title}` : ''
+            ].filter(Boolean).join(' | ');
+
+            if (total === 1) {
+                const status = item.statusBySession[sessions[0].slotKey] || 'Alpha';
+                return statusCell(status, title, methodInfo.code || (status === 'Alpha' ? 'TH' : ''));
+            }
+
+            const cls = hadir === total
+                ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
+                : hadir > 0
+                    ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400'
+                    : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400';
+            const methodHtml = methodInfo.code
+                ? `<div class="mt-0.5 text-[8px] leading-none font-black opacity-80">${escapeHtml(methodInfo.code)}</div>`
+                : '';
+            return `<td class="px-1.5 py-1.5 border-r border-gray-100 dark:border-slate-800 ${cls}" title="${escapeHtml(title)}"><div class="min-h-[24px] flex flex-col items-center justify-center leading-none"><span class="font-black">${hadir}/${total}</span>${methodHtml}</div></td>`;
+        }
+
         function renderRekapDosenGrid(jurnal, columns, meta, jadwal = [], hasSchedule = false) {
             const container = document.getElementById('rekapDosenGrid');
             if (!container) return;
 
             const map = {};
+            const makeItem = (nama, keterangan = '-', extra = '-') => ({
+                nama,
+                keterangan,
+                extra,
+                metodeSet: new Set(),
+                scheduleByDate: {},
+                scheduleBySlot: {},
+                statusBySession: {},
+                methodsBySession: {},
+                fallbackStatusByDate: {},
+                fallbackMethodsByDate: {},
+                hadir: 0,
+                totalJadwal: 0
+            });
+
             const useMasterRows = !hasSchedule && (!meta.mataKuliah || meta.mataKuliah === 'All');
             if (useMasterRows) {
                 appData.dosen.forEach(d => {
@@ -2205,20 +2358,11 @@
                     if (!nama || nama === '-') return;
                     const dosenProdi = getCol(d, ['Program Studi', 'Prodi', 'prodi']);
                     if (!prodiMatchesFilter(dosenProdi, meta.prodi)) return;
-                    map[normalizeText(nama)] = {
-                        nama,
-                        keterangan: dosenProdi,
-                        extra: getCol(d, ['NIDN', 'NIP', 'nidn']),
-                        metodeSet: new Set(),
-                        metodeByDate: {},
-                        statusByDate: {},
-                        scheduleByDate: {},
-                        hadir: 0,
-                        totalJadwal: 0
-                    };
+                    map[normalizeText(nama)] = makeItem(nama, dosenProdi, getCol(d, ['NIDN', 'NIP', 'nidn']));
                 });
             }
 
+            // Setiap kombinasi tanggal, dosen, mata kuliah, dan prodi dihitung satu sesi.
             (jadwal || []).forEach(j => {
                 const nama = getExplicitCol(j, ['Dosen Pengampu', 'Dosen', 'Nama Dosen', 'dosen']);
                 const key = normalizeText(nama);
@@ -2226,77 +2370,91 @@
                 if (!key || !dKey || nama === '-') return;
 
                 const jadwalProdi = getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']);
-                const mk = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
-                const hariJadwal = j.__hariJadwal || normalizeHariMengajar(getExplicitCol(j, ['Hari', 'Hari Mengajar', 'hari'])) || normalizeHariMengajar(getExplicitCol(j, ['Tanggal', 'Tanggal Jadwal', 'tanggal']));
-                if (!map[key]) {
-                    map[key] = {
-                        nama,
-                        keterangan: jadwalProdi || '-',
-                        extra: mk || '-',
-                        metodeSet: new Set(),
-                        metodeByDate: {},
-                        scheduleByDate: {},
-                        statusByDate: {},
-                        hadir: 0,
-                        totalJadwal: 0
-                    };
-                }
-                if (!map[key].scheduleByDate) map[key].scheduleByDate = {};
+                const mataKuliah = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
+                const hari = j.__hariJadwal || normalizeHariMengajar(getExplicitCol(j, ['Hari', 'Hari Kuliah', 'Hari Mengajar', 'hari']));
+                const slotKey = j.__slotKey || getDosenScheduleSlotKey(dKey, nama, mataKuliah, jadwalProdi);
+
+                if (!map[key]) map[key] = makeItem(nama, jadwalProdi || '-', mataKuliah || '-');
+                if (map[key].scheduleBySlot[slotKey]) return; // cegah jadwal ganda identik
+
+                const session = { slotKey, dateKey: dKey, mataKuliah, prodi: jadwalProdi, hari };
+                map[key].scheduleBySlot[slotKey] = session;
                 if (!map[key].scheduleByDate[dKey]) map[key].scheduleByDate[dKey] = [];
-                map[key].scheduleByDate[dKey].push({ mataKuliah: mk, hari: hariJadwal, prodi: jadwalProdi });
-                if (mk && mk !== '-') map[key].extra = mk;
+                map[key].scheduleByDate[dKey].push(session);
+                if (mataKuliah && mataKuliah !== '-') map[key].extra = mataKuliah;
                 if (jadwalProdi && jadwalProdi !== '-') map[key].keterangan = jadwalProdi;
             });
 
             jurnal.forEach(j => {
                 const nama = getExplicitCol(j, ['Dosen Pengampu', 'Dosen', 'Nama Dosen', 'dosen']);
                 const key = normalizeText(nama);
-                if (!key || nama === '-') return;
+                const dKey = dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
+                if (!key || !dKey || nama === '-') return;
+
                 const jurnalProdi = getExplicitCol(j, ['Prodi', 'Program Studi', 'prodi']);
+                const mataKuliah = getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']);
                 if (!map[key]) {
                     if (hasSchedule) return;
                     if (!prodiMatchesFilter(jurnalProdi, meta.prodi)) return;
-                    map[key] = {
-                        nama,
-                        keterangan: jurnalProdi,
-                        extra: getExplicitCol(j, ['Mata Kuliah', 'MataKuliah', 'mataKuliah']),
-                        metodeSet: new Set(),
-                        metodeByDate: {},
-                        statusByDate: {},
-                        scheduleByDate: {},
-                        hadir: 0,
-                        totalJadwal: 0
-                    };
+                    map[key] = makeItem(nama, jurnalProdi, mataKuliah);
                 }
-                const dKey = dateKey(getExplicitCol(j, ['Tanggal', 'tanggal']));
-                if (!dKey) return;
-                const rawStatus = getExplicitCol(j, ['Status Dosen', 'Kehadiran Dosen', 'Presensi Dosen', 'Status Kehadiran Dosen']);
+
                 const metode = getExplicitCol(j, ['Metode', 'Metode Perkuliahan', 'Metode Mengajar', 'Nama Metode', 'metode']);
+                const rawStatus = getExplicitCol(j, ['Status Dosen', 'Kehadiran Dosen', 'Presensi Dosen', 'Status Kehadiran Dosen']);
+                const inferredTidakHadir = methodMeansTidakHadir(metode);
+                const nextStatus = rawStatus ? normalizeAttendanceStatus(rawStatus) : (inferredTidakHadir ? 'Alpha' : 'Hadir');
+
+                if (!hasSchedule) {
+                    if (metode && metode !== '-') {
+                        if (!map[key].fallbackMethodsByDate[dKey]) map[key].fallbackMethodsByDate[dKey] = new Set();
+                        map[key].fallbackMethodsByDate[dKey].add(metode);
+                    }
+                    const current = map[key].fallbackStatusByDate[dKey];
+                    if (!current || getStatusShort(nextStatus) === 'H' || getStatusShort(current) !== 'H') {
+                        map[key].fallbackStatusByDate[dKey] = nextStatus;
+                    }
+                    return;
+                }
+
+                const sessionsOnDate = map[key].scheduleByDate[dKey] || [];
+                if (sessionsOnDate.length === 0) return;
+
+                const exactSlotKey = getDosenScheduleSlotKey(dKey, nama, mataKuliah, jurnalProdi);
+                let session = map[key].scheduleBySlot[exactSlotKey] || null;
+
+                // Fallback untuk data lama yang penamaan prodi/mata kuliahnya sedikit berbeda.
+                if (!session) {
+                    const mkMatches = sessionsOnDate.filter(s => normalizeText(s.mataKuliah) === normalizeText(mataKuliah));
+                    const prodiMatches = mkMatches.filter(s => normalizeText(s.prodi) === normalizeText(jurnalProdi));
+                    if (prodiMatches.length === 1) session = prodiMatches[0];
+                    else if (mkMatches.length === 1) session = mkMatches[0];
+                    else {
+                        const unmatched = sessionsOnDate.filter(s => !map[key].statusBySession[s.slotKey]);
+                        if (unmatched.length === 1) session = unmatched[0];
+                    }
+                }
+                if (!session) return;
+
                 if (metode && metode !== '-') {
                     map[key].metodeSet.add(metode);
-                    if (!map[key].metodeByDate[dKey]) map[key].metodeByDate[dKey] = new Set();
-                    map[key].metodeByDate[dKey].add(metode);
+                    if (!map[key].methodsBySession[session.slotKey]) map[key].methodsBySession[session.slotKey] = new Set();
+                    map[key].methodsBySession[session.slotKey].add(metode);
                 }
-                const inferredTidakHadir = methodMeansTidakHadir(map[key].metodeByDate[dKey]);
-                const nextStatus = rawStatus ? normalizeAttendanceStatus(rawStatus) : (inferredTidakHadir ? 'Alpha' : 'Hadir');
-                const currentStatus = map[key].statusByDate[dKey];
-                // Jika ada lebih dari satu jurnal di tanggal yang sama, Hadir diprioritaskan agar dosen tetap terhitung hadir bila ada sesi mengajar valid.
-                if (!currentStatus || getStatusShort(nextStatus) === 'H' || getStatusShort(currentStatus) !== 'H') {
-                    map[key].statusByDate[dKey] = nextStatus;
+
+                const current = map[key].statusBySession[session.slotKey];
+                if (!current || getStatusShort(nextStatus) === 'H' || getStatusShort(current) !== 'H') {
+                    map[key].statusBySession[session.slotKey] = nextStatus;
                 }
                 if ((!map[key].keterangan || map[key].keterangan === '-') && jurnalProdi && jurnalProdi !== '-') map[key].keterangan = jurnalProdi;
             });
 
             let items = Object.values(map).filter(item => rowMatchesKeyword(item, meta.keyword));
             items.forEach(item => {
-                item.hadir = columns.filter(c => {
-                    if (!c.key) return false;
-                    if (hasSchedule && !(item.scheduleByDate && item.scheduleByDate[c.key])) return false;
-                    return item.statusByDate[c.key] && getStatusShort(item.statusByDate[c.key]) === 'H';
-                }).length;
-                item.totalJadwal = hasSchedule
-                    ? columns.filter(c => c.key && item.scheduleByDate && item.scheduleByDate[c.key]).length
-                    : columns.length;
+                const sessions = Object.values(item.scheduleBySlot || {});
+                item.totalJadwal = hasSchedule ? sessions.length : 0;
+                item.hadir = hasSchedule
+                    ? sessions.filter(session => getStatusShort(item.statusBySession[session.slotKey] || 'Alpha') === 'H').length
+                    : Object.values(item.fallbackStatusByDate || {}).filter(status => getStatusShort(status) === 'H').length;
             });
             items.sort((a, b) => b.hadir - a.hadir || a.nama.localeCompare(b.nama, 'id'));
 
@@ -2306,15 +2464,7 @@
             }
 
             container.innerHTML = items.map(item => {
-                const cells = columns.map(c => {
-                    const scheduled = c.key && item.scheduleByDate && item.scheduleByDate[c.key];
-                    const metodeInfo = c.key ? buildTeachingMethodInfo(item.metodeByDate[c.key]) : { code: '', title: '' };
-                    const scheduleTitle = scheduled ? `Jadwal: ${item.scheduleByDate[c.key].map(x => [x.hari, x.mataKuliah].filter(Boolean).join(' - ')).join('; ')}` : '';
-                    const title = [metodeInfo.title ? `Metode: ${metodeInfo.title}` : '', scheduleTitle, (hasSchedule && scheduled && !item.statusByDate[c.key]) ? 'Terjadwal, tetapi belum ada jurnal/presensi' : ''].filter(Boolean).join(' | ');
-                    const statusValue = c.key ? (item.statusByDate[c.key] || (hasSchedule && scheduled ? 'Alpha' : '')) : '';
-                    const codeValue = metodeInfo.code || (hasSchedule && scheduled && !item.statusByDate[c.key] ? 'TH' : '');
-                    return statusCell(statusValue, title, codeValue);
-                }).join('');
+                const cells = columns.map(c => buildDosenSessionCell(item, c, hasSchedule)).join('');
                 return `
                     <tr class="hover:bg-gray-50 dark:hover:bg-slate-900/40 transition-colors">
                         <td class="px-3 py-2 text-left sticky left-0 z-10 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 min-w-[190px]">
@@ -2324,7 +2474,7 @@
                         <td class="px-3 py-2 text-left text-gray-600 dark:text-slate-300 border-r border-gray-200 dark:border-slate-700 min-w-[175px]">${escapeHtml(item.keterangan || '-')}</td>
                         ${cells}
                         <td class="px-3 py-2 font-black text-gray-800 dark:text-white border-l border-gray-200 dark:border-slate-700">${item.hadir}</td>
-                        <td class="px-3 py-2">${buildPercentCell(item.hadir, item.totalJadwal || columns.length)}</td>
+                        <td class="px-3 py-2">${buildPercentCell(item.hadir, item.totalJadwal, hasSchedule)}</td>
                     </tr>
                 `;
             }).join('');
